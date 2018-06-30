@@ -58,6 +58,7 @@
     "blue-tape": "^1.0.0",
     "brolog": "^1.6.5",
     "clone-class": "^0.6.19",
+    "eslint": "^5.0.1",
     "file-box": "^0.8.22",
     "git-scripts": "^0.2.1",
     "hot-import": "^0.2.1",

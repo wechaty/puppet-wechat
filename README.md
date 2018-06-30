@@ -10,6 +10,9 @@
 
 Wechaty Puppet for Puppeteer
 
+* This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-puppeteer/issues/1>
+* Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/Chatie/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
+
 ## AUTHOR
 
 [Huan LI](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
