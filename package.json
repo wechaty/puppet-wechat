@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-puppeteer",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Puppet Puppeteer for Wechaty",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
