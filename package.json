@@ -55,6 +55,7 @@
     "@types/semver": "^5.5.0",
     "@types/sinon": "^5.0.1",
     "@types/xml2json": "^0.10.0",
+    "babel-eslint": "^8.2.5",
     "blue-tape": "^1.0.0",
     "brolog": "^1.6.5",
     "clone-class": "^0.6.19",
