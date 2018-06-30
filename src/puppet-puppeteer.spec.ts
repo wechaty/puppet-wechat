@@ -18,12 +18,16 @@
  *
  */
 // tslint:disable:no-shadowed-variable
+// tslint:disable:no-var-requires
+// tslint:disable:only-arrow-functions
+// tslint:disable:arrow-parens
+
 import test  from 'blue-tape'
 import sinon from 'sinon'
 const sinonTest   = require('sinon-test')(sinon, {
   useFakeTimers: {  // https://github.com/sinonjs/lolex
-    shouldAdvanceTime : true,
     advanceTimeDelta  : 10,
+    shouldAdvanceTime : true,
   },
 })
 
@@ -32,29 +36,18 @@ const sinonTest   = require('sinon-test')(sinon, {
 
 import { MemoryCard }      from 'memory-card'
 
-import { Wechaty }      from '../wechaty'
-
-import { PuppetPuppeteer }  from './puppet-puppeteer'
 import { Bridge }           from './bridge'
 import { Event }            from './event'
-
-class WechatyTest extends Wechaty {
-  public initPuppetAccessory(puppet: PuppetPuppeteer) {
-    super.initPuppetAccessory(puppet)
-  }
-  public initPuppetEventBridge(puppet: PuppetPuppeteer) {
-    super.initPuppetEventBridge(puppet)
-  }
-}
+import { PuppetPuppeteer }  from './puppet-puppeteer'
 
 class PuppetTest extends PuppetPuppeteer {
-  public contactRawPayload(id: string) {
+  public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
-  public roomRawPayload(id: string) {
+  public roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
-  public messageRawPayload(id: string) {
+  public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
 }
@@ -74,10 +67,6 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
   const sandbox = sinon.createSandbox()
   try {
     const puppet  = new PuppetTest({ memory: new MemoryCard() })
-    const wechaty = new WechatyTest({ puppet })
-
-    wechaty.initPuppetAccessory(puppet)
-    wechaty.initPuppetEventBridge(puppet)
 
     sandbox.stub(Event, 'onScan') // block the scan event to prevent reset logined user
 
@@ -97,7 +86,7 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
     t.pass('should be inited')
     t.is(puppet.logonoff() , false  , 'should be not logined')
 
-    const future = new Promise(r => wechaty.once('login', r))
+    const future = new Promise(r => puppet.once('login', r))
               .catch(e => t.fail(e))
     puppet.bridge.emit('login', 'TestPuppetPuppeteer')
     await future
@@ -110,7 +99,7 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
     t.ok((Bridge.prototype.contactList as any).called,       'contactList stub should be called')
     t.is((Bridge.prototype.contactList as any).callCount, 4, 'should call stubContacList 4 times')
 
-    const logoutPromise = new Promise(resolve => puppet.once('logout', _ => resolve('logoutFired')))
+    const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')
     t.is(await logoutPromise, 'logoutFired', 'should fire logout event')
     t.is(puppet.logonoff(), false, 'should be logouted')

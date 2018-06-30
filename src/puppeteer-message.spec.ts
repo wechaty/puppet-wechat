@@ -17,7 +17,12 @@
  *   limitations under the License.
  *
  */
+
 // tslint:disable:no-shadowed-variable
+// tslint:disable:max-classes-per-file
+// tslint:disable:arrow-parens
+// tslint:disable:ter-no-irregular-whitespace
+
 import test  from 'blue-tape'
 import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
@@ -26,19 +31,16 @@ import {
   MemoryCard,
 }               from 'memory-card'
 
+import Wechaty    from 'wechaty'
+
 import {
   // config,
   log,
-}                 from '../config'
-import Wechaty    from '../wechaty'
+}                 from './config'
 
 import {
   MessagePayload,
 }                 from 'wechaty-puppet'
-
-import {
-  Message,
- }                  from '../user'
 
 import {
   PuppetPuppeteer,
@@ -49,19 +51,19 @@ import {
 }                         from './web-schemas'
 
 class WechatyTest extends Wechaty {
-  public initPuppetAccessory(puppet: PuppetPuppeteer) {
+  public initPuppetAccessory (puppet: PuppetPuppeteer) {
     super.initPuppetAccessory(puppet)
   }
 }
 
 class PuppetTest extends PuppetPuppeteer {
-  public contactRawPayload(id: string) {
+  public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
-  public roomRawPayload(id: string) {
+  public roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
-  public messageRawPayload(id: string) {
+  public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
 }
@@ -81,19 +83,19 @@ test('constructor()', async t => {
   const rawPayload: WebMessageRawPayload = JSON.parse('{"MsgId":"179242112323992762","FromUserName":"@0bb3e4dd746fdbd4a80546aef66f4085","ToUserName":"@16d20edf23a3bf3bc71bb4140e91619f3ff33b4e33f7fcd25e65c1b02c7861ab","MsgType":1,"Content":"test123","Status":3,"ImgStatus":1,"CreateTime":1461652670,"VoiceLength":0,"PlayLength":0,"FileName":"","FileSize":"","MediaId":"","Url":"","AppMsgType":0,"StatusNotifyCode":0,"StatusNotifyUserName":"","RecommendInfo":{"UserName":"","NickName":"","QQNum":0,"Province":"","City":"","Content":"","Signature":"","Alias":"","Scene":0,"VerifyFlag":0,"AttrStatus":0,"Sex":0,"Ticket":"","OpCode":0},"ForwardFlag":0,"AppInfo":{"AppID":"","Type":0},"HasProductId":0,"Ticket":"","ImgHeight":0,"ImgWidth":0,"SubMsgType":0,"NewMsgId":179242112323992770,"MMPeerUserName":"@0bb3e4dd746fdbd4a80546aef66f4085","MMDigest":"test123","MMIsSend":false,"MMIsChatRoom":false,"MMUnread":true,"LocalID":"179242112323992762","ClientMsgId":"179242112323992762","MMActualContent":"test123","MMActualSender":"@0bb3e4dd746fdbd4a80546aef66f4085","MMDigestTime":"14:37","MMDisplayTime":1461652670,"MMTime":"14:37"}')
 
   const EXPECTED = {
-    id:     '179242112323992762',
     from:   '@0bb3e4dd746fdbd4a80546aef66f4085',
+    id:     '179242112323992762',
   }
   const msg = wechaty.Message.create(rawPayload.MsgId)
 
   const sandbox = sinon.createSandbox()
   const mockMessagePayload = (_: string) => {
     const payload: MessagePayload = {
-      id        : 'id',
-      type      : Message.Type.Text,
       fromId    : EXPECTED.from,
+      id        : 'id',
       timestamp : Date.now(),
       toId      : 'toId',
+      type      : wechaty.Message.Type.Text,
     }
     return payload
   }
@@ -135,21 +137,21 @@ test('ready()', async t => {
   const expectedMsgId        = '3009511950433684462'
 
   // Mock
-  function mockContactRawPayload(id: string) {
+  function mockContactRawPayload (id: string) {
     log.silly('TestMessage', `mocked getContact(%s)`, id)
     return new Promise(resolve => {
       let obj = {}
       switch (id) {
         case expectedFromUserName:
           obj = {
-            UserName: expectedFromUserName,
             NickName: expectedFromNickName,
+            UserName: expectedFromUserName,
           }
           break
         case expectedToUserName:
           obj = {
-            UserName: expectedToUserName,
             NickName: expectedToNickName,
+            UserName: expectedToUserName,
           }
           break
         default:
@@ -158,14 +160,14 @@ test('ready()', async t => {
           break
       }
       log.silly('TestMessage', 'setTimeout mocked getContact')
-      setTimeout(_ => {
+      setTimeout(() => {
         log.silly('TestMessage', 'mocked getContact resolved')
         return resolve(obj)
       }, 100)
     })
   }
 
-  function mockMessageRawPayload(id: string) {
+  function mockMessageRawPayload (id: string) {
     if (id === rawPayload.MsgId) {
       return rawPayload
     }
@@ -174,7 +176,7 @@ test('ready()', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetTest({ memory: new MemoryCard })
+  const puppet = new PuppetTest({ memory: new MemoryCard() })
 
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
@@ -259,13 +261,13 @@ test('self()', async t => {
 
   const MOCK_CONTACT = wechaty.Contact.load(MOCK_USER_ID)
 
-  function mockMessagePayload() {
+  function mockMessagePayload () {
     const payload: MessagePayload = {
-      id        : 'id',
       fromId    : MOCK_CONTACT.id,
+      id        : 'id',
+      timestamp : Date.now(),
       toId      : 'to_id',
       type      : wechaty.Message.Type.Text,
-      timestamp : Date.now(),
     }
     return payload
   }
@@ -324,7 +326,7 @@ test('mentioned()', async t => {
   const ROOM_ID = '@@9cdc696e490bd76c57e7dd54792dc1408e27d65e312178b1943e88579b7939f4'
 
   // Mock
-  const mockContactRawPayload = function (id: string) {
+  const mockContactRawPayload = (id: string) => {
     log.silly('PuppeteerMessageTest', 'mockContactRawPayload(%s)', id)
     return new Promise((resolve, reject) => {
       if (id in CONTACT_RAW_PAYLOAD_DICT) {
@@ -336,7 +338,7 @@ test('mentioned()', async t => {
     })
   }
 
-  const mockRoomRawPayload = function (id: string) {
+  const mockRoomRawPayload = (id: string) => {
     log.silly('PuppeteerMessageTest', 'mockRoomRawPayload(%s)', id)
     return new Promise((resolve, reject) => {
       if (id === ROOM_ID) {
@@ -347,7 +349,7 @@ test('mentioned()', async t => {
     })
   }
 
-  const mockMessageRawPayload = function (id: string) {
+  const mockMessageRawPayload = (id: string) => {
     log.silly('PuppeteerMessageTest', 'mockMessageRawPayload(%s)', id)
     return new Promise((resolve, reject) => {
       switch (id) {

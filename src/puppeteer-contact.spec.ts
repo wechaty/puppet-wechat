@@ -18,7 +18,9 @@
  *   limitations under the License.
  *
  */
+// tslint:disable:arrow-parens
 // tslint:disable:no-shadowed-variable
+
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
@@ -31,11 +33,11 @@ import {
 
 import {
   log,
-}              from '../config'
+}              from './config'
 
 // import Wechaty from '../wechaty'
 
-import { Contact } from '../user'
+import { Contact } from 'wechaty'
 
 import PuppetPuppeteer  from './puppet-puppeteer'
 
@@ -48,14 +50,14 @@ test('Contact smoke testing', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  function mockContactPayload(id: string) {
+  function mockContactPayload (id: string) {
     log.verbose('PuppeteerContactTest', 'mockContactPayload(%s)', id)
     return new Promise<any>(resolve => {
       if (id !== UserName) return resolve({})
       setImmediate(() => resolve({
-        UserName:   UserName,
-        NickName:   NickName,
-        RemarkName: RemarkName,
+        NickName,
+        RemarkName,
+        UserName,
       }))
     })
   }
@@ -68,7 +70,7 @@ test('Contact smoke testing', async t => {
 
   // tslint:disable-next-line:variable-name
   const MyContact = cloneClass(Contact)
-  MyContact.puppet = puppet
+  MyContact.puppet = puppet as any  // FIXME: any
 
   const c = new MyContact(UserName)
   t.is(c.id, UserName, 'id/UserName right')

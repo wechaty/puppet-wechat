@@ -16,6 +16,9 @@
  *   limitations under the License.
  *
  */
+
+// tslint:disable:max-line-length
+
 export interface WebContactRawPayload {
   Alias:        string,
   City:         string,
@@ -29,7 +32,7 @@ export interface WebContactRawPayload {
   UserName:     string,
   HeadImgUrl:   string,
 
-  stranger:     string, // assign by injectio.js
+  stranger?:    string, // assign by injectio.js
   VerifyFlag:   number,
 }
 

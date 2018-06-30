@@ -18,7 +18,11 @@
  *   limitations under the License.
  *
  */
+
 // tslint:disable:no-shadowed-variable
+// tslint:disable:max-classes-per-file
+// tslint:disable:arrow-parens
+
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
@@ -29,11 +33,11 @@ import {
 
 import {
   log,
-}                 from '../config'
+}                 from './config'
 
 import {
   Wechaty,
-}                 from '../wechaty'
+}                 from 'wechaty'
 
 import {
   PuppetPuppeteer,
@@ -43,7 +47,7 @@ import {
 }                     from './web-schemas'
 
 class WechatyTest extends Wechaty {
-  public initPuppetAccessory(puppet: PuppetPuppeteer) {
+  public initPuppetAccessory (puppet: PuppetPuppeteer) {
     super.initPuppetAccessory(puppet)
   }
 }
@@ -57,22 +61,22 @@ const ROOM_RAW_PAYLOAD: WebRoomRawPayload = JSON.parse(`{"RemarkPYQuanPin":"","R
 const CONTACT_RAW_PAYLOAD_DICT            = JSON.parse(`{"@ad85207730aa94e006ddce28f74e6878":{ "UserName": "@ad85207730aa94e006ddce28f74e6878","NickName": "田美坤Maggie","RemarkName": "" },"@72c4767ce32db488871fdd1c27173b81":{ "UserName": "@72c4767ce32db488871fdd1c27173b81","NickName": "李竹～英诺天使（此号已满）","RemarkName": "" },"@ecff4a7a86f23455dc42317269aa36ab":{ "UserName": "@ecff4a7a86f23455dc42317269aa36ab","NickName": "童玮亮","RemarkName": "童玮亮备注" }}`)
 
 const ROOM_EXPECTED = {
-  id:           '@@e2355db381dc46a77c0b95516d05e7486135cb6370d8a6af66925d89d50ec278',
-  topic:        '（通知）中国青年天使会官方家',
   encryId:      '@4b8baa99bdfc354443711412126d2aaf',
+  id:           '@@e2355db381dc46a77c0b95516d05e7486135cb6370d8a6af66925d89d50ec278',
   memberId1:    '@ad85207730aa94e006ddce28f74e6878',
-  memberNick1:  '田美坤',
   memberId2:    '@72c4767ce32db488871fdd1c27173b81',
-  memberNick2:  '李竹～英诺天使（此号已满）',
   memberId3:    '@ecff4a7a86f23455dc42317269aa36ab',
+  memberNick1:  '田美坤',
+  memberNick2:  '李竹～英诺天使（此号已满）',
   memberNick3:  '童玮亮备注',
   ownerId:      '@33cc239d22b20d56395bbbd0967b28b9',
+  topic:        '（通知）中国青年天使会官方家',
 }
 
 test('Room smok testing', async t => {
 
   // Mock
-  const mockContactRoomRawPayload = function (id: string) {
+  const mockContactRoomRawPayload = (id: string) => {
     log.verbose('PuppeteerRoomTest', 'mockContactRawPayload(%s)', id)
     return new Promise(resolve => {
       if (id === ROOM_EXPECTED.id) {
@@ -81,7 +85,7 @@ test('Room smok testing', async t => {
         setImmediate(() => resolve(CONTACT_RAW_PAYLOAD_DICT[id]))
       } else {
         // ignore other ids
-        setImmediate(() => resolve({id}))
+        setImmediate(() => resolve({ id }))
       }
     })
   }
@@ -140,7 +144,7 @@ test('Room smok testing', async t => {
 
   const contactB = await room.member(ROOM_EXPECTED.memberNick2)
   const contactC = await room.member(ROOM_EXPECTED.memberNick3)
-  const contactD = await room.member({roomAlias: ROOM_EXPECTED.memberNick1})
+  const contactD = await room.member({ roomAlias: ROOM_EXPECTED.memberNick1 })
   if (!contactB) {
     throw new Error(`member(${ROOM_EXPECTED.memberNick2}) should get member by name by default`)
   }
@@ -185,7 +189,7 @@ test('Room smok testing', async t => {
 
 test('Room iterator for contact in it', async t => {
   // Mock
-  const mockContactRoomRawPayload = function (id: string) {
+  const mockContactRoomRawPayload = (id: string) => {
     log.verbose('PuppeteerRoomTest', 'mockContactRawPayload(%s)', id)
     return new Promise(resolve => {
       if (id === ROOM_EXPECTED.id) {
@@ -194,7 +198,7 @@ test('Room iterator for contact in it', async t => {
         setImmediate(() => resolve(CONTACT_RAW_PAYLOAD_DICT[id]))
       } else {
         // ignore other ids
-        setImmediate(() => resolve({id}))
+        setImmediate(() => resolve({ id }))
       }
     })
   }

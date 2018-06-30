@@ -6,7 +6,7 @@ import {
   MessageType,
 }                 from 'wechaty-puppet'
 
-export function webMessageType(webMsgType: WebMessageType): MessageType {
+export function webMessageType (webMsgType: WebMessageType): MessageType {
   switch (webMsgType) {
     case WebMessageType.TEXT:
       return MessageType.Text
@@ -21,9 +21,6 @@ export function webMessageType(webMsgType: WebMessageType): MessageType {
     case WebMessageType.MICROVIDEO:
     case WebMessageType.VIDEO:
       return MessageType.Video
-
-    case WebMessageType.TEXT:
-      return MessageType.Text
 
     /**
      * Treat those Types as TEXT

@@ -16,14 +16,18 @@
  *   limitations under the License.
  *
  */
-// import http    from 'http'
+
+// tslint:disable:member-ordering
+// tslint:disable:arrow-parens
+// tslint:disable:object-literal-key-quotes
+
 import path    from 'path'
 import nodeUrl from 'url'
 
 import bl       from 'bl'
+import md5      from 'md5'
 import mime     from 'mime'
 import request  from 'request'
-import md5      from 'md5'
 
 import {
   FileBox,
@@ -37,18 +41,40 @@ import {
 }                   from 'watchdog'
 
 import {
+  ContactPayload,
+  ContactType,
+
+  FriendshipPayload,
+  FriendshipPayloadConfirm,
+  FriendshipPayloadReceive,
+  FriendshipType,
+
+  MessagePayload,
+  MessageType,
+
   Puppet,
   PuppetOptions,
+  PuppetQrcodeScanEvent,
   Receiver,
-}                     from 'wechaty-puppet'
-import {
-  config,
-  log,
-  Raven,
-  qrCodeForChatie,
-}                     from '../config'
 
-import Misc           from '../misc'
+  RoomMemberPayload,
+  RoomPayload,
+
+}                           from 'wechaty-puppet'
+
+import {
+  envHead,
+  log,
+  MEMORY_SLOT,
+  qrCodeForChatie,
+}                     from './config'
+
+import {
+  messageFilename,
+  messageRawPayloadParser,
+  plainText,
+  unescapeHtml,
+}                     from './pure-function-helpers'
 
 import {
   Bridge,
@@ -59,43 +85,15 @@ import Event            from './event'
 import {
   WebAppMsgType,
   WebContactRawPayload,
+  WebMediaType,
   WebMessageMediaPayload,
   WebMessageRawPayload,
-  WebMediaType,
   WebMessageType,
   WebRecomendInfo,
-  // WebRoomRawMember,
-  WebRoomRawPayload,
   WebRoomRawMember,
+  WebRoomRawPayload,
 }                           from './web-schemas'
 
-import {
-  ContactPayload,
-  // ContactQueryFilter,
-  ContactType,
-
-  FriendshipPayload,
-  FriendshipPayloadReceive,
-  FriendshipPayloadConfirm,
-  FriendshipType,
-
-  MessagePayload,
-  MessageType,
-
-  // RoomMemberQueryFilter,
-  RoomPayload,
-  RoomMemberPayload,
-  // RoomQueryFilter,
-
-  PuppetQrcodeScanEvent,
-}                           from 'wechaty-puppet'
-
-import {
-  messageRawPayloadParser,
-  messageFilename,
-}                             from './pure-function-helpers'
-
-export type PuppetFoodType = 'scan' | 'ding'
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
 export class PuppetPuppeteer extends Puppet {
@@ -107,22 +105,22 @@ export class PuppetPuppeteer extends Puppet {
 
   private fileId: number
 
-  constructor(
+  constructor (
     public options: PuppetOptions,
   ) {
     super(options)
 
     this.fileId = 0
     this.bridge = new Bridge({
-      head    : config.head,
-      profile : this.options.memory,
+      head    : envHead(),
+      memory : this.options.memory,
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
     this.scanWatchdog   = new Watchdog<ScanFoodType>(SCAN_TIMEOUT, 'Scan')
   }
 
-  public async start(): Promise<void> {
+  public async start (): Promise<void> {
     log.verbose('PuppetPuppeteer', `start() with ${this.options.memory.name}`)
 
     this.state.on('pending')
@@ -154,7 +152,7 @@ export class PuppetPuppeteer extends Puppet {
        */
       const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
       this.on('watchdog', data => throttleQueue.next(data))
-      throttleQueue.subscribe(async data => {
+      throttleQueue.subscribe(async (data: any) => {
         log.verbose('Wechaty', 'start() throttleQueue.subscribe() new item: %s', data)
         await this.saveCookie()
       })
@@ -171,12 +169,11 @@ export class PuppetPuppeteer extends Puppet {
       this.emit('error', e)
       await this.stop()
 
-      Raven.captureException(e)
       throw e
     }
   }
 
-  private initWatchdog(): void {
+  private initWatchdog (): void {
     log.verbose('PuppetPuppeteer', 'initWatchdogForPuppet()')
 
     const puppet = this
@@ -189,7 +186,10 @@ export class PuppetPuppeteer extends Puppet {
 
     puppet.on('watchdog', food => this.watchdog.feed(food))
     this.watchdog.on('feed', food => {
-      log.silly('PuppetPuppeteer', 'initWatchdogForPuppet() dog.on(feed, food={type=%s, data=%s})', food.type, food.data)
+      log.silly('PuppetPuppeteer', 'initWatchdogForPuppet() dog.on(feed, food={type=%s, data=%s})',
+                                    food.type,
+                                    food.data,
+                )
       // feed the dog, heartbeat the puppet.
       // 201805 puppet no need to `heartbeat`?
       // puppet.emit('heartbeat', food.data)
@@ -214,7 +214,7 @@ export class PuppetPuppeteer extends Puppet {
    * sometimes the qrcode will not refresh, leave there expired.
    * so we need to refresh the page after a while
    */
-  private initWatchdogForScan(): void {
+  private initWatchdogForScan (): void {
     log.verbose('PuppetPuppeteer', 'initWatchdogForScan()')
 
     const puppet = this
@@ -263,7 +263,7 @@ export class PuppetPuppeteer extends Puppet {
     })
   }
 
-  public async stop(): Promise<void> {
+  public async stop (): Promise<void> {
     log.verbose('PuppetPuppeteer', 'quit()')
 
     if (this.state.off()) {
@@ -290,7 +290,6 @@ export class PuppetPuppeteer extends Puppet {
       setImmediate(() => this.bridge.removeAllListeners())
     } catch (e) {
       log.error('PuppetPuppeteer', 'quit() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     } finally {
       this.state.off(true)
@@ -299,7 +298,7 @@ export class PuppetPuppeteer extends Puppet {
 
   }
 
-  private async initBridge(): Promise<Bridge> {
+  private async initBridge (): Promise<Bridge> {
     log.verbose('PuppetPuppeteer', 'initBridge()')
 
     if (this.state.off()) {
@@ -325,19 +324,18 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.quit().catch(console.error)
       this.emit('error', e)
 
-      Raven.captureException(e)
       throw e
     }
 
     return this.bridge
   }
 
-  public async messageRawPayload(id: string): Promise <WebMessageRawPayload> {
+  public async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
     const rawPayload = await this.bridge.getMessage(id)
     return rawPayload
   }
 
-  public async messageRawPayloadParser(
+  public async messageRawPayloadParser (
     rawPayload: WebMessageRawPayload,
   ): Promise<MessagePayload> {
     log.verbose('PuppetPuppeteer', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
@@ -347,13 +345,13 @@ export class PuppetPuppeteer extends Puppet {
     return payload
   }
 
-  public async messageFile(messageId: string): Promise<FileBox> {
+  public async messageFile (messageId: string): Promise<FileBox> {
     const rawPayload = await this.messageRawPayload(messageId)
     const fileBox    = await this.messageRawPayloadToFile(rawPayload)
     return fileBox
   }
 
-  private async messageRawPayloadToFile(
+  private async messageRawPayloadToFile (
     rawPayload: WebMessageRawPayload,
   ): Promise<FileBox> {
     let url = await this.messageRawPayloadToUrl(rawPayload)
@@ -362,7 +360,8 @@ export class PuppetPuppeteer extends Puppet {
       throw new Error('no url for type ' + MessageType[rawPayload.MsgType])
     }
 
-    url = url.replace(/^https/i, 'http') // use http instead of https, because https will only success on the very first request!
+    // use http instead of https, because https will only success on the very first request!
+    url = url.replace(/^https/i, 'http')
     const parsedUrl = nodeUrl.parse(url)
 
     const msgFileName = messageFilename(rawPayload)
@@ -374,7 +373,8 @@ export class PuppetPuppeteer extends Puppet {
     const cookies = await this.cookies()
 
     const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) '
+                    + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
 
       // Accept: 'image/webp,image/*,*/*;q=0.8',
       // Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', //  MsgType.IMAGE | VIDEO
@@ -399,7 +399,7 @@ export class PuppetPuppeteer extends Puppet {
       /**
        * pgv_pvi=6639183872; pgv_si=s8359147520; webwx_data_ticket=gSeBbuhX+0kFdkXbgeQwr6Ck
        */
-      Cookie: cookies.map(c => `${c['name']}=${c['value']}`).join('; '),
+      Cookie: cookies.map(c => `${c.name}=${c.value}`).join('; '),
     }
 
     const fileBox = FileBox.fromUrl(url, msgFileName, headers)
@@ -411,7 +411,7 @@ export class PuppetPuppeteer extends Puppet {
    * TODO: Test this function if it could work...
    */
   // public async forward(baseData: MsgRawObj, patchData: MsgRawObj): Promise<boolean> {
-  public async messageForward(
+  public async messageForward (
     receiver  : Receiver,
     messageId : string,
   ): Promise<void> {
@@ -425,7 +425,7 @@ export class PuppetPuppeteer extends Puppet {
 
     // rawPayload = Object.assign({}, rawPayload)
 
-    const newMsg = <WebMessageRawPayload>{}
+    const newMsg = {} as WebMessageRawPayload
     const largeFileSize = 25 * 1024 * 1024
     // let ret = false
     // if you know roomId or userId, you can use `Room.load(roomId)` or `Contact.load(userId)`
@@ -441,16 +441,22 @@ export class PuppetPuppeteer extends Puppet {
     // }
     if (rawPayload.FileSize >= largeFileSize && !rawPayload.Signature) {
       // if has RawObj.Signature, can forward the 25Mb+ file
-      log.warn('MediaMessage', 'forward() Due to webWx restrictions, more than 25MB of files can not be downloaded and can not be forwarded.')
-      throw new Error('forward() Due to webWx restrictions, more than 25MB of files can not be downloaded and can not be forwarded.')
+      log.warn('MediaMessage', 'forward() Due to webWx restrictions, '
+                                + 'more than 25MB of files can not be downloaded and can not be forwarded.')
+      throw new Error('forward() Due to webWx restrictions, '
+                        + 'more than 25MB of files can not be downloaded and can not be forwarded.')
     }
 
     newMsg.FromUserName         = this.id || ''
     newMsg.isTranspond          = true
     newMsg.MsgIdBeforeTranspond = rawPayload.MsgIdBeforeTranspond || rawPayload.MsgId
     newMsg.MMSourceMsgId        = rawPayload.MsgId
-    // In room msg, the content prefix sender:, need to be removed, otherwise the forwarded sender will display the source message sender, causing self () to determine the error
-    newMsg.Content      = Misc.unescapeHtml(rawPayload.Content.replace(/^@\w+:<br\/>/, '')).replace(/^[\w\-]+:<br\/>/, '')
+    // In room msg, the content prefix sender:, need to be removed,
+    // otherwise the forwarded sender will display the source message sender,
+    // causing self () to determine the error
+    newMsg.Content      = unescapeHtml(
+      rawPayload.Content.replace(/^@\w+:<br\/>/, '')
+    ).replace(/^[\w\-]+:<br\/>/, '')
     newMsg.MMIsChatRoom = receiver.roomId ? true : false
 
     // The following parameters need to be overridden after calling createMessage()
@@ -474,12 +480,11 @@ export class PuppetPuppeteer extends Puppet {
       }
     } catch (e) {
       log.error('PuppetPuppeteer', 'forward() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async messageSendText(
+  public async messageSendText (
     receiver : Receiver,
     text     : string,
   ): Promise<void> {
@@ -504,19 +509,18 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.send(destinationId, text)
     } catch (e) {
       log.error('PuppetPuppeteer', 'messageSendText() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async login(userId: string): Promise<void> {
+  public async login (userId: string): Promise<void> {
     return super.login(userId)
   }
 
   /**
    * logout from browser, then server will emit `logout` event
    */
-  public async logout(): Promise<void> {
+  public async logout (): Promise<void> {
     log.verbose('PuppetPuppeteer', 'logout()')
 
     const user = this.selfId()
@@ -529,7 +533,6 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.logout()
     } catch (e) {
       log.error('PuppetPuppeteer', 'logout() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     } finally {
       this.id = undefined
@@ -542,20 +545,19 @@ export class PuppetPuppeteer extends Puppet {
    * Contact
    *
    */
-  public async contactRawPayload(id: string): Promise<WebContactRawPayload> {
+  public async contactRawPayload (id: string): Promise<WebContactRawPayload> {
     log.silly('PuppetPuppeteer', 'contactRawPayload(%s) @ %s', id, this)
     try {
       const rawPayload = await this.bridge.getContact(id) as WebContactRawPayload
       return rawPayload
     } catch (e) {
       log.error('PuppetPuppeteer', 'contactRawPayload(%s) exception: %s', id, e.message)
-      Raven.captureException(e)
       throw e
     }
 
   }
 
-  public async contactRawPayloadParser(
+  public async contactRawPayloadParser (
     rawPayload: WebContactRawPayload,
   ): Promise<ContactPayload> {
     log.silly('PuppetPuppeteer', 'contactParseRawPayload(Object.keys(payload).length=%d)',
@@ -573,28 +575,32 @@ export class PuppetPuppeteer extends Puppet {
       // }
     }
 
-    // this.id = rawPayload.UserName   // MMActualSender??? MMPeerUserName??? `getUserContact(message.MMActualSender,message.MMPeerUserName).HeadImgUrl`
+    // this.id = rawPayload.UserName
+    // MMActualSender??? MMPeerUserName??? `getUserContact(message.MMActualSender,message.MMPeerUserName).HeadImgUrl`
+
     // uin:        rawPayload.Uin,    // stable id: 4763975 || getCookie("wxuin")
 
     return {
-      id:         rawPayload.UserName,
-      weixin:     rawPayload.Alias,  // Wechat ID
-      name:       Misc.plainText(rawPayload.NickName || ''),
-      alias:      rawPayload.RemarkName,
-      gender:     rawPayload.Sex,
-      province:   rawPayload.Province,
-      city:       rawPayload.City,
-      signature:  rawPayload.Signature,
-
-      address:    rawPayload.Alias, // XXX: need a stable address for user
-
-      star:       !!rawPayload.StarFriend,
+      avatar:     rawPayload.HeadImgUrl,
       friend:     rawPayload.stranger === undefined
                     ? undefined
                     : !rawPayload.stranger, // assign by injectio.js
-      avatar:     rawPayload.HeadImgUrl,
+      star:       !!rawPayload.StarFriend,
+
+      address:    rawPayload.Alias, // XXX: need a stable address for user
+
+      alias:      rawPayload.RemarkName,
+      city:       rawPayload.City,
+      gender:     rawPayload.Sex,
+      id:         rawPayload.UserName,
+      name:       plainText(rawPayload.NickName || ''),
+      province:   rawPayload.Province,
+      signature:  rawPayload.Signature,
+      weixin:     rawPayload.Alias,  // Wechat ID
+
       /**
-       * @see 1. https://github.com/Chatie/webwx-app-tracker/blob/7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L3243
+       * @see 1. https://github.com/Chatie/webwx-app-tracker/blob/
+       *  7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L3243
        * @see 2. https://github.com/Urinx/WeixinBot/blob/master/README.md
        * @ignore
        */
@@ -602,23 +608,19 @@ export class PuppetPuppeteer extends Puppet {
       type:      (!!rawPayload.UserName && !rawPayload.UserName.startsWith('@@') && !!(rawPayload.VerifyFlag & 8))
                     ? ContactType.Official
                     : ContactType.Personal,
-      /**
-       * @see 1. https://github.com/Chatie/webwx-app-tracker/blob/7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L3246
-       * @ignore
-       */
-      // special:       specialContactList.indexOf(rawPayload.UserName) > -1 || /@qqim$/.test(rawPayload.UserName),
+
     }
   }
 
-  public ding(data?: string): void {
+  public ding (data?: string): void {
     log.verbose('PuppetPuppeteer', 'ding(%s)', data || '')
     this.bridge.ding(data)
   }
 
-  public async contactAvatar(contactId: string)                : Promise<FileBox>
-  public async contactAvatar(contactId: string, file: FileBox) : Promise<void>
+  public async contactAvatar (contactId: string)                : Promise<FileBox>
+  public async contactAvatar (contactId: string, file: FileBox) : Promise<void>
 
-  public async contactAvatar(contactId: string, file?: FileBox): Promise<void | FileBox> {
+  public async contactAvatar (contactId: string, file?: FileBox): Promise<void | FileBox> {
     log.verbose('PuppetPuppeteer', 'contactAvatar(%s)', contactId)
 
     if (file) {
@@ -640,7 +642,7 @@ export class PuppetPuppeteer extends Puppet {
        * FileBox headers (will be used in NodeJS.http.get param options)
        */
       const headers = {
-        cookie: cookieList.map(c => `${c['name']}=${c['value']}`).join('; '),
+        cookie: cookieList.map(c => `${c.name}=${c.value}`).join('; '),
       }
       // return Misc.urlStream(avatarUrl, cookies)
 
@@ -656,12 +658,11 @@ export class PuppetPuppeteer extends Puppet {
 
     } catch (err) {
       log.warn('PuppeteerContact', 'avatar() exception: %s', err.stack)
-      Raven.captureException(err)
       throw err
     }
   }
 
-  public async contactQrcode(contactId: string): Promise<string> {
+  public async contactQrcode (contactId: string): Promise<string> {
     if (contactId !== this.selfId()) {
       throw new Error('can not set avatar for others')
     }
@@ -670,10 +671,10 @@ export class PuppetPuppeteer extends Puppet {
     // return await this.bridge.WXqr
   }
 
-  public contactAlias(contactId: string)                      : Promise<string>
-  public contactAlias(contactId: string, alias: string | null): Promise<void>
+  public contactAlias (contactId: string)                      : Promise<string>
+  public contactAlias (contactId: string, alias: string | null): Promise<void>
 
-  public async contactAlias(
+  public async contactAlias (
     contactId : string,
     alias?    : string | null,
   ): Promise<string | void> {
@@ -691,7 +692,6 @@ export class PuppetPuppeteer extends Puppet {
       }
     } catch (e) {
       log.warn('PuppetPuppeteer', 'contactRemark(%s, %s) rejected: %s', contactId, alias, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
@@ -744,7 +744,7 @@ export class PuppetPuppeteer extends Puppet {
   //   return filterFunction
   // }
 
-  public async contactList(): Promise<string[]> {
+  public async contactList (): Promise<string[]> {
     const idList = await this.bridge.contactList()
     return idList
   }
@@ -770,14 +770,16 @@ export class PuppetPuppeteer extends Puppet {
    * Room
    *
    */
-  public async roomRawPayload(id: string): Promise<WebRoomRawPayload> {
+  public async roomRawPayload (id: string): Promise<WebRoomRawPayload> {
     log.verbose('PuppetPuppeteer', 'roomRawPayload(%s)', id)
 
     try {
-      let rawPayload: WebRoomRawPayload | undefined  // = await this.bridge.getContact(room.id) as PuppeteerRoomRawPayload
+      let rawPayload: undefined | WebRoomRawPayload
+      // = await this.bridge.getContact(room.id) as PuppeteerRoomRawPayload
 
       // let currNum = rawPayload.MemberList && rawPayload.MemberList.length || 0
-      // let prevNum = room.memberList().length  // rawPayload && rawPayload.MemberList && this.rawObj.MemberList.length || 0
+      // let prevNum = room.memberList().length
+      // rawPayload && rawPayload.MemberList && this.rawObj.MemberList.length || 0
 
       let prevLength = 0
 
@@ -791,7 +793,8 @@ export class PuppetPuppeteer extends Puppet {
         if (rawPayload) {
           const currLength = rawPayload.MemberList && rawPayload.MemberList.length || -1
 
-          log.silly('PuppetPuppeteer', `roomPayload() this.bridge.getContact(%s) MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
+          log.silly('PuppetPuppeteer', `roomPayload() this.bridge.getContact(%s) `
+                                        + `MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
             id,
             prevLength,
             currLength,
@@ -799,7 +802,11 @@ export class PuppetPuppeteer extends Puppet {
           )
 
           if (prevLength === currLength) {
-            log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d`, this.id, ttl, currLength)
+            log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d`,
+                                          this.id,
+                                          ttl,
+                                          currLength,
+                      )
             return rawPayload
           }
           if (currLength >= prevLength) {
@@ -820,12 +827,11 @@ export class PuppetPuppeteer extends Puppet {
 
     } catch (e) {
       log.error('PuppetPuppeteer', 'roomRawPayload(%s) exception: %s', id, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async roomRawPayloadParser(
+  public async roomRawPayloadParser (
     rawPayload: WebRoomRawPayload,
   ): Promise<RoomPayload> {
     log.verbose('PuppetPuppeteer', 'roomRawPayloadParser(%s)', rawPayload)
@@ -867,8 +873,8 @@ export class PuppetPuppeteer extends Puppet {
 
     const roomPayload: RoomPayload = {
       id,
-      topic: Misc.plainText(rawPayload.NickName || ''),
       memberIdList,
+      topic: plainText(rawPayload.NickName || ''),
       // aliasDict,
       // nameMap,
       // roomAliasMap,
@@ -878,14 +884,14 @@ export class PuppetPuppeteer extends Puppet {
     return roomPayload
   }
 
-  public async roomList(): Promise<string[]> {
+  public async roomList (): Promise<string[]> {
     log.verbose('PuppetPupppeteer', 'roomList()')
 
     const idList = await this.bridge.roomList()
     return idList
   }
 
-  public async roomDel(
+  public async roomDel (
     roomId    : string,
     contactId : string,
   ): Promise<void> {
@@ -893,12 +899,11 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.roomDelMember(roomId, contactId)
     } catch (e) {
       log.warn('PuppetPuppeteer', 'roomDelMember(%s, %d) rejected: %s', roomId, contactId, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async roomAvatar(roomId: string): Promise<FileBox> {
+  public async roomAvatar (roomId: string): Promise<FileBox> {
     log.verbose('PuppetPuppeteer', 'roomAvatar(%s)', roomId)
 
     const payload = await this.roomPayload(roomId)
@@ -910,7 +915,7 @@ export class PuppetPuppeteer extends Puppet {
     return qrCodeForChatie()
   }
 
-  public async roomAdd(
+  public async roomAdd (
     roomId    : string,
     contactId : string,
   ): Promise<void> {
@@ -918,15 +923,14 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.roomAddMember(roomId, contactId)
     } catch (e) {
       log.warn('PuppetPuppeteer', 'roomAddMember(%s) rejected: %s', contactId, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async roomTopic(roomId: string)                : Promise<string>
-  public async roomTopic(roomId: string, topic: string) : Promise<void>
+  public async roomTopic (roomId: string)                : Promise<string>
+  public async roomTopic (roomId: string, topic: string) : Promise<void>
 
-  public async roomTopic(
+  public async roomTopic (
     roomId : string,
     topic? : string,
   ): Promise<void | string> {
@@ -939,12 +943,11 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.roomModTopic(roomId, topic)
     } catch (e) {
       log.warn('PuppetPuppeteer', 'roomTopic(%s) rejected: %s', topic, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async roomCreate(
+  public async roomCreate (
     contactIdList : string[],
     topic         : string,
   ): Promise<string> {
@@ -957,15 +960,14 @@ export class PuppetPuppeteer extends Puppet {
 
     } catch (e) {
       log.warn('PuppetPuppeteer', 'roomCreate(%s, %s) rejected: %s', contactIdList.join(','), topic, e.message)
-      Raven.captureException(e)
       throw e
     }
   }
 
-  public async roomAnnounce(roomId: string)                : Promise<string>
-  public async roomAnnounce(roomId: string, text: string)  : Promise<void>
+  public async roomAnnounce (roomId: string)                : Promise<string>
+  public async roomAnnounce (roomId: string, text: string)  : Promise<void>
 
-  public async roomAnnounce(roomId: string, text?: string) : Promise<void | string> {
+  public async roomAnnounce (roomId: string, text?: string) : Promise<void | string> {
     log.warn('PuppetPuppeteer', 'roomAnnounce(%s, %s) not supported', roomId, text ? text : '')
 
     if (text) {
@@ -974,15 +976,15 @@ export class PuppetPuppeteer extends Puppet {
     return ''
   }
 
-  public async roomQuit(roomId: string): Promise<void> {
+  public async roomQuit (roomId: string): Promise<void> {
     log.warn('PuppetPuppeteer', 'roomQuit(%s) not supported by Web API', roomId)
   }
 
-  public async roomQrcode(roomId: string): Promise<string> {
+  public async roomQrcode (roomId: string): Promise<string> {
     throw new Error('not support ' + roomId)
   }
 
-  public async roomMemberList(roomId: string) : Promise<string[]> {
+  public async roomMemberList (roomId: string) : Promise<string[]> {
     log.verbose('PuppetPuppeteer', 'roommemberList(%s)', roomId)
     const rawPayload = await this.roomRawPayload(roomId)
 
@@ -992,7 +994,7 @@ export class PuppetPuppeteer extends Puppet {
     return memberIdList
   }
 
-  public async roomMemberRawPayload(roomId: string, contactId: string): Promise<WebRoomRawMember>  {
+  public async roomMemberRawPayload (roomId: string, contactId: string): Promise<WebRoomRawMember>  {
     log.verbose('PuppetPuppeteer', 'roomMemberRawPayload(%s, %s)', roomId, contactId)
     const rawPayload = await this.roomRawPayload(roomId)
 
@@ -1006,14 +1008,14 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
-  public async roomMemberRawPayloadParser(rawPayload: WebRoomRawMember): Promise<RoomMemberPayload>  {
+  public async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<RoomMemberPayload>  {
     log.verbose('PuppetPuppeteer', 'roomMemberRawPayloadParser(%s)', rawPayload)
 
     const payload: RoomMemberPayload = {
-      id        : rawPayload.UserName,
-      roomAlias : rawPayload.DisplayName,
-      name      : rawPayload.NickName,
       avatar    : rawPayload.HeadImgUrl,
+      id        : rawPayload.UserName,
+      name      : rawPayload.NickName,
+      roomAlias : rawPayload.DisplayName,
     }
     return payload
   }
@@ -1023,7 +1025,7 @@ export class PuppetPuppeteer extends Puppet {
    * Friendship
    *
    */
-  public async friendshipRawPayload(id: string): Promise<WebMessageRawPayload> {
+  public async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
     log.warn('PuppetPuppeteer', 'friendshipRawPayload(%s)', id)
 
     const rawPayload = await this.bridge.getMessage(id)
@@ -1033,7 +1035,7 @@ export class PuppetPuppeteer extends Puppet {
     return rawPayload
   }
 
-  public async friendshipRawPayloadParser(rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
+  public async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
     log.warn('PuppetPuppeteer', 'friendshipRawPayloadParser(%s)', rawPayload)
 
     switch (rawPayload.MsgType) {
@@ -1048,9 +1050,9 @@ export class PuppetPuppeteer extends Puppet {
         }
 
         const payloadReceive: FriendshipPayloadReceive = {
-          id        : rawPayload.MsgId,
           contactId : recommendInfo.UserName,
           hello     : recommendInfo.Content,
+          id        : rawPayload.MsgId,
           ticket    : recommendInfo.Ticket,
           type      : FriendshipType.Receive,
         }
@@ -1058,8 +1060,8 @@ export class PuppetPuppeteer extends Puppet {
 
       case WebMessageType.SYS:
         const payloadConfirm: FriendshipPayloadConfirm = {
-          id        : rawPayload.MsgId,
           contactId : rawPayload.FromUserName,
+          id        : rawPayload.MsgId,
           type      : FriendshipType.Confirm,
         }
         return payloadConfirm
@@ -1068,29 +1070,35 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
-  public async friendshipAdd(
+  public async friendshipAdd (
     contactId : string,
     hello     : string,
   ): Promise<void> {
     try {
       await this.bridge.verifyUserRequest(contactId, hello)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s', contactId, hello, e.message)
-      Raven.captureException(e)
+      log.warn('PuppetPuppeteer', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s',
+                                  contactId,
+                                  hello,
+                                  e.message,
+              )
       throw e
     }
   }
 
-  public async friendshipAccept(
+  public async friendshipAccept (
     friendshipId : string,
   ): Promise<void> {
-    const payload = await this.friendshipPayload(friendshipId) as FriendshipPayloadReceive
+    const payload = await this.friendshipPayload(friendshipId) as any as FriendshipPayloadReceive
 
     try {
       await this.bridge.verifyUserOk(payload.contactId, payload.ticket)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'bridge.verifyUserOk(%s, %s) rejected: %s', payload.contactId, payload.ticket, e.message)
-      Raven.captureException(e)
+      log.warn('PuppetPuppeteer', 'bridge.verifyUserOk(%s, %s) rejected: %s',
+                                  payload.contactId,
+                                  payload.ticket,
+                                  e.message,
+              )
       throw e
     }
   }
@@ -1099,7 +1107,7 @@ export class PuppetPuppeteer extends Puppet {
    * @private
    * For issue #668
    */
-  public async waitStable(): Promise<void> {
+  public async waitStable (): Promise<void> {
     log.verbose('PuppetPuppeteer', 'readyStable()')
 
     let   prevLength = -1
@@ -1126,7 +1134,7 @@ export class PuppetPuppeteer extends Puppet {
    * location.host = www.chatie.io:8080
    * See: https://stackoverflow.com/a/11379802/1123955
    */
-  private async hostname(): Promise<string> {
+  private async hostname (): Promise<string> {
     try {
       const name = await this.bridge.hostname()
       if (!name) {
@@ -1140,17 +1148,17 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
-  private async cookies(): Promise<Cookie[]> {
-    return await this.bridge.cookies()
+  private async cookies (): Promise<Cookie[]> {
+    return this.bridge.cookies()
   }
 
-  public async saveCookie(): Promise<void> {
+  public async saveCookie (): Promise<void> {
     const cookieList = await this.bridge.cookies()
-    this.options.memory.set('cookies', cookieList)
+    this.options.memory.set(MEMORY_SLOT, cookieList)
     this.options.memory.save()
   }
 
-  private extToType(ext: string): WebMessageType {
+  private extToType (ext: string): WebMessageType {
     switch (ext) {
       case '.bmp':
       case '.jpeg':
@@ -1167,7 +1175,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   // public async readyMedia(): Promise<this> {
-  private async messageRawPayloadToUrl(
+  private async messageRawPayloadToUrl (
     rawPayload: WebMessageRawPayload,
   ): Promise<null | string> {
     log.silly('PuppetPuppeteer', 'readyMedia()')
@@ -1255,7 +1263,6 @@ export class PuppetPuppeteer extends Puppet {
 
     } catch (e) {
       log.warn('PuppetPuppeteer', 'ready() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     }
 
@@ -1263,7 +1270,7 @@ export class PuppetPuppeteer extends Puppet {
 
   }
 
-  private async uploadMedia(
+  private async uploadMedia (
     file       : FileBox,
     toUserName : string,
   ): Promise<WebMessageMediaPayload> {
@@ -1301,13 +1308,15 @@ export class PuppetPuppeteer extends Puppet {
     })
 
     // Sending video files is not allowed to exceed 20MB
-    // https://github.com/Chatie/webwx-app-tracker/blob/7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L1115
+    // https://github.com/Chatie/webwx-app-tracker/blob/
+    //  7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L1115
     const MAX_FILE_SIZE   = 100 * 1024 * 1024
     const LARGE_FILE_SIZE = 25 * 1024 * 1024
     const MAX_VIDEO_SIZE  = 20 * 1024 * 1024
 
-    if (mediatype === WebMediaType.Video && buffer.length > MAX_VIDEO_SIZE)
+    if (mediatype === WebMediaType.Video && buffer.length > MAX_VIDEO_SIZE) {
       throw new Error(`Sending video files is not allowed to exceed ${MAX_VIDEO_SIZE / 1024 / 1024}MB`)
+    }
     if (buffer.length > MAX_FILE_SIZE) {
       throw new Error(`Sending files is not allowed to exceed ${MAX_FILE_SIZE / 1024 / 1024}MB`)
     }
@@ -1328,57 +1337,59 @@ export class PuppetPuppeteer extends Puppet {
 
     const hostname = await this.bridge.hostname()
     const headers = {
-      Referer: `https://${hostname}`,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
-      Cookie: cookie.map(c => c.name + '=' + c.value).join('; '),
+      Cookie       : cookie.map(c => c.name + '=' + c.value).join('; '),
+      Referer      : `https://${hostname}`,
+      'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 '
+                      + '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
     }
 
     log.silly('PuppetPuppeteer', 'uploadMedia() headers:%s', JSON.stringify(headers))
 
     const uploadMediaRequest = {
+      AESKey:        '',
       BaseRequest:   baseRequest,
+      ClientMediaId: +new Date(),
+      DataLen:       size,
       FileMd5:       fileMd5,
       FromUserName:  fromUserName,
-      ToUserName:    toUserName,
-      UploadType:    2,
-      ClientMediaId: +new Date,
       MediaType:     WebMediaType.Attachment,
-      StartPos:      0,
-      DataLen:       size,
-      TotalLen:      size,
       Signature:     '',
-      AESKey:        '',
+      StartPos:      0,
+      ToUserName:    toUserName,
+      TotalLen:      size,
+      UploadType:    2,
     }
 
     const checkData = {
       BaseRequest:  baseRequest,
-      FromUserName: fromUserName,
-      ToUserName:   toUserName,
+      FileMd5:      fileMd5,
       FileName:     filename,
       FileSize:     size,
-      FileMd5:      fileMd5,
       FileType:     7,              // If do not have this parameter, the api will fail
+      FromUserName: fromUserName,
+      ToUserName:   toUserName,
     }
 
     const mediaData = {
-      ToUserName: toUserName,
-      MediaId:    '',
+      FileMd5:    fileMd5,
       FileName:   filename,
       FileSize:   size,
-      FileMd5:    fileMd5,
       MMFileExt:  ext,
+      MediaId:    '',
+      ToUserName: toUserName,
     } as WebMessageMediaPayload
 
     // If file size > 25M, must first call checkUpload to get Signature and AESKey, otherwise it will fail to upload
-    // https://github.com/Chatie/webwx-app-tracker/blob/7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L1132 #1182
+    // https://github.com/Chatie/webwx-app-tracker/blob/
+    //  7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L1132 #1182
     if (size > LARGE_FILE_SIZE) {
       let ret
       try {
-        ret = <any> await new Promise((resolve, reject) => {
+        ret = await new Promise<any>((resolve, reject) => {
           const r = {
-            url: `https://${hostname}${checkUploadUrl}`,
             headers,
             json: checkData,
+            url: `https://${hostname}${checkUploadUrl}`,
           }
           request.post(r, (err, _ /* res */, body) => {
             try {
@@ -1398,12 +1409,13 @@ export class PuppetPuppeteer extends Puppet {
                 }
                 if (typeof obj !== 'object' || obj.BaseResponse.Ret !== 0) {
                   const errMsg = obj.BaseResponse || 'api return err'
-                  log.silly('PuppetPuppeteer', 'uploadMedia() checkUpload err:%s \nreq:%s\nret:%s', JSON.stringify(errMsg), JSON.stringify(r), body)
+                  log.silly('PuppetPuppeteer', 'uploadMedia() checkUpload err:%s \nreq:%s\nret:%s',
+                                                JSON.stringify(errMsg), JSON.stringify(r), body)
                   reject(new Error('chackUpload err:' + JSON.stringify(errMsg)))
                 }
                 resolve({
-                  Signature : obj.Signature,
                   AESKey    : obj.AESKey,
+                  Signature : obj.Signature,
                 })
               }
             } catch (e) {
@@ -1431,35 +1443,36 @@ export class PuppetPuppeteer extends Puppet {
     log.verbose('PuppetPuppeteer', 'uploadMedia() pass_ticket: %s', passTicket)
 
     const formData = {
-      id,
-      name: filename,
-      type: contentType,
-      lastModifiedDate: Date().toString(),
-      size,
-      mediatype,
-      uploadmediarequest: JSON.stringify(uploadMediaRequest),
-      webwx_data_ticket: webwxDataTicket,
-      pass_ticket: passTicket || '',
       filename: {
-        value: buffer,
         options: {
-          filename,
           contentType,
+          filename,
           size,
         },
+        value: buffer,
       },
+      id,
+      lastModifiedDate: Date().toString(),
+      mediatype,
+      name: filename,
+      pass_ticket: passTicket || '',
+      size,
+      type: contentType,
+      uploadmediarequest: JSON.stringify(uploadMediaRequest),
+      webwx_data_ticket: webwxDataTicket,
     }
     let mediaId: string
     try {
-      mediaId = <string>await new Promise((resolve, reject) => {
+      mediaId = await new Promise<string>((resolve, reject) => {
         try {
           request.post({
-            url: uploadMediaUrl + '?f=json',
-            headers,
             formData,
-          }, function (err, _, body) {
-            if (err) { reject(err) }
-            else {
+            headers,
+            url: uploadMediaUrl + '?f=json',
+          }, (err, _, body) => {
+            if (err) {
+              reject(err)
+            } else {
               let obj = body
               if (typeof body !== 'object') {
                 obj = JSON.parse(body)
@@ -1482,7 +1495,7 @@ export class PuppetPuppeteer extends Puppet {
     return Object.assign(mediaData, { MediaId: mediaId })
   }
 
-  public async messageSendFile(
+  public async messageSendFile (
     receiver : Receiver,
     file     : FileBox,
   ): Promise<void> {
@@ -1517,12 +1530,12 @@ export class PuppetPuppeteer extends Puppet {
       // To support forward file
       log.silly('PuppetPuppeteer', 'skip upload file, rawObj:%s', JSON.stringify(rawPayload))
       mediaData = {
-        ToUserName : destinationId,
-        MediaId    : rawPayload.MediaId,
-        MsgType    : rawPayload.MsgType,
         FileName   : rawPayload.FileName,
         FileSize   : rawPayload.FileSize,
         MMFileExt  : rawPayload.MMFileExt,
+        MediaId    : rawPayload.MediaId,
+        MsgType    : rawPayload.MsgType,
+        ToUserName : destinationId,
       }
       if (rawPayload.Signature) {
         mediaData.Signature = rawPayload.Signature
@@ -1542,7 +1555,6 @@ export class PuppetPuppeteer extends Puppet {
       ret = await this.bridge.sendMedia(mediaData)
     } catch (e) {
       log.error('PuppetPuppeteer', 'sendMedia() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     }
     if (!ret) {
@@ -1550,7 +1562,7 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
-  public async messageSendContact(
+  public async messageSendContact (
     receiver  : Receiver,
     contactId : string,
   ): Promise<void> {
@@ -1558,14 +1570,13 @@ export class PuppetPuppeteer extends Puppet {
     throw new Error('not support')
   }
 
-  private async getBaseRequest(): Promise<any> {
+  private async getBaseRequest (): Promise<any> {
     try {
       const json = await this.bridge.getBaseRequest()
       const obj = JSON.parse(json)
       return obj.BaseRequest
     } catch (e) {
       log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
-      Raven.captureException(e)
       throw e
     }
   }

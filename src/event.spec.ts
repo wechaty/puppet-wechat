@@ -33,7 +33,7 @@ import {
   PuppetPuppeteer,
 }                   from './puppet-puppeteer'
 
-test('Puppet Puppeteer Event smoke testing', async t => {
+test('Puppet Puppeteer Event smoke testing', async (t) => {
   const puppet = new PuppetPuppeteer({
     memory: new MemoryCard(),
   })

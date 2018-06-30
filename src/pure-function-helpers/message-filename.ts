@@ -6,7 +6,7 @@ import {
   messageExtname,
 }                         from './message-extname'
 
-export function messageFilename(
+export function messageFilename (
   rawPayload: WebMessageRawPayload,
 ): string {
 

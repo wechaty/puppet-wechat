@@ -17,7 +17,10 @@
  *   limitations under the License.
  *
  */
-// tslint:disable:no-shadowed-variable
+
+ // tslint:disable:no-shadowed-variable
+// tslint:disable:max-classes-per-file
+
 import test  from 'blue-tape'
 import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
@@ -28,10 +31,8 @@ import {
 
 import {
   Contact,
-}           from '../user'
-import {
   Wechaty,
-}           from '../wechaty'
+}           from 'wechaty'
 
 import {
   FriendshipPayload,
@@ -46,24 +47,24 @@ import {
 }                         from './web-schemas'
 
 class WechatyTest extends Wechaty {
-  public initPuppetAccessory(puppet: PuppetPuppeteer) {
+  public initPuppetAccessory (puppet: PuppetPuppeteer) {
     super.initPuppetAccessory(puppet)
   }
 }
 
 class PuppetTest extends PuppetPuppeteer {
-  public contactRawPayload(id: string) {
+  public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
-  public roomRawPayload(id: string) {
+  public roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
-  public messageRawPayload(id: string) {
+  public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
 }
 
-test('PuppetPuppeteerFriendship.receive smoke testing', async t => {
+test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
   const puppet  = new PuppetTest({ memory: new MemoryCard() })
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
@@ -82,11 +83,11 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async t => {
   const type = FriendshipType.Receive
 
   const payload: FriendshipPayload = {
-    id,
-    type,
     contactId: contact.id,
     hello,
+    id,
     ticket,
+    type,
   }
 
   const sandbox = sinon.createSandbox()
@@ -103,7 +104,7 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async t => {
   sandbox.restore()
 })
 
-test('PuppetPuppeteerFriendship.confirm smoke testing', async t => {
+test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
 
   const puppet  = new PuppetTest({ memory: new MemoryCard() })
   const wechaty = new WechatyTest({ puppet })
@@ -115,9 +116,9 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async t => {
   `)
 
   const friendshipPayload: FriendshipPayload = {
+    contactId : 'xxx',
     id        : 'id',
     type      : FriendshipType.Confirm,
-    contactId : 'xxx',
   }
 
   const sandbox = sinon.createSandbox()

@@ -1,10 +1,10 @@
 import {
+  WebAppMsgType,
   WebMessageRawPayload,
   WebMessageType,
-  WebAppMsgType,
 }                         from '../web-schemas'
 
-export function messageExtname(
+export function messageExtname (
   rawPayload: WebMessageRawPayload,
 ): string {
   let ext: string

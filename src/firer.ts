@@ -17,19 +17,21 @@
  *
  */
 
-/* tslint:disable:no-var-requires */
+// tslint:disable:no-var-requires
+// tslint:disable:arrow-parens
+
 // const retryPromise  = require('retry-promise').default
 // import cuid from 'cuid'
 
 import {
   log,
-}               from '../config'
+}               from './config'
 
+import { PuppetPuppeteer }    from './puppet-puppeteer'
 import {
   // WebRecomendInfo,
   WebMessageRawPayload,
 }                             from './web-schemas'
-import PuppetPuppeteer        from './puppet-puppeteer'
 
 // import {
 //   // FriendRequestPayload,
@@ -64,10 +66,12 @@ const REGEX_CONFIG = {
     // Wechat change this, should desperate. See more in pr#651
     // /^" (.+)" joined the group chat via the QR Code shared by "?(.+?)".$/,
 
-    // There are 2 blank(charCode is 32) here. Qrcode is shared by bot.     eg: "管理员" joined group chat via the QR code you shared.
+    // There are 2 blank(charCode is 32) here. Qrcode is shared by bot.
+    // eg: "管理员" joined group chat via the QR code you shared.
     /^"(.+)" joined group chat via the QR code "?(.+?)"? shared.\s+$/,
 
-    // There are no blank(charCode is 32) here. Qrcode isn't shared by bot. eg: "宁锐锋" joined the group chat via the QR Code shared by "管理员".
+    // There are no blank(charCode is 32) here. Qrcode isn't shared by bot.
+    // eg: "宁锐锋" joined the group chat via the QR Code shared by "管理员".
     /^"(.+)" joined the group chat via the QR Code shared by "?(.+?)".$/,
 
     // There are 2 blank(charCode is 32) here. Qrcode is shared by bot.     eg: "管理员"通过扫描你分享的二维码加入群聊
@@ -95,7 +99,7 @@ const REGEX_CONFIG = {
 }
 
 export class Firer {
-  constructor(
+  constructor (
     public puppet: PuppetPuppeteer,
   ) {
     //
@@ -133,7 +137,7 @@ export class Firer {
   //   this.puppet.emit('friend', id)
   // }
 
-  public async checkFriendConfirm(
+  public async checkFriendConfirm (
     rawPayload : WebMessageRawPayload,
   ) {
     const content = rawPayload.Content
@@ -159,7 +163,7 @@ export class Firer {
     this.puppet.emit('friendship', rawPayload.MsgId)
   }
 
-  public async checkRoomJoin(
+  public async checkRoomJoin (
     rawPayload : WebMessageRawPayload,
   ): Promise<boolean> {
 
@@ -186,7 +190,7 @@ export class Firer {
     /**
      * Convert the display name to Contact ID
      */
-    let   inviterContactId: undefined | string = undefined
+    let   inviterContactId: undefined | string
     const inviteeContactIdList: string[]       = []
 
     if (/^You|你$/i.test(inviterName)) { //  === 'You' || inviter === '你' || inviter === 'you'
@@ -211,7 +215,7 @@ export class Firer {
        * loop inviteeNameList
        * set inviteeContactIdList
        */
-      for (const i in inviteeNameList) {
+      for (let i = 0; i < inviteeNameList.length; i++) {
         const inviteeName = inviteeNameList[i]
 
         const inviteeContactId = inviteeContactIdList[i]
@@ -223,7 +227,10 @@ export class Firer {
           try {
             await this.puppet.contactPayload(inviteeContactId)
           } catch (e) {
-            log.warn('PuppetPuppeteerFirer', 'fireRoomJoin() contactPayload(%s) exception: %s', inviteeContactId, e.message)
+            log.warn('PuppetPuppeteerFirer', 'fireRoomJoin() contactPayload(%s) exception: %s',
+                                              inviteeContactId,
+                                              e.message,
+                    )
             ready = false
           }
         } else {
@@ -295,7 +302,7 @@ export class Firer {
   /**
    * You removed "Bruce LEE" from the group chat
    */
-  public async checkRoomLeave(
+  public async checkRoomLeave (
     rawPayload : WebMessageRawPayload,
   ): Promise<boolean> {
     log.verbose('PuppetPuppeteerFirer', 'fireRoomLeave(%s)', rawPayload.Content)
@@ -315,7 +322,9 @@ export class Firer {
 
     /**
      * FIXME: leaver maybe is a list
-     * @lijiarui: I have checked, leaver will never be a list. If the bot remove 2 leavers at the same time, it will be 2 sys message, instead of 1 sys message contains 2 leavers.
+     * @lijiarui: I have checked, leaver will never be a list.
+     * If the bot remove 2 leavers at the same time,
+     * it will be 2 sys message, instead of 1 sys message contains 2 leavers.
      */
     let leaverContactId  : undefined | string
     let removerContactId : undefined | string
@@ -355,7 +364,7 @@ export class Firer {
     return true
   }
 
-  public async checkRoomTopic(
+  public async checkRoomTopic (
     rawPayload : WebMessageRawPayload,
   ): Promise<boolean> {
     let topic   : string
@@ -396,7 +405,7 @@ export class Firer {
   /**
    * try to find FriendRequest Confirmation Message
    */
-  private parseFriendConfirm(
+  private parseFriendConfirm (
     content: string,
   ): boolean {
     const reList = REGEX_CONFIG.friendConfirm
@@ -420,7 +429,7 @@ export class Firer {
    *  管理员 invited 小桔建群助手 to the group chat
    *  管理员 invited 庆次、小桔妹 to the group chat
    */
-  private parseRoomJoin(
+  private parseRoomJoin (
     content: string,
   ): [string[], string] {
     log.verbose('PuppetPuppeteerFirer', 'parseRoomJoin(%s)', content)
@@ -428,9 +437,9 @@ export class Firer {
     const reListInvite = REGEX_CONFIG.roomJoinInvite
     const reListQrcode = REGEX_CONFIG.roomJoinQrcode
 
-    let foundInvite: string[]|null = []
+    let foundInvite: null | string[] = []
     reListInvite.some(re => !!(foundInvite = content.match(re)))
-    let foundQrcode: string[]|null = []
+    let foundQrcode: null | string[] = []
     reListQrcode.some(re => !!(foundQrcode = content.match(re)))
     if ((!foundInvite || !foundInvite.length) && (!foundQrcode || !foundQrcode.length)) {
       throw new Error('parseRoomJoin() not found matched re of ' + content)
@@ -440,12 +449,14 @@ export class Firer {
      * "管理员"通过扫描你分享的二维码加入群聊
      */
     const [inviter, inviteeStr] = foundInvite ? [ foundInvite[1], foundInvite[2] ] : [ foundQrcode[2], foundQrcode[1] ]
+
+    // FIXME: should also compatible english split
     const inviteeList = inviteeStr.split(/、/)
 
     return [inviteeList, inviter] // put invitee at first place
   }
 
-  private parseRoomLeave(
+  private parseRoomLeave (
     content: string,
   ): [string, string] {
     let matchIKickOther: null | string[] = []
@@ -478,12 +489,12 @@ export class Firer {
     return [leaverName, removerName]
   }
 
-  private parseRoomTopic(
+  private parseRoomTopic (
     content: string,
   ): [string, string] {
     const reList = REGEX_CONFIG.roomTopic
 
-    let found: string[]|null = []
+    let found: null | string[] = []
     reList.some(re => !!(found = content.match(re)))
     if (!found || !found.length) {
       throw new Error('checkRoomTopic() not found')

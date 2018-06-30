@@ -16,6 +16,8 @@
  *   limitations under the License.
  *
  */
+// tslint:disable:arrow-parens
+
 import { EventEmitter } from 'events'
 import fs          from 'fs'
 import path        from 'path'
@@ -38,17 +40,22 @@ import {
 /* tslint:disable:no-var-requires */
 // const retryPromise  = require('retry-promise').default
 
-import { log }        from '../config'
-import Misc           from '../misc'
+import {
+  log,
+  MEMORY_SLOT,
+  retry,
+}               from './config'
 
 import {
+  WebContactRawPayload,
   WebMessageMediaPayload,
   WebMessageRawPayload,
-  WebContactRawPayload,
-}                               from '../puppet-puppeteer/web-schemas'
-import {
   WebRoomRawPayload,
 }                               from './web-schemas'
+
+import {
+  unescapeHtml,
+}                       from './pure-function-helpers'
 
 export interface InjectResult {
   code:    number,
@@ -56,8 +63,8 @@ export interface InjectResult {
 }
 
 export interface BridgeOptions {
-  head?   : boolean,
-  profile : MemoryCard,
+  head?  : boolean,
+  memory : MemoryCard,
 }
 
 export class Bridge extends EventEmitter {
@@ -65,7 +72,7 @@ export class Bridge extends EventEmitter {
   private page    : undefined | Page
   private state   : StateSwitch
 
-  constructor(
+  constructor (
     public options: BridgeOptions,
   ) {
     super()
@@ -74,7 +81,7 @@ export class Bridge extends EventEmitter {
     this.state = new StateSwitch('PuppetPuppeteerBridge', log)
   }
 
-  public async init(): Promise<void> {
+  public async init (): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'init()')
 
     this.state.on('pending')
@@ -110,12 +117,11 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async initBrowser(): Promise<Browser> {
+  public async initBrowser (): Promise<Browser> {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
 
     const headless = this.options.head ? false : true
     const browser = await launch({
-      headless,
       args: [
         '--audio-output-channels=0',
         '--disable-default-apps',
@@ -128,6 +134,7 @@ export class Bridge extends EventEmitter {
         '--mute-audio',
         '--no-sandbox',
       ],
+      headless,
     })
 
     const version = await browser.version()
@@ -136,7 +143,7 @@ export class Bridge extends EventEmitter {
     return browser
   }
 
-  public async onDialog(dialog: Dialog) {
+  public async onDialog (dialog: Dialog) {
     log.warn('PuppetPuppeteerBridge', 'init() page.on(dialog) type:%s message:%s',
                                 dialog.type, dialog.message())
     try {
@@ -149,7 +156,7 @@ export class Bridge extends EventEmitter {
     this.emit('error', new Error(`${dialog.type}(${dialog.message()})`))
   }
 
-  public async onLoad(page: Page): Promise<void> {
+  public async onLoad (page: Page): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'initPage() on(load) %s', page.url())
 
     if (this.state.off()) {
@@ -159,7 +166,7 @@ export class Bridge extends EventEmitter {
 
     try {
       const emitExist = await page.evaluate(() => {
-        return typeof window['emit'] === 'function'
+        return typeof window.emit === 'function'
       })
       if (!emitExist) {
         await page.exposeFunction('emit', this.emit.bind(this))
@@ -178,7 +185,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async initPage(browser: Browser): Promise<Page> {
+  public async initPage (browser: Browser): Promise<Page> {
     log.verbose('PuppetPuppeteerBridge', 'initPage()')
 
     // set this in time because the following callbacks
@@ -189,11 +196,14 @@ export class Bridge extends EventEmitter {
 
     page.on('dialog', this.onDialog.bind(this))
 
-    const cookieList = (await this.options.profile.get('cookies')) as Cookie[]
+    const cookieList = (await this.options.memory.get(MEMORY_SLOT)) as Cookie[]
     const url        = this.entryUrl(cookieList)
 
     log.verbose('PuppetPuppeteerBridge', 'initPage() before page.goto(url)')
-    await page.goto(url) // Does this related to(?) the CI Error: exception: Navigation Timeout Exceeded: 30000ms exceeded
+
+    // Does this related to(?) the CI Error: exception: Navigation Timeout Exceeded: 30000ms exceeded
+    await page.goto(url)
+
     log.verbose('PuppetPuppeteerBridge', 'initPage() after page.goto(url)')
 
     if (cookieList && cookieList.length) {
@@ -207,7 +217,7 @@ export class Bridge extends EventEmitter {
     return page
   }
 
-  public async readyAngular(page: Page): Promise<void> {
+  public async readyAngular (page: Page): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'readyAngular()')
 
     try {
@@ -230,7 +240,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async inject(page: Page): Promise<void> {
+  public async inject (page: Page): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'inject()')
 
     const WECHATY_BRO_JS_FILE = path.join(
@@ -242,7 +252,7 @@ export class Bridge extends EventEmitter {
       const sourceCode = fs.readFileSync(WECHATY_BRO_JS_FILE)
                             .toString()
 
-      let retObj = await page.evaluate(sourceCode) as any as InjectResult
+      let retObj = await page.evaluate(sourceCode) as InjectResult
 
       if (retObj && /^(2|3)/.test(retObj.code.toString())) {
         // HTTP Code 2XX & 3XX
@@ -276,7 +286,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async logout(): Promise<any> {
+  public async logout (): Promise<any> {
     log.verbose('PuppetPuppeteerBridge', 'logout()')
     try {
       return await this.proxyWechaty('logout')
@@ -286,7 +296,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async quit(): Promise<void> {
+  public async quit (): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'quit()')
 
     if (!this.page) {
@@ -315,7 +325,7 @@ export class Bridge extends EventEmitter {
     this.state.off(true)
   }
 
-  public async getUserName(): Promise<string> {
+  public async getUserName (): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getUserName()')
 
     try {
@@ -327,7 +337,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async contactAlias(contactId: string, alias: string|null): Promise<boolean> {
+  public async contactAlias (contactId: string, alias: null | string): Promise<boolean> {
     try {
       return await this.proxyWechaty('contactRemark', contactId, alias)
     } catch (e) {
@@ -339,7 +349,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async contactList(): Promise<string[]> {
+  public async contactList (): Promise<string[]> {
     try {
       return await this.proxyWechaty('contactList')
     } catch (e) {
@@ -348,7 +358,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async roomList(): Promise<string[]> {
+  public async roomList (): Promise<string[]> {
     try {
       return await this.proxyWechaty('roomList')
     } catch (e) {
@@ -357,7 +367,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async roomDelMember(
+  public async roomDelMember (
     roomId:     string,
     contactId:  string,
   ): Promise<number> {
@@ -372,7 +382,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async roomAddMember(
+  public async roomAddMember (
     roomId:     string,
     contactId:  string,
   ): Promise<number> {
@@ -389,7 +399,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async roomModTopic(
+  public async roomModTopic (
     roomId: string,
     topic:  string,
   ): Promise<string> {
@@ -405,7 +415,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async roomCreate(contactIdList: string[], topic?: string): Promise<string> {
+  public async roomCreate (contactIdList: string[], topic?: string): Promise<string> {
     if (!contactIdList || !Array.isArray(contactIdList)) {
       throw new Error('no valid contactIdList')
     }
@@ -423,7 +433,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async verifyUserRequest(
+  public async verifyUserRequest (
     contactId:  string,
     hello:      string,
   ): Promise<boolean> {
@@ -440,7 +450,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async verifyUserOk(
+  public async verifyUserOk (
     contactId:  string,
     ticket:     string,
   ): Promise<boolean> {
@@ -457,7 +467,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async send(
+  public async send (
     toUserName: string,
     text:       string,
   ): Promise<void> {
@@ -481,7 +491,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMsgImg(id: string): Promise<string> {
+  public async getMsgImg (id: string): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getMsgImg(%s)', id)
 
     try {
@@ -492,7 +502,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMsgEmoticon(id: string): Promise<string> {
+  public async getMsgEmoticon (id: string): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getMsgEmoticon(%s)', id)
 
     try {
@@ -503,7 +513,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMsgVideo(id: string): Promise<string> {
+  public async getMsgVideo (id: string): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getMsgVideo(%s)', id)
 
     try {
@@ -514,7 +524,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMsgVoice(id: string): Promise<string> {
+  public async getMsgVoice (id: string): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getMsgVoice(%s)', id)
 
     try {
@@ -525,7 +535,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMsgPublicLinkImg(id: string): Promise<string> {
+  public async getMsgPublicLinkImg (id: string): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getMsgPublicLinkImg(%s)', id)
 
     try {
@@ -536,9 +546,9 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getMessage(id: string): Promise<WebMessageRawPayload> {
+  public async getMessage (id: string): Promise<WebMessageRawPayload> {
     try {
-      return await Misc.retry(async (retry, attempt) => {
+      return await retry(async (retryException, attempt) => {
         log.silly('PuppetPuppeteerBridge', 'getMessage(%s) retry attempt %d',
                                           id,
                                           attempt,
@@ -552,7 +562,7 @@ export class Bridge extends EventEmitter {
           throw new Error('got empty return value at attempt: ' + attempt)
         } catch (e) {
           log.verbose('PuppetPuppeteerBridge', 'getMessage() proxyWechaty(getMessage, %s) exception: %s', id, e.message)
-          retry(e)
+          retryException(e)
         }
       })
 
@@ -562,9 +572,9 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getContact(id: string): Promise<WebContactRawPayload | WebRoomRawPayload> {
+  public async getContact (id: string): Promise<WebContactRawPayload | WebRoomRawPayload> {
     try {
-      return await Misc.retry(async (retry, attempt) => {
+      return await retry(async (retryException, attempt) => {
         log.silly('PuppetPuppeteerBridge', 'getContact(%s) retry attempt %d',
                                           id,
                                           attempt,
@@ -578,7 +588,7 @@ export class Bridge extends EventEmitter {
           throw new Error('got empty return value at attempt: ' + attempt)
         } catch (e) {
           log.verbose('PuppetPuppeteerBridge', 'getContact() proxyWechaty(getContact, %s) exception: %s', id, e.message)
-          retry(e)
+          retryException(e)
         }
       })
 
@@ -589,7 +599,7 @@ export class Bridge extends EventEmitter {
     /////////////////////////////////
   }
 
-  public async getBaseRequest(): Promise<string> {
+  public async getBaseRequest (): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getBaseRequest()')
 
     try {
@@ -600,7 +610,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getPassticket(): Promise<string> {
+  public async getPassticket (): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getPassticket()')
 
     try {
@@ -611,7 +621,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getCheckUploadUrl(): Promise<string> {
+  public async getCheckUploadUrl (): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getCheckUploadUrl()')
 
     try {
@@ -622,7 +632,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async getUploadMediaUrl(): Promise<string> {
+  public async getUploadMediaUrl (): Promise<string> {
     log.verbose('PuppetPuppeteerBridge', 'getUploadMediaUrl()')
 
     try {
@@ -633,7 +643,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async sendMedia(mediaData: WebMessageMediaPayload): Promise<boolean> {
+  public async sendMedia (mediaData: WebMessageMediaPayload): Promise<boolean> {
     log.verbose('PuppetPuppeteerBridge', 'sendMedia(mediaData)')
 
     if (!mediaData.ToUserName) {
@@ -650,7 +660,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async forward(baseData: WebMessageRawPayload, patchData: WebMessageRawPayload): Promise<boolean> {
+  public async forward (baseData: WebMessageRawPayload, patchData: WebMessageRawPayload): Promise<boolean> {
     log.verbose('PuppetPuppeteerBridge', 'forward()')
 
     if (!baseData.ToUserName) {
@@ -670,7 +680,7 @@ export class Bridge extends EventEmitter {
   /**
    * Proxy Call to Wechaty in Bridge
    */
-  public async proxyWechaty(
+  public async proxyWechaty (
     wechatyFunc : string,
     ...args     : any[]
   ): Promise<any> {
@@ -728,7 +738,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public ding(data: any): void {
+  public ding (data: any): void {
     log.verbose('PuppetPuppeteerBridge', 'ding(%s)', data || '')
 
     this.proxyWechaty('ding', data)
@@ -741,7 +751,7 @@ export class Bridge extends EventEmitter {
     })
   }
 
-  public preHtmlToXml(text: string): string {
+  public preHtmlToXml (text: string): string {
     log.verbose('PuppetPuppeteerBridge', 'preHtmlToXml()')
 
     const preRegex = /^<pre[^>]*>([^<]+)<\/pre>$/i
@@ -749,10 +759,10 @@ export class Bridge extends EventEmitter {
     if (!matches) {
       return text
     }
-    return Misc.unescapeHtml(matches[1])
+    return unescapeHtml(matches[1])
   }
 
-  public async innerHTML(): Promise<string> {
+  public async innerHTML (): Promise<string> {
     const html = await this.evaluate(() => {
       return window.document.body.innerHTML
     })
@@ -762,7 +772,7 @@ export class Bridge extends EventEmitter {
   /**
    * Throw if there's a blocked message
    */
-  public async testBlockedMessage(text?: string): Promise<string | false> {
+  public async testBlockedMessage (text?: string): Promise<string | false> {
     if (!text) {
       text = await this.innerHTML()
     }
@@ -843,7 +853,7 @@ export class Bridge extends EventEmitter {
     // })
   }
 
-  public async clickSwitchAccount(page: Page): Promise<boolean> {
+  public async clickSwitchAccount (page: Page): Promise<boolean> {
     log.verbose('PuppetPuppeteerBridge', 'clickSwitchAccount()')
 
     // https://github.com/GoogleChrome/puppeteer/issues/537#issuecomment-334918553
@@ -882,7 +892,9 @@ export class Bridge extends EventEmitter {
     // TODO: use page.$x() (with puppeteer v1.1 or above) to replace DIY version of listXpath() instead.
     // See: https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagexexpression
 
-    const XPATH_SELECTOR = `//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']`
+    const XPATH_SELECTOR =
+      `//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']`
+
     try {
       // const [button] = await listXpath(page, XPATH_SELECTOR)
       const [button] = await page.$x(XPATH_SELECTOR)
@@ -902,7 +914,7 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async hostname(): Promise<string | null> {
+  public async hostname (): Promise<string | null> {
     log.verbose('PuppetPuppeteerBridge', 'hostname()')
 
     if (!this.page) {
@@ -920,10 +932,10 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async cookies(cookieList: Cookie[]): Promise<void>
-  public async cookies(): Promise<Cookie[]>
+  public async cookies (cookieList: Cookie[]): Promise<void>
+  public async cookies (): Promise<Cookie[]>
 
-  public async cookies(cookieList?: Cookie[]): Promise<void | Cookie[]> {
+  public async cookies (cookieList?: Cookie[]): Promise<void | Cookie[]> {
     if (!this.page) {
       throw new Error('no page')
     }
@@ -946,7 +958,7 @@ export class Bridge extends EventEmitter {
   /**
    * name
    */
-  public entryUrl(cookieList?: Cookie[]): string {
+  public entryUrl (cookieList?: Cookie[]): string {
     log.verbose('PuppetPuppeteerBridge', 'cookieDomain(%s)', cookieList)
 
     const DEFAULT_URL = 'https://wx.qq.com'
@@ -984,7 +996,7 @@ export class Bridge extends EventEmitter {
     return url
   }
 
-  public async reload(): Promise<void> {
+  public async reload (): Promise<void> {
     log.verbose('PuppetPuppeteerBridge', 'reload()')
 
     if (!this.page) {
@@ -995,7 +1007,7 @@ export class Bridge extends EventEmitter {
     return
   }
 
-  public async evaluate(fn: () => any, ...args: any[]): Promise<any> {
+  public async evaluate (fn: () => any, ...args: any[]): Promise<any> {
     log.silly('PuppetPuppeteerBridge', 'evaluate()')
 
     if (!this.page) {

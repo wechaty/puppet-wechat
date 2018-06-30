@@ -27,15 +27,15 @@ import test  from 'blue-tape'
 // import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
 
-import { PuppetPuppeteer }  from './puppet-puppeteer'
 import { Firer }            from './firer'
+import { PuppetPuppeteer }  from './puppet-puppeteer'
 
 const SELF_ID = 'self-id'
 const mockPuppetPuppeteer = {
   selfId: () => SELF_ID,
 } as any as PuppetPuppeteer
 
-test('parseFriendConfirm()', async t => {
+test('parseFriendConfirm()', async (t) => {
   const contentList = [
     [
       'You have added 李卓桓 as your WeChat contact. Start chatting!',
@@ -67,8 +67,8 @@ test('parseFriendConfirm()', async t => {
   t.false(result, 'should be falsy for other msg')
 })
 
-test('parseRoomJoin()', async t => {
-  const contentList: [string, string, string[]][] = [
+test('parseRoomJoin()', async (t) => {
+  const contentList: Array<[string, string, string[]]> = [
     [
       `You invited 管理员 to the group chat.   `,
       `You`,
@@ -136,7 +136,7 @@ test('parseRoomJoin()', async t => {
   }, Error, 'should throws if message is not expected')
 })
 
-test('parseRoomLeave()', async t => {
+test('parseRoomLeave()', async (t) => {
   const contentLeaverList = [
     [
       `You removed "Bruce LEE" from the group chat`,
@@ -178,7 +178,7 @@ test('parseRoomLeave()', async t => {
   }, Error, 'should throw if message is not expected')
 })
 
-test('parseRoomTopic()', async t => {
+test('parseRoomTopic()', async (t) => {
   const contentList = [
     [
       `"李卓桓.PreAngel" changed the group name to "ding"`,

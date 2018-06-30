@@ -17,8 +17,10 @@
  *   limitations under the License.
  *
  */
-import test  from 'blue-tape'
+// tslint:disable:arrow-parens
 // tslint:disable:no-shadowed-variable
+
+import test  from 'blue-tape'
 
 // import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
@@ -35,16 +37,16 @@ import {
 import Bridge     from './bridge'
 
 const PUPPETEER_LAUNCH_OPTIONS = {
-  headless: true,
   args: [
     '--disable-gpu',
     '--disable-setuid-sandbox',
     '--no-sandbox',
   ],
+  headless: true,
 }
-test('PuppetPuppeteerBridge', async t => {
-  const profile = new MemoryCard()
-  const bridge = new Bridge({ profile })
+
+test('PuppetPuppeteerBridge', async (t) => {
+  const bridge = new Bridge({ memory: new MemoryCard() })
   try {
     await bridge.init()
     await bridge.quit()
@@ -54,7 +56,7 @@ test('PuppetPuppeteerBridge', async t => {
   }
 })
 
-test('preHtmlToXml()', async t => {
+test('preHtmlToXml()', async (t) => {
   const BLOCKED_HTML_ZH = [
     '<pre style="word-wrap: break-word; white-space: pre-wrap;">',
       '&lt;error&gt;',
@@ -71,8 +73,8 @@ test('preHtmlToXml()', async t => {
     '</error>',
   ].join('')
 
-  const profile = new MemoryCard()
-  const bridge = new Bridge({ profile })
+  const memory = new MemoryCard()
+  const bridge = new Bridge({ memory })
 
   const xml = bridge.preHtmlToXml(BLOCKED_HTML_ZH)
   t.equal(xml, BLOCKED_XML_ZH, 'should parse html to xml')
@@ -111,32 +113,32 @@ test('testBlockedMessage()', async t => {
   ].join('')
 
   t.test('not blocked', async t => {
-    const profile = new MemoryCard()
-    const bridge = new Bridge({ profile })
+    const memory = new MemoryCard()
+    const bridge = new Bridge({ memory })
 
     const msg = await bridge.testBlockedMessage('this is not xml')
     t.equal(msg, false, 'should return false when no block message')
   })
 
   t.test('html', async t => {
-    const profile = new MemoryCard()
-    const bridge = new Bridge({ profile })
+    const memory = new MemoryCard()
+    const bridge = new Bridge({ memory })
 
     const msg = await bridge.testBlockedMessage(BLOCKED_HTML_ZH)
     t.equal(msg, BLOCKED_TEXT_ZH, 'should get zh blocked message')
   })
 
   t.test('zh', async t => {
-    const profile = new MemoryCard()
-    const bridge = new Bridge({ profile })
+    const memory = new MemoryCard()
+    const bridge = new Bridge({ memory })
 
     const msg = await bridge.testBlockedMessage(BLOCKED_XML_ZH)
     t.equal(msg, BLOCKED_TEXT_ZH, 'should get zh blocked message')
   })
 
   test('en', async t => {
-    const profile = new MemoryCard()
-    const bridge = new Bridge({ profile })
+    const memory = new MemoryCard()
+    const bridge = new Bridge({ memory })
 
     const msg = await bridge.testBlockedMessage(BLOCKED_XML_EN)
     t.equal(msg, BLOCKED_TEXT_EN, 'should get en blocked message')
@@ -152,8 +154,8 @@ test('clickSwitchAccount()', async t => {
     <a href="javascript:;" ng-click="qrcodeLogin()" class="button button_default">Switch Account</a>
     </div>
   `
-  const profile = new MemoryCard()
-  const bridge = new Bridge({ profile} )
+  const memory = new MemoryCard()
+  const bridge = new Bridge({ memory })
 
   t.test('switch account needed', async t => {
     const browser = await launch(PUPPETEER_LAUNCH_OPTIONS)
@@ -183,9 +185,9 @@ test('clickSwitchAccount()', async t => {
 })
 
 test('WechatyBro.ding()', async t => {
-  const profile = new MemoryCard(Math.random().toString(36).substr(2, 5))
+  const memory = new MemoryCard(Math.random().toString(36).substr(2, 5))
   const bridge = new Bridge({
-    profile,
+    memory,
   })
   t.ok(bridge, 'should instanciated a bridge')
 
@@ -195,7 +197,7 @@ test('WechatyBro.ding()', async t => {
 
     const retDing = await bridge.evaluate(() => {
       return WechatyBro.ding()
-    }) as any as string
+    }) as string
 
     t.is(retDing, 'dong', 'should got dong after execute WechatyBro.ding()')
 
@@ -207,6 +209,6 @@ test('WechatyBro.ding()', async t => {
   } catch (err) {
     t.fail('exception: ' + err.message)
   } finally {
-    profile.destroy()
+    memory.destroy()
   }
 })

@@ -3,6 +3,7 @@ import {
 }                         from '../web-schemas'
 
 import {
+  MessagePayload,
   MessageType,
 }                 from 'wechaty-puppet'
 import {
@@ -16,11 +17,7 @@ import {
   webMessageType,
 }                 from './web-message-type'
 
-import {
-  MessagePayload,
-}                         from 'wechaty-puppet'
-
-export function messageRawPayloadParser(
+export function messageRawPayloadParser (
   rawPayload: WebMessageRawPayload,
 ): MessagePayload {
   const id                           = rawPayload.MsgId
@@ -48,7 +45,8 @@ export function messageRawPayloadParser(
   }
 
   if (rawPayload.ToUserName) {
-    if (!isRoomId(rawPayload.ToUserName)) { // if a message in room without any specific receiver, then it will set to be `undefined`
+    if (!isRoomId(rawPayload.ToUserName)) {
+      // if a message in room without any specific receiver, then it will set to be `undefined`
       toId = rawPayload.ToUserName
     }
   }
@@ -56,12 +54,12 @@ export function messageRawPayloadParser(
   const type: MessageType = webMessageType(rawPayload.MsgType)
 
   const payloadBase = {
-    id,
-    type,
-    fromId,
     filename: msgFileName,
+    fromId,
+    id,
     text,
     timestamp,
+    type,
   }
 
   let payload: MessagePayload
@@ -69,14 +67,14 @@ export function messageRawPayloadParser(
   if (toId) {
     payload = {
       ...payloadBase,
-      toId,
       roomId,
+      toId,
     }
   } else if (roomId) {
     payload = {
       ...payloadBase,
-      toId,
       roomId,
+      toId,
     }
   } else {
     throw new Error('neither roomId nor toId')

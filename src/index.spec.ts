@@ -25,6 +25,6 @@ import {
   PuppetPuppeteer,
 } from './'
 
-test('PuppetPuppeteer Module Exports', async t => {
+test('PuppetPuppeteer Module Exports', async (t) => {
   t.ok(PuppetPuppeteer  , 'should export PuppetPuppeteer')
 })

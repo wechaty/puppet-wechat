@@ -22,7 +22,7 @@ import {
 
 import {
   log,
-}                 from '../config'
+}                 from './config'
 // import {
 //   PuppetScanEvent,
 // }                 from 'wechaty-puppet'
@@ -34,8 +34,8 @@ import {
   PuppetPuppeteer,
 }                         from './puppet-puppeteer'
 import {
-  WebMessageType,
   WebMessageRawPayload,
+  WebMessageType,
 }                         from './web-schemas'
 
 /* tslint:disable:variable-name */
@@ -52,7 +52,7 @@ export const Event = {
 
 }
 
-function onDing(
+function onDing (
   this: PuppetPuppeteer,
   data: any,
 ): void {
@@ -60,7 +60,7 @@ function onDing(
   this.emit('watchdog', { data })
 }
 
-async function onScan(
+async function onScan (
   this    : PuppetPuppeteer,
   // Do not use PuppetScanPayload at here, use { code: number, url: string } instead,
   //  because this is related with Browser Hook Code:
@@ -103,11 +103,11 @@ async function onScan(
   this.emit('scan', qrcode, status)
 }
 
-function onLog(data: any): void {
+function onLog (data: any): void {
   log.silly('PuppetPuppeteerEvent', 'onLog(%s)', data)
 }
 
-async function onLogin(
+async function onLogin (
   this: PuppetPuppeteer,
   note: string,
   ttl = 30,
@@ -174,7 +174,7 @@ async function onLogin(
   return
 }
 
-async function onLogout(
+async function onLogout (
   this: PuppetPuppeteer,
   data: any,
 ): Promise<void> {
@@ -188,7 +188,7 @@ async function onLogout(
   }
 }
 
-async function onMessage(
+async function onMessage (
   this       : PuppetPuppeteer,
   rawPayload : WebMessageRawPayload,
 ): Promise<void> {
@@ -230,7 +230,7 @@ async function onMessage(
   this.emit('message', rawPayload.MsgId)
 }
 
-async function onUnload(this: PuppetPuppeteer): Promise<void> {
+async function onUnload (this: PuppetPuppeteer): Promise<void> {
   log.silly('PuppetPuppeteerEvent', 'onUnload()')
   /*
   try {
