@@ -16,23 +16,24 @@ npm install *-*.*.*.tgz \
   @types/node \
   @types/normalize-package-data \
   @types/promise-retry \
+  @types/puppeteer \
   brolog \
   file-box \
   hot-import \
   lru-cache \
   memory-card \
   normalize-package-data \
+  rxjs \
   state-switch \
   typescript \
   wechaty-puppet \
-  wechat4u \
   qr-image \
   promise-retry \
   watchdog \
 
 ./node_modules/.bin/tsc \
   --esModuleInterop \
-  --lib esnext \
+  --lib dom,esnext \
   --noEmitOnError \
   --noImplicitAny \
   --target es6 \

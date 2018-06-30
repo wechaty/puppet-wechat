@@ -34,6 +34,11 @@ import {
   MemoryCard,
 }                 from 'memory-card'
 
+// import {
+//   log,
+// }                 from './config'
+// log.silly('BridgeTesting', 'import typings for Brolog')
+
 import Bridge     from './bridge'
 
 const PUPPETEER_LAUNCH_OPTIONS = {

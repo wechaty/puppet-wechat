@@ -31,7 +31,7 @@ const sinonTest   = require('sinon-test')(sinon, {
   },
 })
 
-// import { log }    from '../../src/config'
+// import { log }    from './config'
 // log.level('silly')
 
 import { MemoryCard }      from 'memory-card'
@@ -87,14 +87,16 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
     t.is(puppet.logonoff() , false  , 'should be not logined')
 
     const future = new Promise(r => puppet.once('login', r))
-              .catch(e => t.fail(e))
+                        .catch(e => t.fail(e))
     puppet.bridge.emit('login', 'TestPuppetPuppeteer')
     await future
 
     t.is(puppet.logonoff(), true, 'should be logined')
 
     t.ok((puppet.bridge.getUserName as any).called, 'bridge.getUserName should be called')
-    t.ok((puppet.contactRawPayload as any).called,  'puppet.contactRawPayload should be called')
+
+    // Puppet will not ready the contact, so the contactRawPayload might not be called at here. Huan, 2018.6
+    // t.ok((puppet.contactRawPayload as any).called,  'puppet.contactRawPayload should be called')
 
     t.ok((Bridge.prototype.contactList as any).called,       'contactList stub should be called')
     t.is((Bridge.prototype.contactList as any).callCount, 4, 'should call stubContacList 4 times')

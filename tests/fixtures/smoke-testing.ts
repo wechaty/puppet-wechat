@@ -16,7 +16,7 @@ import {
   log,
 }                   from 'wechaty-puppet-puppeteer'
 
-log.level('silly')
+log.level('verbose')
 
 async function main () {
   const puppet = new PuppetPuppeteer({ memory: new MemoryCard() })

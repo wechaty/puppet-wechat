@@ -5,4 +5,4 @@ interface Window {
   emit?: Function, // from puppeteer
 }
 
-// declare const WechatyBro: any
+declare const WechatyBro: any
