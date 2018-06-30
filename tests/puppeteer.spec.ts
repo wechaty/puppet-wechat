@@ -17,6 +17,10 @@
  *   limitations under the License.
  *
  */
+
+// tslint:disable:arrow-parens
+// tslint:disable:no-console
+
 import fs    from 'fs'
 import path  from 'path'
 
@@ -30,16 +34,18 @@ import {
 }                 from 'puppeteer'
 
 const PUPPETEER_LAUNCH_OPTIONS = {
-  headless: true,
   args: [
     '--disable-gpu',
     '--disable-setuid-sandbox',
     '--no-sandbox',
   ],
+  headless: true,
 }
 
 test('Puppeteer smoke testing', async t => {
-  let browser, page
+  let browser
+  let page
+
   try {
     browser = await launch(PUPPETEER_LAUNCH_OPTIONS)
     t.ok(browser, 'Browser instnace')
@@ -222,15 +228,15 @@ test('other demos', async t => {
     t.ok(cookieList[0].name,  'should get cookies with name')
 
     const cookie: Cookie = {
-      name     : 'test-name',
-      value    : 'test-value',
       domain   : 'qq.com',
-      path     : '/',
       expires  : 1234324132,
       httpOnly : false,
-      secure   : false,
+      name     : 'test-name',
+      path     : '/',
       sameSite : 'Strict',
+      secure   : false,
       session  : true,
+      value    : 'test-value',
     }
     await page.setCookie(cookie)
 
