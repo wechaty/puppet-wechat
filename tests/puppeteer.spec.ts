@@ -59,7 +59,7 @@ test('Puppeteer smoke testing', async t => {
     t.pass('should open wx.qq.com')
 
     const result = await page.evaluate(() => 42)
-    t.is(result as any, 42, 'should get 42')
+    t.is(result, 42, 'should get 42')
 
   } catch (e) {
     t.fail(e && e.message || e)
@@ -245,7 +245,7 @@ test('other demos', async t => {
 
     t.equal(await page.evaluate('1 + 2'), 3, 'should evaluated 1 + 2 = 3')
 
-    const url = await page.url()
+    const url = page.url()
     t.equal(url, EXPECTED_URL, 'should get the url right')
     // await new Promise(r => setTimeout(r, 3000))
 
