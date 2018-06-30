@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es6"
+    , "module": "commonjs"
+    , "outDir": "dist"
+    , "declaration": true
+    , "sourceMap": true
+    , "strict": true
+    , "traceResolution": false
+    , "esModuleInterop" : true
+    , "resolveJsonModule": true
+    , "lib": [
+      "dom"
+      , "esnext"
+    ]
+  }
+  , "exclude": [
+      "node_modules/"
+    , "dist/"
+  ]
+  , "include": [
+       "bin/*.ts"
+     , "scripts/**/*.ts"
+     , "examples/**/*.ts"
+     , "src/**/*.ts"
+     , "tests/**/*.spec.ts"
+  ]
+}
