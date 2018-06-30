@@ -24,6 +24,7 @@ npm install *-*.*.*.tgz \
   memory-card \
   normalize-package-data \
   rxjs \
+  rx-queue \
   state-switch \
   typescript \
   wechaty-puppet \
