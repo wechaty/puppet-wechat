@@ -38,9 +38,8 @@
  * read more about this in puppet-web-bridge.ts
  */
 
-(function() {
-
-  function init() {
+(function () {
+  function init () {
     if (!angularIsReady()) {
       retObj.code = 503 // 503 SERVICE UNAVAILABLE https://httpstatuses.com/503
       retObj.message = 'init() without a ready angular env'
@@ -75,7 +74,7 @@
     return retObj
   }
 
-  function log(text) {
+  function log (text) {
     WechatyBro.emit('log', text)
   }
 
@@ -84,11 +83,11 @@
   * Functions that Glued with AngularJS
   *
   */
-  function MMCgiLogined() {
+  function MMCgiLogined () {
     return !!(window.MMCgi && window.MMCgi.isLogin)
   }
 
-  function angularIsReady() {
+  function angularIsReady () {
     // don't log inside, because we has not yet init clog here.
     return !!(
       (typeof angular) !== 'undefined'
@@ -98,7 +97,7 @@
     )
   }
 
-  function heartBeat(firstTime) {
+  function heartBeat (firstTime) {
     var TIMEOUT = 15000 // 15s
     if (firstTime && WechatyBro.vars.heartBeatTimmer) {
       log('heartBeat timer exist when 1st time is true? return for do nothing')
@@ -109,14 +108,13 @@
     return TIMEOUT
   }
 
-  function glueToAngular() {
+  function glueToAngular () {
     var injector  = angular.element(document).injector()
     if (!injector) {
       throw new Error('glueToAngular cant get injector(right now)')
     }
-
     var accountFactory  = injector.get('accountFactory')
-    var appFactory      = injector.get('appFactory')
+    // var appFactory      = injector.get('appFactory')
     var chatroomFactory = injector.get('chatroomFactory')
     var chatFactory     = injector.get('chatFactory')
     var contactFactory  = injector.get('contactFactory')
@@ -161,7 +159,7 @@
      * https://github.com/angular/angular.js/blob/a4e60cb6970d8b6fa9e0af4b9f881ee3ba7fdc99/test/ng/controllerSpec.js#L24
      */
     var contentChatScope  = rootScope.$new()
-    injector.get('$controller')('contentChatController', {$scope: contentChatScope })
+    injector.get('$controller')('contentChatController', { $scope: contentChatScope })
 
     // get all we need from wx in browser(angularjs)
     WechatyBro.glue = {
@@ -189,10 +187,10 @@
     return true
   }
 
-  function checkScan() {
+  function checkScan () {
     // log('checkScan()')
     if (loginState()) {
-      log('checkScan() - already login, no more check, and return(only)') //but I will emit a login event')
+      log('checkScan() - already login, no more check, and return(only)') // but I will emit a login event')
       // login('checkScan found already login')
       return
     }
@@ -237,24 +235,22 @@
     // wait a while because the account maybe blocked by tencent,
     // then there will be a dialog should appear
     setTimeout(() => login('scan code 200'), 1000)
-    return
   }
 
-  function loginState(state) {
+  function loginState (state) {
     if (typeof state === 'undefined') {
       return !!WechatyBro.vars.loginState
     }
     WechatyBro.vars.loginState = state
-    return
   }
 
-  function login(data) {
+  function login (data) {
     log('login(' + data + ')')
     loginState(true)
     WechatyBro.emit('login', data)
   }
 
-  function logout(data) {
+  function logout (data) {
     log('logout(' + data + ')')
 
     loginState(false)
@@ -269,32 +265,32 @@
     setTimeout(() => checkScan(), 1000)
   }
 
-  function ding(data) {
+  function ding (data) {
     log('recv ding')
     return data || 'dong'
   }
 
-  function hookEvents() {
+  function hookEvents () {
     var rootScope = WechatyBro.glue.rootScope
     var appScope = WechatyBro.glue.appScope
     if (!rootScope || !appScope) {
       log('hookEvents() no rootScope')
       return false
     }
-    rootScope.$on('message:add:success', function(event, data) {
+    rootScope.$on('message:add:success', function (event, data) {
       if (!loginState()) { // in case of we missed the pageInit event
         login('by event[message:add:success]')
       }
       WechatyBro.emit('message', data)
     })
-    rootScope.$on('root:pageInit:success'), function (event, data) {
+    rootScope.$on('root:pageInit:success', function (event, data) {
       login('by event[root:pageInit:success]')
-    }
+    })
     // newLoginPage seems not stand for a user login action
     // appScope.$on("newLoginPage", function(event, data) {
     //   login('by event[newLoginPage]')
     // })
-    window.addEventListener('unload', function(e) {
+    window.addEventListener('unload', function (e) {
       // XXX only 1 event can be emitted here???
       WechatyBro.emit('unload', String(e))
       log('event unload')
@@ -302,14 +298,14 @@
     return true
   }
 
-  function hookRecalledMsgProcess() {
+  function hookRecalledMsgProcess () {
     var chatFactory = WechatyBro.glue.chatFactory
     var utilFactory = WechatyBro.glue.utilFactory
     var confFactory = WechatyBro.glue.confFactory
 
     // hook chatFactory._recalledMsgProcess, resolve emit RECALLED type msg
-    oldRecalledMsgProcess = chatFactory._recalledMsgProcess
-    chatFactory._recalledMsgProcess = function(msg) {
+    var oldRecalledMsgProcess = chatFactory._recalledMsgProcess
+    chatFactory._recalledMsgProcess = function (msg) {
       oldRecalledMsgProcess(msg)
       var m = Object.assign({}, msg)
       var content = utilFactory.htmlDecode(m.MMActualContent)
@@ -323,7 +319,7 @@
           m.MsgType = confFactory.MSGTYPE_RECALLED
         } else {
           m.MsgId = revokemsg.msgid
-          m.MMActualContent = m.Content = revokemsg.replacemsg.replace(/"/g,"")
+          m.MMActualContent = m.Content = revokemsg.replacemsg.replace(/"/g, '')
         }
         WechatyBro.emit('message', m)
       }
@@ -336,7 +332,7 @@
    *  getMsgImg(message.MsgId,'slave')
    *  getMsgImg(message.MsgId,'big',message)
    */
-  function getMsgImg(id, type, message) {
+  function getMsgImg (id, type, message) {
     var contentChatScope = WechatyBro.glue.contentChatScope
     if (!contentChatScope) {
       throw new Error('getMsgImg() contentChatScope not found')
@@ -347,14 +343,14 @@
     // https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=8454987316459381112&skey=%40crypt_f9cec94b_bd210b2224f217afeab8d462af70cf53
   }
 
-  function getMsgEmoticon(id) {
+  function getMsgEmoticon (id) {
     var chatFactory = WechatyBro.glue.chatFactory
 
     var message = chatFactory.getMsg(id)
-    return message.MMPreviewSrc || getMsgImg(message.MsgId,'big',message)  || message.MMThumbSrc
+    return message.MMPreviewSrc || getMsgImg(message.MsgId, 'big', message)  || message.MMThumbSrc
   }
 
-  function getMsgVideo(id) {
+  function getMsgVideo (id) {
     var contentChatScope = WechatyBro.glue.contentChatScope
     if (!contentChatScope) {
       throw new Error('getMsgVideo() contentChatScope not found')
@@ -366,42 +362,42 @@
   /**
    * from playVoice()
    */
-  function getMsgVoice(id) {
+  function getMsgVoice (id) {
     var confFactory     = WechatyBro.glue.confFactory
     var accountFactory  = WechatyBro.glue.accountFactory
 
-    var path = confFactory.API_webwxgetvoice + "?msgid=" + id + "&skey=" + accountFactory.getSkey()
+    var path = confFactory.API_webwxgetvoice + '?msgid=' + id + '&skey=' + accountFactory.getSkey()
     return window.location.origin + path
   }
 
-  function getMsgPublicLinkImg(id) {
+  function getMsgPublicLinkImg (id) {
     var path = '/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg?url=xxx&msgid=' + id + '&pictype=location'
     return window.location.origin + path
   }
 
-  function getBaseRequest() {
+  function getBaseRequest () {
     var accountFactory = WechatyBro.glue.accountFactory
     var BaseRequest = accountFactory.getBaseRequest()
 
     return JSON.stringify(BaseRequest)
   }
 
-  function getPassticket() {
+  function getPassticket () {
     var accountFactory = WechatyBro.glue.accountFactory
     return accountFactory.getPassticket()
   }
 
-  function getCheckUploadUrl() {
+  function getCheckUploadUrl () {
     var confFactory = WechatyBro.glue.confFactory
     return confFactory.API_checkupload
   }
 
-  function getUploadMediaUrl() {
+  function getUploadMediaUrl () {
     var confFactory = WechatyBro.glue.confFactory
     return confFactory.API_webwxuploadmedia
   }
 
-  function sendMedia(data) {
+  function sendMedia (data) {
     var chatFactory = WechatyBro.glue.chatFactory
     var confFactory = WechatyBro.glue.confFactory
 
@@ -439,7 +435,7 @@
     return true
   }
 
-  function forward(baseData, patchData) {
+  function forward (baseData, patchData) {
     var chatFactory = WechatyBro.glue.chatFactory
     var confFactory = WechatyBro.glue.confFactory
 
@@ -463,8 +459,7 @@
     return true
   }
 
-
-  function send(ToUserName, Content) {
+  function send (ToUserName, Content) {
     var chatFactory = WechatyBro.glue.chatFactory
     var confFactory = WechatyBro.glue.confFactory
 
@@ -487,7 +482,7 @@
     return true
   }
 
-  function getMessage(id) {
+  function getMessage (id) {
     var chatFactory = WechatyBro.glue.chatFactory
     if (!chatFactory) {
       log('chatFactory not inited')
@@ -500,7 +495,7 @@
     }
 
     var msgWithoutFunction = {}
-    Object.keys(msg).forEach(function(k) {
+    Object.keys(msg).forEach(function (k) {
       if (typeof msg[k] !== 'function') {
         msgWithoutFunction[k] = msg[k]
       }
@@ -508,7 +503,7 @@
     return msgWithoutFunction
   }
 
-  function getContact(id) {
+  function getContact (id) {
     var contactFactory = WechatyBro.glue.contactFactory
     if (!contactFactory) {
       log('contactFactory not inited')
@@ -523,31 +518,27 @@
         contact.stranger = !(contact.isContact())
       }
 
-      Object.keys(contact).forEach(function(k) {
+      Object.keys(contact).forEach(function (k) {
         if (typeof contact[k] !== 'function') {
           contactWithoutFunction[k] = contact[k]
         }
       })
-
     } else {
-
       /**
        * when `id` does not exist in _contact Array, maybe it is belongs to a stranger in a room.
        * try to find in room's member list for this `id`, and return the contact info, if any.
        */
       contact = Object.keys(_contacts)
-                .filter(id => id.match(/^@@/))    // only search in room
-                .map(id => _contacts[id])         // map to room array
-                .filter(r => r.MemberList.length) // get rid of room without member list
-                .filter(r => r.MemberList
-                            .filter(m => m.UserName === id)
-                            .length
-                )
-                .map(c => c.MemberList
-                          .filter(m => m.UserName === id)
-                          [0]
-                )
-                [0]
+        .filter(id => id.match(/^@@/))    // only search in room
+        .map(id => _contacts[id])         // map to room array
+        .filter(r => r.MemberList.length) // get rid of room without member list
+        .filter(r => r.MemberList
+          .filter(m => m.UserName === id)
+          .length
+        )
+        .map(c => c.MemberList
+          .filter(m => m.UserName === id)[0]
+        )[0]
 
       if (contact) {
         contact.stranger = true
@@ -561,13 +552,12 @@
         // Not found contact id
         contactWithoutFunction = null
       }
-
     }
 
     return contactWithoutFunction
   }
 
-  function getUserName() {
+  function getUserName () {
     if (!WechatyBro.loginState()) {
       return null
     }
@@ -577,7 +567,7 @@
             : null
   }
 
-  function contactList() {
+  function contactList () {
     var contactFactory = WechatyBro.glue.contactFactory
 
     return new Promise(resolve => retryFind(0, resolve))
@@ -585,7 +575,7 @@
     // return
 
     // retry 3 times, sleep 300ms between each time
-    function retryFind(attempt, callback) {
+    function retryFind (attempt, done) {
       attempt = attempt || 0
 
       var contactIdList = contactFactory
@@ -593,18 +583,17 @@
                           .map(c => c.UserName)
 
       if (contactIdList && contactIdList.length) {
-        callback(contactIdList)
+        done(contactIdList)
       } else if (attempt > 3) {
-        callback([])
+        done([])
       } else {
         attempt++
-        setTimeout(() => retryFind(attempt, callback), 1000)
+        setTimeout(() => retryFind(attempt, done), 1000)
       }
-
     }
   }
 
-  function contactRemark(UserName, remark) {
+  function contactRemark (UserName, remark) {
     if (remark === null || remark === undefined) {
       remark = ''
     }
@@ -621,7 +610,7 @@
 
     return new Promise(resolve => {
       mmHttp({
-        method: "POST",
+        method: 'POST',
         url: confFactory.API_webwxoplog,
         data: angular.extend({
           UserName: UserName,
@@ -629,9 +618,9 @@
           RemarkName: emojiFactory.formatHTMLToSend(remark),
         }, accountFactory.getBaseRequest()),
         MMRetry: {
-          count: 3,
-          timeout: 1e4,
-          serial: !0,
+          count   : 3,
+          timeout : 1e4,
+          serial  : !0,
         }
       })
       .success(() => {
@@ -645,7 +634,7 @@
   }
 
   // function roomFind(filterFunction) {
-  function roomList() {
+  function roomList () {
     var contactFactory = WechatyBro.glue.contactFactory
 
     // var match
@@ -660,12 +649,12 @@
                          .map(r => r.UserName)
   }
 
-  function roomDelMember(ChatRoomName, UserName) {
+  function roomDelMember (ChatRoomName, UserName) {
     var chatroomFactory = WechatyBro.glue.chatroomFactory
     return chatroomFactory.delMember(ChatRoomName, UserName)
   }
 
-  function roomAddMember(ChatRoomName, UserName) {
+  function roomAddMember (ChatRoomName, UserName) {
     var chatroomFactory = WechatyBro.glue.chatroomFactory
     // log(ChatRoomName)
     // log(UserName)
@@ -679,27 +668,28 @@
         return resolve(0)
       }, 10 * 1000)
 
-      chatroomFactory.addMember(ChatRoomName, UserName, function(result) {
+      chatroomFactory.addMember(ChatRoomName, UserName, function (result) {
         clearTimeout(timer)
         return resolve(1)
       })
     })
   }
 
-  function roomModTopic(ChatRoomName, topic) {
+  function roomModTopic (ChatRoomName, topic) {
     var chatroomFactory = WechatyBro.glue.chatroomFactory
     return chatroomFactory.modTopic(ChatRoomName, topic)
   }
 
-  function roomCreate(UserNameList, topic) {
-    var UserNameListArg = UserNameList.map(function(n) { return { UserName: n } })
+  function roomCreate (UserNameList, topic) {
+    var UserNameListArg = UserNameList.map(function (n) { return { UserName: n } })
 
     var chatroomFactory = WechatyBro.glue.chatroomFactory
     var state           = WechatyBro.glue.state
 
     return new Promise(resolve => {
       chatroomFactory.create(UserNameListArg)
-                      .then(function(r) {
+                      .then(function (r) {
+                        // eslint-disable-next-line
                         if (r.BaseResponse && 0 == r.BaseResponse.Ret || -2013 == r.BaseResponse.Ret) {
                           state.go('chat', { userName: r.ChatRoomName }) // BE CAREFUL: key name is userName, not UserName! 20161001
                           // if (topic) {
@@ -717,7 +707,7 @@
                                         )
                         }
                       })
-                      .catch(function(e) {
+                      .catch(function (e) {
                         // TODO change to reject (BREAKIKNG CHANGES)
                         resolve(
                           JSON.parse(
@@ -731,8 +721,8 @@
     })
   }
 
-  function verifyUserRequest(UserName, VerifyContent) {
-    VerifyContent = VerifyContent || '';
+  function verifyUserRequest (UserName, VerifyContent) {
+    VerifyContent = VerifyContent || ''
 
     var contactFactory  = WechatyBro.glue.contactFactory
     var confFactory     = WechatyBro.glue.confFactory
@@ -759,7 +749,7 @@
     })
   }
 
-  function verifyUserOk(UserName, Ticket) {
+  function verifyUserOk (UserName, Ticket) {
     var contactFactory  = WechatyBro.glue.contactFactory
     var confFactory     = WechatyBro.glue.confFactory
 
@@ -775,22 +765,15 @@
         return resolve(true)
       }, err => {       // fail
         // alert('err')
-        log('friendVerify(' + UserName + ', ' + Ticket + ') fail')
+        log('friendVerify(' + UserName + ', ' + Ticket + ') fail' + err)
         return resolve(false)
       })
     })
   }
 
-
-
-
-  /////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////
-
-
-
-
+  // ///////////////////////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////////////////
+  // ///////////////////////////////////////////////////////////////////////////
 
   /*
    * WechatyBro injectio must return this object.
@@ -866,7 +849,7 @@
 
     // test purpose
     isLogin: () => {
-      log('isLogin() DEPRECATED. use loginState() instead');
+      log('isLogin() DEPRECATED. use loginState() instead')
       return loginState()
     },
     loginState,
@@ -878,5 +861,4 @@
   retObj.message = 'WechatyBro Inject Done'
 
   return retObj
-
 }.apply(window))
