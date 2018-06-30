@@ -5,11 +5,14 @@
 import promiseRetry = require('promise-retry')
 import { WrapOptions } from 'retry'
 
-import { Brolog }   from 'brolog'
+import {
+  // Brolog,
+  log,
+}                   from 'brolog'
 import { FileBox }  from 'file-box'
 import qrImage      from 'qr-image'
 
-export const log = new Brolog()
+// export const log = new Brolog()
 
 export async function retry<T> (
   retryableFn: (
@@ -57,3 +60,7 @@ export function qrCodeForChatie (): FileBox {
 }
 
 export const MEMORY_SLOT = 'PUPPET_PUPPETEER'
+
+export {
+  log,
+}
