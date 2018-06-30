@@ -1,0 +1,9 @@
+#
+# https://help.github.com/articles/about-codeowners/
+#
+
+/docs/                @lijiarui
+/src/bridge.*.ts      @mukaiu @xjchengo
+/src/event.ts         @binsee
+/src/firer.*.ts       @xinbenlv
+/src/wechaty-bro.js   @binsee @mukaiu @hczhcz @cherry-geqi @zhenyong
