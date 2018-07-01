@@ -29,7 +29,7 @@ async function main () {
 
   await puppet.stop()
 
-  log.info('SmokeTesting', `Puppet v${puppet.version()} smoking test passed.`)
+  log.info('SmokeTesting', `Puppet v${puppet.version()} smoke testing passed.`)
   return 0
 }
 
