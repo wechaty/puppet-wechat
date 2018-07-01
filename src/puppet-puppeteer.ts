@@ -33,6 +33,9 @@ import {
   FileBox,
 }                   from 'file-box'
 import {
+  MemoryCard,
+}                   from 'memory-card'
+import {
   ThrottleQueue,
 }                   from 'rx-queue'
 import {
@@ -104,16 +107,21 @@ export class PuppetPuppeteer extends Puppet {
   public scanWatchdog: Watchdog<ScanFoodType>
 
   private fileId: number
+  private memory: MemoryCard
 
   constructor (
-    public options: PuppetOptions,
+    public options: PuppetOptions = {},
   ) {
     super(options)
 
+    this.memory = options.memory
+                  ? options.memory
+                  : new MemoryCard()
+
     this.fileId = 0
     this.bridge = new Bridge({
-      head    : envHead(),
-      memory : this.options.memory,
+      head   : envHead(),
+      memory : this.memory,
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
@@ -121,7 +129,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async start (): Promise<void> {
-    log.verbose('PuppetPuppeteer', `start() with ${this.options.memory.name}`)
+    log.verbose('PuppetPuppeteer', `start() with ${this.memory.name}`)
 
     this.state.on('pending')
 
@@ -1154,8 +1162,8 @@ export class PuppetPuppeteer extends Puppet {
 
   public async saveCookie (): Promise<void> {
     const cookieList = await this.bridge.cookies()
-    this.options.memory.set(MEMORY_SLOT, cookieList)
-    this.options.memory.save()
+    this.memory.set(MEMORY_SLOT, cookieList)
+    this.memory.save()
   }
 
   private extToType (ext: string): WebMessageType {
