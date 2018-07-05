@@ -27,9 +27,6 @@ import sinon from 'sinon'
 import {
   cloneClass,
 }               from 'clone-class'
-import {
-  MemoryCard,
-}               from 'memory-card'
 
 import {
   log,
@@ -62,10 +59,7 @@ test('Contact smoke testing', async t => {
     })
   }
 
-  const puppet = new PuppetPuppeteer({
-    memory: new MemoryCard(),
-    // wechaty: new Wechaty(),
-  })
+  const puppet = new PuppetPuppeteer()
   sandbox.stub(puppet as any, 'contactRawPayload').callsFake(mockContactPayload)
 
   // tslint:disable-next-line:variable-name

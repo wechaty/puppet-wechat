@@ -26,11 +26,6 @@
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
-// import cloneClass from 'clone-class'
-import {
-  MemoryCard,
-}               from 'memory-card'
-
 import {
   log,
 }                 from './config'
@@ -92,9 +87,7 @@ test('Room smok testing', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetPuppeteerTest({
-    memory: new MemoryCard(),
-  })
+  const puppet = new PuppetPuppeteerTest()
 
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
@@ -167,9 +160,7 @@ test('Room smok testing', async t => {
 
 // test('Room static method', async t => {
 
-//   const puppet = new PuppetPuppeteer({
-//     memory: new MemoryCard(),
-//   })
+//   const puppet = new PuppetPuppeteer()
 //   const wechaty = new WechatyTest({ puppet })
 //   wechaty.initPuppetAccessory(puppet)
 
@@ -205,9 +196,7 @@ test('Room iterator for contact in it', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetPuppeteer({
-    memory: new MemoryCard(),
-  })
+  const puppet = new PuppetPuppeteer()
 
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)

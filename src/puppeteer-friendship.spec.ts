@@ -26,10 +26,6 @@ import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
 
 import {
-  MemoryCard,
-}               from 'memory-card'
-
-import {
   Contact,
   Wechaty,
 }           from 'wechaty'
@@ -65,7 +61,7 @@ class PuppetTest extends PuppetPuppeteer {
 }
 
 test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
-  const puppet  = new PuppetTest({ memory: new MemoryCard() })
+  const puppet  = new PuppetTest()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 
@@ -106,7 +102,7 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
 
 test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
 
-  const puppet  = new PuppetTest({ memory: new MemoryCard() })
+  const puppet  = new PuppetTest()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 

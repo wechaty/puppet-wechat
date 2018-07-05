@@ -34,8 +34,6 @@ const sinonTest   = require('sinon-test')(sinon, {
 // import { log }    from './config'
 // log.level('silly')
 
-import { MemoryCard }      from 'memory-card'
-
 import { Bridge }           from './bridge'
 import { Event }            from './event'
 import { PuppetPuppeteer }  from './puppet-puppeteer'
@@ -53,7 +51,7 @@ class PuppetTest extends PuppetPuppeteer {
 }
 
 // test('Puppet smoke testing', async t => {
-//   const puppet  = new PuppetTest({ memory: new MemoryCard() })
+//   const puppet  = new PuppetTest()
 //   const wechaty = new WechatyTest({ puppet })
 //   wechaty.initPuppetAccessory(puppet)
 
@@ -66,7 +64,7 @@ class PuppetTest extends PuppetPuppeteer {
 test('login/logout events', sinonTest(async function (t: test.Test) {
   const sandbox = sinon.createSandbox()
   try {
-    const puppet  = new PuppetTest({ memory: new MemoryCard() })
+    const puppet  = new PuppetTest()
 
     sandbox.stub(Event, 'onScan') // block the scan event to prevent reset logined user
 

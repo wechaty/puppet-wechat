@@ -23,20 +23,12 @@ import test  from 'blue-tape'
 // import sinon from 'sinon'
 
 import {
-  MemoryCard,
-}               from 'memory-card'
-
-// import Wechaty  from '../wechaty'
-
-import {
   // Event,
   PuppetPuppeteer,
 }                   from './puppet-puppeteer'
 
 test('Puppet Puppeteer Event smoke testing', async (t) => {
-  const puppet = new PuppetPuppeteer({
-    memory: new MemoryCard(),
-  })
+  const puppet = new PuppetPuppeteer()
 
   try {
     await puppet.start()

@@ -33,9 +33,6 @@ import {
   FileBox,
 }                   from 'file-box'
 import {
-  MemoryCard,
-}                   from 'memory-card'
-import {
   ThrottleQueue,
 }                   from 'rx-queue'
 import {
@@ -107,16 +104,11 @@ export class PuppetPuppeteer extends Puppet {
   public scanWatchdog: Watchdog<ScanFoodType>
 
   private fileId: number
-  private memory: MemoryCard
 
   constructor (
     public options: PuppetOptions = {},
   ) {
     super(options)
-
-    this.memory = options.memory
-                  ? options.memory
-                  : new MemoryCard()
 
     this.fileId = 0
     this.bridge = new Bridge({

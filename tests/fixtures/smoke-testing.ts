@@ -8,10 +8,6 @@
 // tslint:disable:no-console
 
 import {
-  MemoryCard,
-}                   from 'memory-card'
-
-import {
   PuppetPuppeteer,
   log,
 }                   from 'wechaty-puppet-puppeteer'
@@ -19,7 +15,7 @@ import {
 log.level('verbose')
 
 async function main () {
-  const puppet = new PuppetPuppeteer({ memory: new MemoryCard() })
+  const puppet = new PuppetPuppeteer()
   const future = new Promise(r => puppet.once('scan', r))
 
   await puppet.start()

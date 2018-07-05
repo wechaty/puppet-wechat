@@ -27,10 +27,6 @@ import test  from 'blue-tape'
 import sinon from 'sinon'
 // const sinonTest   = require('sinon-test')(sinon)
 
-import {
-  MemoryCard,
-}               from 'memory-card'
-
 import Wechaty    from 'wechaty'
 
 import {
@@ -73,7 +69,7 @@ class PuppetPuppeteerTest extends PuppetPuppeteer {
 }
 
 test('constructor()', async t => {
-  const puppet  = new PuppetTest({ memory: new MemoryCard() })
+  const puppet  = new PuppetTest()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 
@@ -176,7 +172,7 @@ test('ready()', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetTest({ memory: new MemoryCard() })
+  const puppet = new PuppetTest()
 
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
@@ -206,7 +202,7 @@ test('ready()', async t => {
 })
 
 test('find()', async t => {
-  const puppet  = new PuppetPuppeteer({ memory: new MemoryCard() })
+  const puppet  = new PuppetPuppeteer()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 
@@ -229,7 +225,7 @@ test('find()', async t => {
 })
 
 test('findAll()', async t => {
-  const puppet  = new PuppetTest({ memory: new MemoryCard() })
+  const puppet  = new PuppetTest()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 
@@ -251,7 +247,7 @@ test('findAll()', async t => {
 })
 
 test('self()', async t => {
-  const puppet  = new PuppetPuppeteer({ memory: new MemoryCard() })
+  const puppet  = new PuppetPuppeteer()
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
 
@@ -375,7 +371,7 @@ test('mentioned()', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetPuppeteerTest({ memory: new MemoryCard() })
+  const puppet = new PuppetPuppeteerTest()
 
   const wechaty = new WechatyTest({ puppet })
   wechaty.initPuppetAccessory(puppet)
