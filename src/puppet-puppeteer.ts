@@ -59,7 +59,6 @@ import {
 
   RoomMemberPayload,
   RoomPayload,
-
 }                           from 'wechaty-puppet'
 
 import {
@@ -97,11 +96,10 @@ import {
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
 export class PuppetPuppeteer extends Puppet {
-  public bridge       : Bridge
+  public bridge: Bridge
 
   public scanPayload? : PuppetQrcodeScanEvent
-
-  public scanWatchdog: Watchdog<ScanFoodType>
+  public scanWatchdog : Watchdog<ScanFoodType>
 
   private fileId: number
 
@@ -118,6 +116,8 @@ export class PuppetPuppeteer extends Puppet {
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
     this.scanWatchdog   = new Watchdog<ScanFoodType>(SCAN_TIMEOUT, 'Scan')
+
+    this.initWatchdogForScan()
   }
 
   public async start (): Promise<void> {
@@ -126,8 +126,14 @@ export class PuppetPuppeteer extends Puppet {
     this.state.on('pending')
 
     try {
-      this.initWatchdog()
-      this.initWatchdogForScan()
+      /**
+       * Overwrite the memory in bridge
+       * because it could be changed between constructor() and start()
+       */
+      this.bridge.options.memory = this.memory
+
+      // this.initWatchdog()
+      // this.initWatchdogForScan()
 
       this.bridge = await this.initBridge()
       log.verbose('PuppetPuppeteer', 'initBridge() done')
@@ -159,52 +165,18 @@ export class PuppetPuppeteer extends Puppet {
 
       log.verbose('PuppetPuppeteer', 'start() done')
 
-      this.emit('start')
+      // this.emit('start')
       return
 
     } catch (e) {
       log.error('PuppetPuppeteer', 'start() exception: %s', e)
 
-      this.state.off(true)
+      // this.state.off(true)
       this.emit('error', e)
       await this.stop()
 
       throw e
     }
-  }
-
-  private initWatchdog (): void {
-    log.verbose('PuppetPuppeteer', 'initWatchdogForPuppet()')
-
-    const puppet = this
-
-    // clean the dog because this could be re-inited
-    this.watchdog.removeAllListeners()
-
-    // fix issue #981
-    puppet.removeAllListeners('watchdog')
-
-    puppet.on('watchdog', food => this.watchdog.feed(food))
-    this.watchdog.on('feed', food => {
-      log.silly('PuppetPuppeteer', 'initWatchdogForPuppet() dog.on(feed, food={type=%s, data=%s})',
-                                    food.type,
-                                    food.data,
-                )
-      // feed the dog, heartbeat the puppet.
-      // 201805 puppet no need to `heartbeat`?
-      // puppet.emit('heartbeat', food.data)
-    })
-
-    this.watchdog.on('reset', async (food, timeout) => {
-      log.warn('PuppetPuppeteer', 'initWatchdogForPuppet() dog.on(reset) last food:%s, timeout:%s',
-                            food.data, timeout)
-      try {
-        await this.stop()
-        await this.start()
-      } catch (e) {
-        puppet.emit('error', e)
-      }
-    })
   }
 
   /**
@@ -221,17 +193,17 @@ export class PuppetPuppeteer extends Puppet {
     const dog    = this.scanWatchdog
 
     // clean the dog because this could be re-inited
-    dog.removeAllListeners()
+    // dog.removeAllListeners()
 
     puppet.on('scan', info => dog.feed({
       data: info,
       type: 'scan',
     }))
     puppet.on('login',  user => {
-      dog.feed({
-        data: user,
-        type: 'login',
-      })
+      // dog.feed({
+      //   data: user,
+      //   type: 'login',
+      // })
       // do not monitor `scan` event anymore
       // after user login
       dog.sleep()
@@ -252,8 +224,8 @@ export class PuppetPuppeteer extends Puppet {
         log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) exception: %s', e)
         try {
           log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) try to recover by bridge.{quit,init}()', e)
-          await this.bridge.quit()
-          await this.bridge.init()
+          await this.bridge.stop()
+          await this.bridge.start()
           log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) recover successful')
         } catch (e) {
           log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) recover FAIL: %s', e)
@@ -264,36 +236,36 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async stop (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'quit()')
+    log.verbose('PuppetPuppeteer', 'stop()')
 
     if (this.state.off()) {
-      log.warn('PuppetPuppeteer', 'quit() is called on a OFF puppet. await ready(off) and return.')
+      log.warn('PuppetPuppeteer', 'stop() is called on a OFF puppet. await ready(off) and return.')
       await this.state.ready('off')
       return
     }
     this.state.off('pending')
 
-    log.verbose('PuppetPuppeteer', 'quit() make watchdog sleep before do quit')
+    log.verbose('PuppetPuppeteer', 'stop() make watchdog sleep before do stop')
 
     /**
      * Clean listeners for `watchdog`
      */
-    this.watchdog.sleep()
+    // this.watchdog.sleep()
     this.scanWatchdog.sleep()
-    this.watchdog.removeAllListeners()
+    // this.watchdog.removeAllListeners()
     this.scanWatchdog.removeAllListeners()
     this.removeAllListeners('watchdog')
 
     try {
-      await this.bridge.quit()
+      await this.bridge.stop()
       // register the removeListeners micro task at then end of the task queue
       setImmediate(() => this.bridge.removeAllListeners())
     } catch (e) {
-      log.error('PuppetPuppeteer', 'quit() exception: %s', e.message)
+      log.error('PuppetPuppeteer', 'this.bridge.quit() exception: %s', e.message)
       throw e
     } finally {
       this.state.off(true)
-      this.emit('stop')
+      // this.emit('stop')
     }
 
   }
@@ -309,6 +281,8 @@ export class PuppetPuppeteer extends Puppet {
 
     this.bridge.on('dong'     , data => this.emit('dong', data))
     // this.bridge.on('ding'     , Event.onDing.bind(this))
+    this.bridge.on('heartbeat', data => this.emit('watchdog', { type: 'bridge ding', data }))
+
     this.bridge.on('error'    , e => this.emit('error', e))
     this.bridge.on('log'      , Event.onLog.bind(this))
     this.bridge.on('login'    , Event.onLogin.bind(this))
@@ -318,10 +292,10 @@ export class PuppetPuppeteer extends Puppet {
     this.bridge.on('unload'   , Event.onUnload.bind(this))
 
     try {
-      await this.bridge.init()
+      await this.bridge.start()
     } catch (e) {
       log.error('PuppetPuppeteer', 'initBridge() exception: %s', e.message)
-      await this.bridge.quit().catch(console.error)
+      await this.bridge.stop().catch(console.error)
       this.emit('error', e)
 
       throw e
