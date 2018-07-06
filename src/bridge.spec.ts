@@ -53,8 +53,8 @@ const PUPPETEER_LAUNCH_OPTIONS = {
 test('PuppetPuppeteerBridge', async (t) => {
   const bridge = new Bridge({ memory: new MemoryCard() })
   try {
-    await bridge.init()
-    await bridge.quit()
+    await bridge.start()
+    await bridge.stop()
     t.pass('Bridge instnace')
   } catch (e) {
     t.fail('Bridge instance: ' + e)
@@ -197,7 +197,7 @@ test('WechatyBro.ding()', async t => {
   t.ok(bridge, 'should instanciated a bridge')
 
   try {
-    await bridge.init()
+    await bridge.start()
     t.pass('should init Bridge')
 
     const retDing = await bridge.evaluate(() => {
@@ -209,7 +209,7 @@ test('WechatyBro.ding()', async t => {
     const retCode = await bridge.proxyWechaty('loginState')
     t.is(typeof retCode, 'boolean', 'should got a boolean after call proxyWechaty(loginState)')
 
-    await bridge.quit()
+    await bridge.stop()
     t.pass('b.quit()')
   } catch (err) {
     t.fail('exception: ' + err.message)

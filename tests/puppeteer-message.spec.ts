@@ -32,7 +32,7 @@ import Wechaty    from 'wechaty'
 import {
   // config,
   log,
-}                 from './config'
+}                 from '../src/config'
 
 import {
   MessagePayload,
@@ -40,11 +40,11 @@ import {
 
 import {
   PuppetPuppeteer,
-}                         from './puppet-puppeteer'
+}                         from '../src/puppet-puppeteer'
 import {
   WebMessageRawPayload,
   WebRoomRawPayload,
-}                         from './web-schemas'
+}                         from '../src/web-schemas'
 
 class WechatyTest extends Wechaty {
   public initPuppetAccessory (puppet: PuppetPuppeteer) {

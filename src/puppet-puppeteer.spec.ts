@@ -111,3 +111,16 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
     sandbox.restore()
   }
 }))
+
+test('restart() 3 times', async t => {
+  const puppet = new PuppetPuppeteer()
+
+  let n = 3
+
+  while (n--) {
+    await puppet.start()
+    await puppet.stop()
+  }
+
+  t.pass('restarted many times')
+})

@@ -2,7 +2,7 @@
 
 // Extend the `Window` from Browser
 interface Window {
-  emit?: Function, // from puppeteer
+  wechatyPuppetBridgeEmit?: Function, // from puppeteer
 }
 
 declare const WechatyBro: any

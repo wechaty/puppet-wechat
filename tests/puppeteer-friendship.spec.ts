@@ -37,10 +37,10 @@ import {
 
 import {
   PuppetPuppeteer,
-}                         from './puppet-puppeteer'
+}                         from '../src/puppet-puppeteer'
 import {
   WebMessageRawPayload,
-}                         from './web-schemas'
+}                         from '../src/web-schemas'
 
 class WechatyTest extends Wechaty {
   public initPuppetAccessory (puppet: PuppetPuppeteer) {

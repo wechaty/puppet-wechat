@@ -30,13 +30,13 @@ import {
 
 import {
   log,
-}              from './config'
+}              from '../src/config'
 
 // import Wechaty from '../wechaty'
 
 import { Contact } from 'wechaty'
 
-import PuppetPuppeteer  from './puppet-puppeteer'
+import PuppetPuppeteer  from '../src/puppet-puppeteer'
 
 test('Contact smoke testing', async t => {
 

@@ -81,13 +81,13 @@ export class Bridge extends EventEmitter {
     this.state = new StateSwitch('PuppetPuppeteerBridge', log)
   }
 
-  public async init (): Promise<void> {
-    log.verbose('PuppetPuppeteerBridge', 'init()')
+  public async start (): Promise<void> {
+    log.verbose('PuppetPuppeteerBridge', 'start()')
 
     this.state.on('pending')
     try {
       this.browser = await this.initBrowser()
-      log.verbose('PuppetPuppeteerBridge', 'init() initBrowser() done')
+      log.verbose('PuppetPuppeteerBridge', 'start() initBrowser() done')
 
       this.on('load', this.onLoad.bind(this))
 
@@ -96,9 +96,9 @@ export class Bridge extends EventEmitter {
       await ready
 
       this.state.on(true)
-      log.verbose('PuppetPuppeteerBridge', 'init() initPage() done')
+      log.verbose('PuppetPuppeteerBridge', 'start() initPage() done')
     } catch (e) {
-      log.error('PuppetPuppeteerBridge', 'init() exception: %s', e)
+      log.error('PuppetPuppeteerBridge', 'start() exception: %s', e)
       this.state.off(true)
 
       try {
@@ -109,7 +109,7 @@ export class Bridge extends EventEmitter {
           await this.browser.close()
         }
       } catch (e2) {
-        log.error('PuppetPuppeteerBridge', 'init() exception %s, close page/browser exception %s', e, e2)
+        log.error('PuppetPuppeteerBridge', 'start() exception %s, close page/browser exception %s', e, e2)
       }
 
       this.emit('error', e)
@@ -144,32 +144,36 @@ export class Bridge extends EventEmitter {
   }
 
   public async onDialog (dialog: Dialog) {
-    log.warn('PuppetPuppeteerBridge', 'init() page.on(dialog) type:%s message:%s',
+    log.warn('PuppetPuppeteerBridge', 'onDialog() page.on(dialog) type:%s message:%s',
                                 dialog.type, dialog.message())
     try {
       // XXX: Which ONE is better?
       await dialog.accept()
       // await dialog.dismiss()
     } catch (e) {
-      log.error('PuppetPuppeteerBridge', 'init() dialog.dismiss() reject: %s', e)
+      log.error('PuppetPuppeteerBridge', 'onDialog() dialog.dismiss() reject: %s', e)
     }
     this.emit('error', new Error(`${dialog.type}(${dialog.message()})`))
   }
 
   public async onLoad (page: Page): Promise<void> {
-    log.verbose('PuppetPuppeteerBridge', 'initPage() on(load) %s', page.url())
+    log.verbose('PuppetPuppeteerBridge', 'onLoad() page.url=%s', page.url())
 
     if (this.state.off()) {
-      log.verbose('PuppetPuppeteerBridge', 'initPage() onLoad() OFF state detected. NOP')
+      log.verbose('PuppetPuppeteerBridge', 'onLoad() OFF state detected. NOP')
       return // reject(new Error('onLoad() OFF state detected'))
     }
 
     try {
       const emitExist = await page.evaluate(() => {
-        return typeof window.emit === 'function'
+        return typeof window.wechatyPuppetBridgeEmit === 'function'
       })
       if (!emitExist) {
-        await page.exposeFunction('emit', this.emit.bind(this))
+        /**
+         * expose window.wechatyPuppetBridgeEmit at here.
+         * enable wechaty-bro.js to emit message to bridge
+         */
+        await page.exposeFunction('wechatyPuppetBridgeEmit', this.emit.bind(this))
       }
 
       await this.readyAngular(page)
@@ -179,7 +183,7 @@ export class Bridge extends EventEmitter {
       this.emit('ready')
 
     } catch (e) {
-      log.error('PuppetPuppeteerBridge', 'init() initPage() onLoad() exception: %s', e)
+      log.error('PuppetPuppeteerBridge', 'onLoad() exception: %s', e)
       await page.close()
       this.emit('error', e)
     }
@@ -296,8 +300,8 @@ export class Bridge extends EventEmitter {
     }
   }
 
-  public async quit (): Promise<void> {
-    log.verbose('PuppetPuppeteerBridge', 'quit()')
+  public async stop (): Promise<void> {
+    log.verbose('PuppetPuppeteerBridge', 'stop()')
 
     if (!this.page) {
       throw new Error('no page')
@@ -310,16 +314,16 @@ export class Bridge extends EventEmitter {
 
     try {
       await this.page.close()
-      log.silly('PuppetPuppeteerBridge', 'quit() page.close()-ed')
+      log.silly('PuppetPuppeteerBridge', 'stop() page.close()-ed')
     } catch (e) {
-      log.warn('PuppetPuppeteerBridge', 'quit() page.close() exception: %s', e)
+      log.warn('PuppetPuppeteerBridge', 'stop() page.close() exception: %s', e)
     }
 
     try {
       await this.browser.close()
-      log.silly('PuppetPuppeteerBridge', 'quit() browser.close()-ed')
+      log.silly('PuppetPuppeteerBridge', 'stop() browser.close()-ed')
     } catch (e) {
-      log.warn('PuppetPuppeteerBridge', 'quit() browser.close() exception: %s', e)
+      log.warn('PuppetPuppeteerBridge', 'stop() browser.close() exception: %s', e)
     }
 
     this.state.off(true)

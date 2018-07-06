@@ -103,7 +103,7 @@
       log('heartBeat timer exist when 1st time is true? return for do nothing')
       return
     }
-    WechatyBro.emit('ding', 'heartbeat@browser')
+    WechatyBro.emit('heartbeat', 'heartbeat@browser')
     WechatyBro.vars.heartBeatTimmer = setTimeout(heartBeat, TIMEOUT)
     return TIMEOUT
   }
@@ -278,14 +278,14 @@
       return false
     }
     rootScope.$on('message:add:success', function (event, data) {
-      if (!loginState()) { // in case of we missed the pageInit event
-        login('by event[message:add:success]')
-      }
+      // if (!loginState()) { // in case of we missed the pageInit event
+      //   login('by event[message:add:success]')
+      // }
       WechatyBro.emit('message', data)
     })
-    rootScope.$on('root:pageInit:success', function (event, data) {
-      login('by event[root:pageInit:success]')
-    })
+    // rootScope.$on('root:pageInit:success', function (event, data) {
+    //   login('by event[root:pageInit:success]')
+    // })
     // newLoginPage seems not stand for a user login action
     // appScope.$on("newLoginPage", function(event, data) {
     //   login('by event[newLoginPage]')
@@ -811,7 +811,7 @@
 
     // funcs
     ding,   // simple return 'dong'
-    emit:   window.emit,  // send event to Node.js
+    emit:   window.wechatyPuppetBridgeEmit,  // send event to PuppetPuppeteerBridge in Node.js
     init,   // initialize WechatyBro @ Browser
     log,    // log to Node.js
     logout, // logout current logined user
