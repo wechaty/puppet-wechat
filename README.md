@@ -4,8 +4,9 @@
 [![NPM Version](https://badge.fury.io/js/wechaty-puppet-puppeteer.svg)](https://badge.fury.io/js/wechaty-puppet-puppeteer)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 [![Linux/Mac Build Status](https://travis-ci.com/Chatie/wechaty-puppet-puppeteer.svg?branch=master)](https://travis-ci.com/Chatie/wechaty-puppet-puppeteer)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Chatie/wechaty-puppet-puppeteer.svg)](https://greenkeeper.io/)
 
-[![Wechaty Puppet Puppeteer](https://chatie.io/wechaty-puppet-puppeteer/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-puppeteer) [![Greenkeeper badge](https://badges.greenkeeper.io/Chatie/wechaty-puppet-puppeteer.svg)](https://greenkeeper.io/)
+[![Wechaty Puppet Puppeteer](https://chatie.io/wechaty-puppet-puppeteer/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-puppeteer)
 
 > Picture Credit: [https://www.forsbergplustwo.com](https://www.forsbergplustwo.com/blogs/news/pdf-generation-with-chrome-headless-in-ruby-using-puppeteer-on-heroku)
 
