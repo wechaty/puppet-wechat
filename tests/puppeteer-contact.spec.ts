@@ -24,17 +24,13 @@
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
-import {
-  cloneClass,
-}               from 'clone-class'
+// import {
+//   cloneClass,
+// }               from 'clone-class'
 
 import {
   log,
 }              from '../src/config'
-
-// import Wechaty from '../wechaty'
-
-import { Contact } from 'wechaty'
 
 import PuppetPuppeteer  from '../src/puppet-puppeteer'
 
@@ -62,17 +58,17 @@ test('Contact smoke testing', async t => {
   const puppet = new PuppetPuppeteer()
   sandbox.stub(puppet as any, 'contactRawPayload').callsFake(mockContactPayload)
 
+  const contactPayload = await puppet.contactPayload(UserName)
+
   // tslint:disable-next-line:variable-name
-  const MyContact = cloneClass(Contact)
-  MyContact.puppet = puppet as any  // FIXME: any
+  // const MyContact = cloneClass(Contact)
+  // MyContact.puppet = puppet as any  // FIXME: any
 
-  const c = new MyContact(UserName)
-  t.is(c.id, UserName, 'id/UserName right')
+  // const c = new MyContact(UserName)
+  t.is(contactPayload.id, UserName, 'id/UserName right')
 
-  await c.ready()
-
-  t.is(c.name(), NickName, 'NickName set')
-  t.is(c.alias(), RemarkName, 'should get the right alias from Contact')
+  t.is(contactPayload.name,   NickName, 'NickName set')
+  t.is(contactPayload.alias,  RemarkName, 'should get the right alias from Contact')
 
   sandbox.restore()
 

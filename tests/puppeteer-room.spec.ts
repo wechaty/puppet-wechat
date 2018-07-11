@@ -31,21 +31,11 @@ import {
 }                 from '../src/config'
 
 import {
-  Wechaty,
-}                 from 'wechaty'
-
-import {
   PuppetPuppeteer,
 }                     from '../src/puppet-puppeteer'
 import {
   WebRoomRawPayload,
 }                     from '../src/web-schemas'
-
-class WechatyTest extends Wechaty {
-  public initPuppetAccessory (puppet: PuppetPuppeteer) {
-    super.initPuppetAccessory(puppet)
-  }
-}
 
 class PuppetPuppeteerTest extends PuppetPuppeteer {
   public id?: string = undefined
@@ -68,7 +58,7 @@ const ROOM_EXPECTED = {
   topic:        '（通知）中国青年天使会官方家',
 }
 
-test('Room smok testing', async t => {
+test('Room smoke testing', async t => {
 
   // Mock
   const mockContactRoomRawPayload = (id: string) => {
@@ -89,71 +79,68 @@ test('Room smok testing', async t => {
 
   const puppet = new PuppetPuppeteerTest()
 
-  const wechaty = new WechatyTest({ puppet })
-  wechaty.initPuppetAccessory(puppet)
-
   sandbox.stub(puppet, 'contactRawPayload').callsFake(mockContactRoomRawPayload)
   sandbox.stub(puppet, 'roomRawPayload').callsFake(mockContactRoomRawPayload)
 
   sandbox.stub(puppet, 'id').value('pretend-to-be-logined')
 
-  const room = wechaty.Room.load(ROOM_EXPECTED.id)
-  await room.ready()
+  const roomPayload = await puppet.roomPayload(ROOM_EXPECTED.id)
 
-  t.is(room.id, ROOM_EXPECTED.id, 'should set id/UserName right')
+  t.is(roomPayload.id, ROOM_EXPECTED.id, 'should set id/UserName right')
 
   // t.is((r as any).payload[.('encryId') , EXPECTED.encryId, 'should set EncryChatRoomId')
 
-  t.is(await room.topic(), ROOM_EXPECTED.topic, 'should set topic/NickName')
+  t.is(roomPayload.topic, ROOM_EXPECTED.topic, 'should set topic/NickName')
 
-  const contact1 = new wechaty.Contact(ROOM_EXPECTED.memberId1)
-  const alias1 = await room.alias(contact1)
-  t.is(alias1, ROOM_EXPECTED.memberNick1, 'should get roomAlias')
+  // const contact1 = new wechaty.Contact(ROOM_EXPECTED.memberId1)
+  // const alias1 = await room.alias(contact1)
+  // const contactPayload1    = await puppet.contactPayload(ROOM_EXPECTED.memberId1)
+  const roomMemberPayload1 = await puppet.roomMemberPayload(ROOM_EXPECTED.id, ROOM_EXPECTED.memberId1)
+
+  t.is(roomMemberPayload1.roomAlias, ROOM_EXPECTED.memberNick1, 'should get roomAlias')
 
   // const name1 = r.alias(contact1)
   // t.is(name1, EXPECTED.memberNick1, 'should get roomAlias')
 
-  const contact2 = wechaty.Contact.load(ROOM_EXPECTED.memberId2)
-  const alias2 = await room.alias(contact2)
-  t.is(alias2, null, 'should return null if not set roomAlias')
+  // const contact2 = wechaty.Contact.load(ROOM_EXPECTED.memberId2)
+  // const alias2 = await room.alias(contact2)
+  // const contactPayload2 = await puppet.contactPayload(ROOM_EXPECTED.memberId2)
+  const memberPayload2  = await puppet.roomMemberPayload(ROOM_EXPECTED.id, ROOM_EXPECTED.memberId2)
+
+  t.is(memberPayload2.roomAlias, '', 'should return null if not set roomAlias')
 
   // const name2 = r.alias(contact2)
   // t.is(name2, null, 'should return null if not set roomAlias')
+  const memberIdList = await puppet.roomMemberList(ROOM_EXPECTED.id)
+  t.equal(memberIdList.includes(ROOM_EXPECTED.memberId1), true, 'should has contact1')
 
-  t.equal(await room.has(contact1), true, 'should has contact1')
-  const noSuchContact = wechaty.Contact.load('not exist id')
-  t.equal(await room.has(noSuchContact), false, 'should has no this member')
+  // const noSuchContact = wechaty.Contact.load('not exist id')
+  // t.equal(await room.has(noSuchContact), false, 'should has no this member')
 
-  const owner = room.owner()
-  t.true(owner === null || owner instanceof wechaty.Contact, 'should get Contact instance for owner, or null')
+  // const owner = room.owner()
+  // t.true(owner === null || owner instanceof wechaty.Contact, 'should get Contact instance for owner, or null')
 
   // wxApp hide uin for all contacts.
   // t.is(r.owner().id, EXPECTED.ownerId, 'should get owner right by OwnerUin & Uin')
 
-  const contactA = await room.member(ROOM_EXPECTED.memberNick1)
-  if (!contactA) {
-    throw new Error(`member(${ROOM_EXPECTED.memberNick1}) should get member by roomAlias by default`)
-  }
+  // const contactA = await room.member(ROOM_EXPECTED.memberNick1)
 
-  const contactB = await room.member(ROOM_EXPECTED.memberNick2)
-  const contactC = await room.member(ROOM_EXPECTED.memberNick3)
-  const contactD = await room.member({ roomAlias: ROOM_EXPECTED.memberNick1 })
-  if (!contactB) {
-    throw new Error(`member(${ROOM_EXPECTED.memberNick2}) should get member by name by default`)
-  }
-  if (!contactC) {
-    throw new Error(`member(${ROOM_EXPECTED.memberNick3}) should get member by name by default`)
-  }
-  if (!contactD) {
-    throw new Error(`member({alias: ${ROOM_EXPECTED.memberNick3}}) should get member by roomAlias`)
-  }
-  t.is(contactA.id, ROOM_EXPECTED.memberId1, `should get the right id from ${ROOM_EXPECTED.memberId1}, find member by default`)
-  t.is(contactB.id, ROOM_EXPECTED.memberId2, `should get the right id from ${ROOM_EXPECTED.memberId2}, find member by default`)
-  t.is(contactC.id, ROOM_EXPECTED.memberId3, `should get the right id from ${ROOM_EXPECTED.memberId3}, find member by default`)
-  t.is(contactD.id, ROOM_EXPECTED.memberId1, `should get the right id from ${ROOM_EXPECTED.memberId1}, find member by roomAlias`)
+  // if (!contactA) {
+  //   throw new Error(`member(${ROOM_EXPECTED.memberNick1}) should get member by roomAlias by default`)
+  // }
 
-  const s = room.toString()
-  t.is(typeof s, 'string', 'toString()')
+  const resultA = await puppet.roomMemberSearch(ROOM_EXPECTED.id, ROOM_EXPECTED.memberNick1)
+  const resultB = await puppet.roomMemberSearch(ROOM_EXPECTED.id, ROOM_EXPECTED.memberNick2)
+  const resultC = await puppet.roomMemberSearch(ROOM_EXPECTED.id, ROOM_EXPECTED.memberNick3)
+  const resultD = await puppet.roomMemberSearch(ROOM_EXPECTED.id, { roomAlias: ROOM_EXPECTED.memberNick1 })
+  // const contactB = await room.member(ROOM_EXPECTED.memberNick2)
+  // const contactC = await room.member(ROOM_EXPECTED.memberNick3)
+  // const contactD = await room.member({ roomAlias: ROOM_EXPECTED.memberNick1 })
+
+  t.is(resultA[0], ROOM_EXPECTED.memberId1, `should get the right id from ${ROOM_EXPECTED.memberId1}, find member by default`)
+  t.is(resultB[0], ROOM_EXPECTED.memberId2, `should get the right id from ${ROOM_EXPECTED.memberId2}, find member by default`)
+  t.is(resultC[0], ROOM_EXPECTED.memberId3, `should get the right id from ${ROOM_EXPECTED.memberId3}, find member by default`)
+  t.is(resultD[0], ROOM_EXPECTED.memberId1, `should get the right id from ${ROOM_EXPECTED.memberId1}, find member by roomAlias`)
 
   sandbox.restore()
 })
@@ -177,44 +164,3 @@ test('Room smok testing', async t => {
 
 //   t.is(roomList.length, 0, 'should return empty array before login')
 // })
-
-test('Room iterator for contact in it', async t => {
-  // Mock
-  const mockContactRoomRawPayload = (id: string) => {
-    log.verbose('PuppeteerRoomTest', 'mockContactRawPayload(%s)', id)
-    return new Promise(resolve => {
-      if (id === ROOM_EXPECTED.id) {
-        setImmediate(() => resolve(ROOM_RAW_PAYLOAD))
-      } else if (id in CONTACT_RAW_PAYLOAD_DICT) {
-        setImmediate(() => resolve(CONTACT_RAW_PAYLOAD_DICT[id]))
-      } else {
-        // ignore other ids
-        setImmediate(() => resolve({ id }))
-      }
-    })
-  }
-
-  const sandbox = sinon.createSandbox()
-
-  const puppet = new PuppetPuppeteer()
-
-  const wechaty = new WechatyTest({ puppet })
-  wechaty.initPuppetAccessory(puppet)
-
-  sandbox.stub(puppet, 'contactRawPayload').callsFake(mockContactRoomRawPayload)
-  sandbox.stub(puppet, 'roomRawPayload').callsFake(mockContactRoomRawPayload)
-
-  const room = wechaty.Room.load(ROOM_EXPECTED.id)
-  await room.ready()
-
-  const MEMBER_CONTACT_ID_LIST = ROOM_RAW_PAYLOAD.MemberList!.map(rawMember => rawMember.UserName)
-
-  let n = 0
-  for await (const memberContact of room) {
-    t.ok(MEMBER_CONTACT_ID_LIST.includes(memberContact.id), 'should get one of the room member: ' + memberContact.id)
-    n++
-  }
-
-  const memberList = await room.memberList()
-  t.equal(n, memberList.length, 'should iterate all the members of the room')
-})
