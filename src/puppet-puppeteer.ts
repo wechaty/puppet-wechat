@@ -159,7 +159,7 @@ export class PuppetPuppeteer extends Puppet {
       const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
       this.on('watchdog', data => throttleQueue.next(data))
       throttleQueue.subscribe(async (data: any) => {
-        log.verbose('Wechaty', 'start() throttleQueue.subscribe() new item: %s', data)
+        log.verbose('PuppetPuppeteer', 'start() throttleQueue.subscribe() new item: %s', data)
         await this.saveCookie()
       })
 
