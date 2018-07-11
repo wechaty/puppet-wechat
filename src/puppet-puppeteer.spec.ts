@@ -24,12 +24,12 @@
 
 import test  from 'blue-tape'
 import sinon from 'sinon'
-const sinonTest   = require('sinon-test')(sinon, {
-  useFakeTimers: {  // https://github.com/sinonjs/lolex
-    advanceTimeDelta  : 10,
-    shouldAdvanceTime : true,
-  },
-})
+// const sinonTest   = require('sinon-test')(sinon, {
+//   useFakeTimers: {  // https://github.com/sinonjs/lolex
+//     advanceTimeDelta  : 10,
+//     shouldAdvanceTime : true,
+//   },
+// })
 
 // import { log }    from './config'
 // log.level('silly')
@@ -61,7 +61,7 @@ class PuppetTest extends PuppetPuppeteer {
 //   t.ok(puppet.state.pending(), 'should be pending state after set')
 // })
 
-test('login/logout events', sinonTest(async function (t: test.Test) {
+test('login/logout events', async t => {
   const sandbox = sinon.createSandbox()
   try {
     const puppet  = new PuppetTest()
@@ -110,7 +110,7 @@ test('login/logout events', sinonTest(async function (t: test.Test) {
   } finally {
     sandbox.restore()
   }
-}))
+})
 
 test('restart() 3 times', async t => {
   const puppet = new PuppetPuppeteer()

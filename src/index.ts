@@ -16,12 +16,14 @@
  *   limitations under the License.
  *
  */
-import { log }              from './config'
+export {
+  VERSION,
+  log,
+}              from './config'
+
 import { PuppetPuppeteer }  from './puppet-puppeteer'
 
 export {
-  log,
   PuppetPuppeteer,
 }
-
 export default PuppetPuppeteer

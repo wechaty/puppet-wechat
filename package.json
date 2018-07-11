@@ -80,7 +80,6 @@
     "semver": "^5.5.0",
     "shx": "^0.3.1",
     "sinon": "^6.0.1",
-    "sinon-test": "^2.2.0",
     "state-switch": "^0.6.2",
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
