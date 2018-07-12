@@ -66,6 +66,7 @@ import {
   log,
   MEMORY_SLOT,
   qrCodeForChatie,
+  VERSION,
 }                     from './config'
 
 import {
@@ -96,6 +97,8 @@ import {
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
 export class PuppetPuppeteer extends Puppet {
+  public static readonly VERSION = VERSION
+
   public bridge: Bridge
 
   public scanPayload? : PuppetQrcodeScanEvent
