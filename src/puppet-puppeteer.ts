@@ -1558,6 +1558,16 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
+  public unref (): void {
+    log.verbose('PuppetPuppeteer', 'unref ()')
+    super.unref()
+
+    if (this.scanWatchdog) {
+      this.scanWatchdog.unref()
+    }
+
+    // TODO: unref() the puppeteer
+  }
 }
 
 export default PuppetPuppeteer
