@@ -24,6 +24,30 @@ If you want to break the above limitations, please consider to use a Wechaty Pup
 
 Learn more about the Puppet at [Wechaty wiki: Puppet](https://github.com/Chatie/wechaty/wiki/Puppet)
 
+## Note for Developers in China
+
+Cause `storage.googleapis.com` is blocked in mainland china, you'd better config by following guide.
+
+### `npm` user
+
+```bash
+npm config set registry https://registry.npm.taobao.org
+npm config set disturl https://npm.taobao.org/dist
+npm config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
+```
+
+then you can check your `$HOME/.npmrc`
+
+### `yarn` user
+
+```bash
+yarn config set registry https://registry.npm.taobao.org
+yarn config set disturl https://npm.taobao.org/dist
+yarn config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
+```
+
+then you can check your `$HOME/.yarnrc`
+
 ## AUTHOR
 
 [Huan LI](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
