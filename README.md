@@ -29,19 +29,23 @@ Learn more about the Puppet at [Wechaty wiki: Puppet](https://github.com/Chatie/
 Cause `storage.googleapis.com` is blocked in mainland china, you'd better config by following guide.
 
 ### `npm` user
+
 ```bash
 npm config set registry https://registry.npm.taobao.org
 npm config set disturl https://npm.taobao.org/dist
 npm config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
 ```
+
 then you can check your `$HOME/.npmrc`
 
 ### `yarn` user
+
 ```bash
 yarn config set registry https://registry.npm.taobao.org
 yarn config set disturl https://npm.taobao.org/dist
 yarn config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
 ```
+
 then you can check your `$HOME/.yarnrc`
 
 ## AUTHOR
@@ -57,5 +61,3 @@ then you can check your `$HOME/.yarnrc`
 * Code & Docs © 2016-2018 Huan LI \<zixia@zixia.net\>
 * Code released under the Apache-2.0 License
 * Docs released under Creative Commons
-
-
