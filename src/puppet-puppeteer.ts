@@ -619,12 +619,10 @@ export class PuppetPuppeteer extends Puppet {
        * FileBox headers (will be used in NodeJS.http.get param options)
        */
       const headers = {
-        cookie: cookieList.map(c => `${c.name}=${c.value}`).join('; '),
+        cookie: cookieList.map(
+          c => `${c.name}=${c.value}`
+        ).join('; '),
       }
-      // return Misc.urlStream(avatarUrl, cookies)
-
-      // const contact = this.Contact.load(contactId)
-      // await contact.ready()
 
       const fileName = (payload.name || 'unknown') + '-avatar.jpg'
       return FileBox.fromUrl(
