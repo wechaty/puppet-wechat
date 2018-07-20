@@ -298,7 +298,9 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.start()
     } catch (e) {
       log.error('PuppetPuppeteer', 'initBridge() exception: %s', e.message)
-      await this.bridge.stop().catch(console.error)
+      await this.bridge.stop().catch(e => {
+        log.error('PuppetPuppeteer', 'initBridge() this.bridge.stop() rejection: %s', e)
+      })
       this.emit('error', e)
 
       throw e
