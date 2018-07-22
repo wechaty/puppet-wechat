@@ -219,7 +219,7 @@ async function onMessage (
         const topicRestul = await firer.checkRoomTopic(rawPayload)
 
         if (!joinResult && !leaveResult && !topicRestul) {
-          log.warn('PuppetPuppeteerEvent', `checkRoomSystem message: <${rawPayload.Content}> not found`)
+          log.silly('PuppetPuppeteerEvent', `checkRoomSystem message: <${rawPayload.Content}> not found`)
         }
       } else {
         await firer.checkFriendConfirm(rawPayload)
