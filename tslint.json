@@ -5,6 +5,8 @@
     "trailing-comma": true,
     "import-spacing": false,
     "no-multi-spaces": false,
+    "arrow-parens": false,
+    "space-within-parens": false,
     "typedef-whitespace": false
   }
 }
