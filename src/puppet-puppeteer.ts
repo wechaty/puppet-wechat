@@ -59,7 +59,7 @@ import {
 
   RoomMemberPayload,
   RoomPayload,
-}                           from 'wechaty-puppet'
+}                   from 'wechaty-puppet'
 
 import {
   envHead,
@@ -67,20 +67,22 @@ import {
   MEMORY_SLOT,
   qrCodeForChatie,
   VERSION,
-}                     from './config'
+}                           from './config'
 
 import {
   messageFilename,
   messageRawPayloadParser,
   plainText,
   unescapeHtml,
-}                     from './pure-function-helpers'
+}                           from './pure-function-helpers'
 
 import {
   Bridge,
   Cookie,
-}                       from './bridge'
-import Event            from './event'
+}                           from './bridge'
+import {
+  Event,
+}                           from './event'
 
 import {
   WebAppMsgType,
@@ -673,74 +675,10 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
-  // private contactQueryFilterToFunctionString(
-  //   query: ContactQueryFilter,
-  // ): string {
-  //   log.verbose('PuppetPuppeteer', 'contactQueryFilterToFunctionString({ %s })',
-  //                           Object.keys(query)
-  //                                 .map(k => `${k}: ${query[k as keyof ContactQueryFilter]}`)
-  //                                 .join(', '),
-  //             )
-
-  //   if (Object.keys(query).length !== 1) {
-  //     throw new Error('query only support one key. multi key support is not availble now.')
-  //   }
-
-  //   const filterKey = Object.keys(query)[0] as keyof ContactQueryFilter
-
-  //   let filterValue: string | RegExp | undefined  = query[filterKey]
-  //   if (!filterValue) {
-  //     throw new Error('filterValue not found')
-  //   }
-
-  //   const protocolKeyMap = {
-  //     name:   'NickName',
-  //     alias:  'RemarkName',
-  //   }
-
-  //   const protocolFilterKey = protocolKeyMap[filterKey]
-  //   if (!protocolFilterKey) {
-  //     throw new Error('unsupport protocol filter key')
-  //   }
-
-  //   /**
-  //    * must be string because we need inject variable value
-  //    * into code as variable namespecialContactList
-  //    */
-  //   let filterFunction: string
-
-  //   if (filterValue instanceof RegExp) {
-  //     filterFunction = `(function (c) { return ${filterValue.toString()}.test(c.${protocolFilterKey}) })`
-  //   } else if (typeof filterValue === 'string') {
-  //     filterValue = filterValue.replace(/'/g, '\\\'')
-  //     filterFunction = `(function (c) { return c.${protocolFilterKey} === '${filterValue}' })`
-  //   } else {
-  //     throw new Error('unsupport name type')
-  //   }
-
-  //   return filterFunction
-  // }
-
   public async contactList (): Promise<string[]> {
     const idList = await this.bridge.contactList()
     return idList
   }
-
-  // public async contactFindAll(
-  //   query: ContactQueryFilter = { name: /.*/ },
-  // ): Promise<string[]> {
-
-  //   const filterFunc = this.contactQueryFilterToFunctionString(query)
-
-  //   try {
-  //     const idList = await this.bridge.contactFind(filterFunc)
-  //     return idList
-  //   } catch (e) {
-  //     log.warn('PuppetPuppeteer', 'contactFind(%s) rejected: %s', filterFunc, e.message)
-  //     Raven.captureException(e)
-  //     throw e
-  //   }
-  // }
 
   /**
    *

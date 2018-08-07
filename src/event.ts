@@ -192,11 +192,6 @@ async function onMessage (
   this       : PuppetPuppeteer,
   rawPayload : WebMessageRawPayload,
 ): Promise<void> {
-  // const msg = this.Message.create(
-  //   rawPayload.MsgId,
-  //   await this.messagePayload(rawPayload.MsgId),
-  // )
-
   const firer = new Firer(this)
 
   /**
@@ -243,5 +238,3 @@ async function onUnload (this: PuppetPuppeteer): Promise<void> {
   }
   */
 }
-
-export default Event

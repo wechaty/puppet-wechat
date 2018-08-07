@@ -51,7 +51,7 @@ export function messageRawPayloadParser (
     }
   }
 
-  const type: MessageType = webMessageType(rawPayload.MsgType)
+  const type: MessageType = webMessageType(rawPayload)
 
   const payloadBase = {
     filename: msgFileName,

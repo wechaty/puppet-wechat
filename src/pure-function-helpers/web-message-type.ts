@@ -1,4 +1,6 @@
 import {
+  WebAppMsgType,
+  WebMessageRawPayload,
   WebMessageType,
 }                         from '../web-schemas'
 
@@ -6,10 +8,19 @@ import {
   MessageType,
 }                 from 'wechaty-puppet'
 
-export function webMessageType (webMsgType: WebMessageType): MessageType {
-  switch (webMsgType) {
+export function webMessageType (
+  rawPayload: WebMessageRawPayload,
+): MessageType {
+
+  switch (rawPayload.MsgType) {
     case WebMessageType.TEXT:
-      return MessageType.Text
+      switch (rawPayload.SubMsgType) {
+        case WebMessageType.LOCATION:
+          return MessageType.Attachment
+
+        default:
+          return MessageType.Text
+      }
 
     case WebMessageType.EMOTICON:
     case WebMessageType.IMAGE:
@@ -22,6 +33,17 @@ export function webMessageType (webMsgType: WebMessageType): MessageType {
     case WebMessageType.VIDEO:
       return MessageType.Video
 
+    case WebMessageType.APP:
+      switch (rawPayload.AppMsgType) {
+        case WebAppMsgType.ATTACH:
+        case WebAppMsgType.URL:
+        case WebAppMsgType.READER_TYPE:
+          return MessageType.Attachment
+
+        default:
+          return MessageType.Text
+      }
+
     /**
      * Treat those Types as TEXT
      *
@@ -29,7 +51,6 @@ export function webMessageType (webMsgType: WebMessageType): MessageType {
      * FIXME: should we use better message type at here???
      */
     case WebMessageType.SYS:
-    case WebMessageType.APP:
       return MessageType.Text
 
     // VERIFYMSG           = 37,
