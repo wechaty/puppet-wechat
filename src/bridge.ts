@@ -19,9 +19,8 @@
 // tslint:disable:arrow-parens
 
 import { EventEmitter } from 'events'
-import fs          from 'fs'
-import path        from 'path'
-
+import fs               from 'fs'
+import path             from 'path'
 import {
   Browser,
   Cookie,
@@ -30,8 +29,8 @@ import {
   Page,
 }                       from 'puppeteer'
 import StateSwitch      from 'state-switch'
-// import { parseString }  from 'xml2js'
-import { toJson }       from 'xml2json'
+import { parseString }  from 'xml2js'
+// import { toJson }       from 'xml2json'
 
 import {
   MemoryCard,
@@ -799,7 +798,15 @@ export class Bridge extends EventEmitter {
     try {
       // see unit test for detail
       const tryXmlText = this.preHtmlToXml(text)
-      obj = JSON.parse(toJson(tryXmlText))
+      // obj = JSON.parse(toJson(tryXmlText))
+      obj = await new Promise((resolve, reject) => {
+        parseString(tryXmlText, { explicitArray: false }, (err, result) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(result)
+        })
+      })
     } catch (e) {
       log.warn('PuppetPuppeteerBridge', 'testBlockedMessage() toJson() exception: %s', e)
       return false
