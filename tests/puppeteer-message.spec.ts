@@ -93,13 +93,13 @@ test('constructor()', async t => {
   }
 
   sandbox.stub(puppet, 'contactPayload').returns({})
-  sandbox.stub(puppet, 'contactPayloadCache').returns({})
+  // sandbox.stub(puppet, 'contactPayloadCache').returns({})
 
   sandbox.stub(puppet, 'roomPayload').returns({})
-  sandbox.stub(puppet, 'roomPayloadCache').returns({})
+  // sandbox.stub(puppet, 'roomPayloadCache').returns({})
 
   sandbox.stub(puppet, 'messagePayload').callsFake(mockMessagePayload)
-  sandbox.stub(puppet, 'messagePayloadCache').callsFake(mockMessagePayload)
+  // sandbox.stub(puppet, 'messagePayloadCache').callsFake(mockMessagePayload)
 
   await puppet.login(MOCK_USER_ID)
 

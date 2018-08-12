@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-puppeteer",
-  "version": "0.8.12",
+  "version": "0.9.0",
   "description": "Puppet Puppeteer for Wechaty",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -77,8 +77,8 @@
     "tslint": "^5.11.0",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",
-    "wechaty": "^0.18.5",
-    "wechaty-puppet": "^0.8.5"
+    "wechaty": "^0.19.148",
+    "wechaty-puppet": "^0.13.17"
   },
   "git": {
     "scripts": {
@@ -87,7 +87,7 @@
   },
   "peerDependencies": {
     "file-box": "^0.8.22",
-    "wechaty-puppet": "^0.8.1"
+    "wechaty-puppet": "^0.13.17"
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
   "dependencies": {

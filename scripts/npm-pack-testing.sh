@@ -27,7 +27,7 @@ npm install *-*.*.*.tgz \
   rx-queue \
   state-switch \
   typescript \
-  wechaty-puppet \
+  wechaty-puppet@next \
   qr-image \
   promise-retry \
   watchdog \

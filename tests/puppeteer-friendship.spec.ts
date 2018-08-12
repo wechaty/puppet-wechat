@@ -81,7 +81,7 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
 
   const sandbox = sinon.createSandbox()
   sandbox.stub(puppet, 'friendshipPayload').resolves(payload)
-  sandbox.stub(puppet, 'friendshipPayloadCache').returns(payload)
+  // sandbox.stub(puppet, 'friendshipPayloadCache').returns(payload)
 
   // const contact = wechaty.Contact.load(info.UserName)
   // const contactPayload = await puppet.contactPayload(info.UserName)
@@ -120,11 +120,11 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
 
   sandbox.stub(puppet, 'messageRawPayload')   .resolves(rawMessagePayload)
 
-  sandbox.stub(puppet, 'contactPayload')      .resolves({})
-  sandbox.stub(puppet, 'contactPayloadCache') .returns({})
+  sandbox.stub(puppet, 'contactPayload').resolves({})
+  // sandbox.stub(puppet, 'contactPayloadCache') .returns({})
 
-  sandbox.stub(puppet, 'friendshipPayload')      .resolves(friendshipPayload)
-  sandbox.stub(puppet, 'friendshipPayloadCache') .returns(friendshipPayload)
+  sandbox.stub(puppet, 'friendshipPayload').resolves(friendshipPayload)
+  // sandbox.stub(puppet, 'friendshipPayloadCache') .returns(friendshipPayload)
 
   // const msg = wechaty.Message.create(rawMessagePayload.MsgId)
   // await msg.ready()

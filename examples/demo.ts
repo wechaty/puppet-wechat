@@ -20,7 +20,6 @@
 // tslint:disable:no-console
 
 import {
-  config,
   Contact,
   Message,
   Wechaty,
@@ -35,7 +34,7 @@ import { PuppetPuppeteer } from '../src/'
 const puppet = new PuppetPuppeteer()
 
 const bot = new Wechaty({
-  profile : config.default.DEFAULT_PROFILE,
+  profile : 'wechaty-puppet-puppeteer-demo',
   puppet,
 })
 
