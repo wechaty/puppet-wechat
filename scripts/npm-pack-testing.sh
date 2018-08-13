@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+NPM_TAG=latest
+if [ ./development-release.ts ]; then
+  NPM_TAG=next
+fi
+
 npm run dist
 npm run pack
 
@@ -27,7 +32,7 @@ npm install *-*.*.*.tgz \
   rx-queue \
   state-switch \
   typescript \
-  wechaty-puppet@next \
+  "wechaty-puppet@$NPM_TAG" \
   qr-image \
   promise-retry \
   watchdog \
