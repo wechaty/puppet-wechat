@@ -19,12 +19,6 @@
 
 // tslint:disable:no-console
 
-import {
-  Contact,
-  Message,
-  Wechaty,
-}           from 'wechaty'
-
 import { PuppetPuppeteer } from '../src/'
 /**
  *
@@ -33,17 +27,12 @@ import { PuppetPuppeteer } from '../src/'
  */
 const puppet = new PuppetPuppeteer()
 
-const bot = new Wechaty({
-  profile : 'wechaty-puppet-puppeteer-demo',
-  puppet,
-})
-
 /**
  *
  * 2. Register event handlers for Bot
  *
  */
-bot
+puppet
 .on('logout', onLogout)
 .on('login',  onLogin)
 .on('scan',   onScan)
@@ -55,10 +44,10 @@ bot
  * 3. Start the bot!
  *
  */
-bot.start()
+puppet.start()
 .catch(async e => {
   console.error('Bot start() fail:', e)
-  await bot.stop()
+  await puppet.stop()
   process.exit(-1)
 })
 
@@ -85,16 +74,16 @@ function onScan (qrcode: string, status: number) {
   console.log(`[${status}] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
 }
 
-function onLogin (user: Contact) {
-  console.log(`${user.name()} login`)
-  bot.say('Wechaty login').catch(console.error)
+function onLogin (contactId: string) {
+  console.log(`${contactId} login`)
+  puppet.messageSendText({ contactId, }, 'Wechaty login').catch(console.error)
 }
 
-function onLogout (user: Contact) {
-  console.log(`${user.name()} logouted`)
+function onLogout (contactId: string) {
+  console.log(`${contactId} logouted`)
 }
 
-function onError (e: Error) {
+function onError (e: string) {
   console.error('Bot error:', e)
   /*
   if (bot.logonoff()) {
@@ -109,8 +98,9 @@ function onError (e: Error) {
  *    dealing with Messages.
  *
  */
-async function onMessage (msg: Message) {
-  console.log(msg.toString)
+async function onMessage (messageId: string) {
+  const payload = await puppet.messagePayload(messageId)
+  console.log(JSON.stringify(payload))
 }
 
 /**
@@ -119,16 +109,7 @@ async function onMessage (msg: Message) {
  *
  */
 const welcome = `
-| __        __        _           _
-| \\ \\      / /__  ___| |__   __ _| |_ _   _
-|  \\ \\ /\\ / / _ \\/ __| '_ \\ / _\` | __| | | |
-|   \\ V  V /  __/ (__| | | | (_| | |_| |_| |
-|    \\_/\\_/ \\___|\\___|_| |_|\\__,_|\\__|\\__, |
-|                                     |___/
-
-=============== Powered by Wechaty ===============
--------- https://github.com/chatie/wechaty --------
-          Version: ${bot.version(true)}
+Puppet Version: ${puppet.version()}
 
 Please wait... I'm trying to login in...
 
