@@ -17,11 +17,11 @@ cp tests/fixtures/smoke-testing.ts "$TMPDIR"
 cd $TMPDIR
 npm init -y
 npm install *-*.*.*.tgz \
-  @types/lru-cache \
   @types/node \
   @types/normalize-package-data \
   @types/promise-retry \
   @types/puppeteer \
+  @types/quick-lru \
   brolog \
   file-box \
   hot-import \
