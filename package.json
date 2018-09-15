@@ -58,7 +58,7 @@
     "@types/sinon": "^5.0.1",
     "@types/xml2js": "^0.4.3",
     "ajv": "^6.5.2",
-    "babel-eslint": "^8.2.5",
+    "babel-eslint": "^9.0.0",
     "blue-tape": "^1.0.0",
     "eslint": "^5.0.1",
     "eslint-config-standard": "^12.0.0",
