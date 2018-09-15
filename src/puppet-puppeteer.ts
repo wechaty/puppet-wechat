@@ -57,9 +57,14 @@ import {
   PuppetQrcodeScanEvent,
   Receiver,
 
+  RoomInvitationPayload,
   RoomMemberPayload,
   RoomPayload,
-}                   from 'wechaty-puppet'
+
+  throwUnsupportedError,
+
+  UrlLinkPayload,
+}                           from 'wechaty-puppet'
 
 import {
   envHead,
@@ -332,6 +337,10 @@ export class PuppetPuppeteer extends Puppet {
     return fileBox
   }
 
+  public async messageUrl (messageId: string)  : Promise<UrlLinkPayload> {
+    return throwUnsupportedError()
+  }
+
   private async messageRawPayloadToFile (
     rawPayload: WebMessageRawPayload,
   ): Promise<FileBox> {
@@ -386,6 +395,13 @@ export class PuppetPuppeteer extends Puppet {
     const fileBox = FileBox.fromUrl(url, msgFileName, headers)
 
     return fileBox
+  }
+
+  public async messageSendUrl (
+    to             : Receiver,
+    urlLinkPayload : UrlLinkPayload,
+  ) : Promise<void> {
+    throwUnsupportedError()
   }
 
   /**
@@ -519,6 +535,24 @@ export class PuppetPuppeteer extends Puppet {
       this.id = undefined
       this.emit('logout', user)
     }
+  }
+
+  /**
+   *
+   * ContactSelf
+   *
+   *
+   */
+  public async contactSelfQrcode (): Promise<string> {
+    return throwUnsupportedError()
+  }
+
+  public async contactSelfName (name: string): Promise<void> {
+    return throwUnsupportedError()
+  }
+
+  public async contactSelfSignature (signature: string): Promise<void> {
+    return throwUnsupportedError()
   }
 
   /**
@@ -933,6 +967,23 @@ export class PuppetPuppeteer extends Puppet {
       roomAlias : rawPayload.DisplayName,
     }
     return payload
+  }
+
+  /**
+   *
+   * Room Invitation
+   *
+   */
+  public async roomInvitationAccept (roomInvitationId: string): Promise<void> {
+    return throwUnsupportedError()
+  }
+
+  public async roomInvitationRawPayload (roomInvitationId: string): Promise<any> {
+    return throwUnsupportedError()
+  }
+
+  public async roomInvitationRawPayloadParser (rawPayload: any): Promise<RoomInvitationPayload> {
+    return throwUnsupportedError()
   }
 
   /**

@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-puppeteer",
-  "version": "0.8.12",
+  "version": "0.14.2",
   "description": "Puppet Puppeteer for Wechaty",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -58,27 +58,27 @@
     "@types/sinon": "^5.0.1",
     "@types/xml2js": "^0.4.3",
     "ajv": "^6.5.2",
-    "babel-eslint": "^8.2.5",
+    "babel-eslint": "^9.0.0",
     "blue-tape": "^1.0.0",
     "eslint": "^5.0.1",
-    "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^7.0.0",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0",
+    "eslint-plugin-promise": "^4.0.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "file-box": "^0.8.24",
     "git-scripts": "^0.2.1",
-    "markdownlint-cli": "^0.12.0",
     "memory-card": "^0.6.2",
+    "markdownlint-cli": "^0.13.0",
     "normalize-package-data": "^2.4.0",
     "semver": "^5.5.0",
     "shx": "^0.3.1",
     "sinon": "^6.0.1",
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
-    "tslint-config-standard": "^7.1.0",
+    "tslint-config-standard": "^8.0.0",
     "typescript": "^3.0.1",
-    "wechaty": "^0.18.5",
-    "wechaty-puppet": "^0.8.5"
+    "wechaty-puppet": "^0.14.1"
   },
   "git": {
     "scripts": {
@@ -87,7 +87,7 @@
   },
   "peerDependencies": {
     "file-box": "^0.8.22",
-    "wechaty-puppet": "^0.8.1"
+    "wechaty-puppet": "^0.14.1"
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
   "dependencies": {
