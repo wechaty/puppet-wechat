@@ -41,7 +41,7 @@
     "url": "https://github.com/Chatie/wechaty-puppet-puppeteer/issues"
   },
   "devDependencies": {
-    "@types/bl": "^0.8.32",
+    "@types/bl": "^2.1.0",
     "@types/blue-tape": "^0.1.31",
     "@types/lru-cache": "^4.1.1",
     "@types/md5": "^2.1.32",
