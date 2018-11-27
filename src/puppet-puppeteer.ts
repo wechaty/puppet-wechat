@@ -1120,8 +1120,8 @@ export class PuppetPuppeteer extends Puppet {
 
   public async saveCookie (): Promise<void> {
     const cookieList = await this.bridge.cookies()
-    this.memory.set(MEMORY_SLOT, cookieList)
-    this.memory.save()
+    await this.memory.set(MEMORY_SLOT, cookieList)
+    await this.memory.save()
   }
 
   private extToType (ext: string): WebMessageType {

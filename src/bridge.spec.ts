@@ -50,7 +50,10 @@ const PUPPETEER_LAUNCH_OPTIONS = {
 }
 
 test('PuppetPuppeteerBridge', async (t) => {
-  const bridge = new Bridge({ memory: new MemoryCard() })
+  const memory = new MemoryCard()
+  await memory.load()
+
+  const bridge = new Bridge({ memory })
   try {
     await bridge.start()
     await bridge.stop()
@@ -190,6 +193,7 @@ test('clickSwitchAccount()', async t => {
 
 test('WechatyBro.ding()', async t => {
   const memory = new MemoryCard(Math.random().toString(36).substr(2, 5))
+  await memory.load()
   const bridge = new Bridge({
     memory,
   })
@@ -213,6 +217,6 @@ test('WechatyBro.ding()', async t => {
   } catch (err) {
     t.fail('exception: ' + err.message)
   } finally {
-    memory.destroy()
+    await memory.destroy()
   }
 })
