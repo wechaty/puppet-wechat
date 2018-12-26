@@ -51,7 +51,7 @@ then you can check your `$HOME/.yarnrc`
 
 ## HISTORY
 
-### master
+### v0.15 master
 
 ### v0.14 Aug 2018
 
