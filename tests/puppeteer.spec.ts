@@ -236,6 +236,7 @@ test('other demos', async t => {
       sameSite : 'Strict',
       secure   : false,
       session  : true,
+      size     : 42,
       value    : 'test-value',
     }
     await page.setCookie(cookie)
