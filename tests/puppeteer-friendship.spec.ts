@@ -120,7 +120,7 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
 
   sandbox.stub(puppet, 'messageRawPayload')   .resolves(rawMessagePayload)
 
-  sandbox.stub(puppet, 'contactPayload').resolves({})
+  sandbox.stub(puppet, 'contactPayload').resolves({} as any)
   // sandbox.stub(puppet, 'contactPayloadCache') .returns({})
 
   sandbox.stub(puppet, 'friendshipPayload').resolves(friendshipPayload)

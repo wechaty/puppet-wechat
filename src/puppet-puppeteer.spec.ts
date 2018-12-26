@@ -71,13 +71,13 @@ test('login/logout events', async t => {
     sandbox.stub(Bridge.prototype, 'getUserName').resolves('mockedUserName')
     sandbox.stub(Bridge.prototype, 'contactList')
       .onFirstCall().resolves([])
-      .onSecondCall().resolves([1])
-      .resolves([1, 2])
+      .onSecondCall().resolves(['1'])
+      .resolves(['1', '2'])
 
     sandbox.stub(puppet, 'contactRawPayload').resolves({
       NickName: 'mockedNickName',
       UserName: 'mockedUserName',
-    })
+    } as any)
     // sandbox.stub(puppet, 'waitStable').resolves()
 
     await puppet.start()

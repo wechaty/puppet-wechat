@@ -63,7 +63,7 @@ test('Room smoke testing', async t => {
   // Mock
   const mockContactRoomRawPayload = (id: string) => {
     log.verbose('PuppeteerRoomTest', 'mockContactRawPayload(%s)', id)
-    return new Promise(resolve => {
+    return new Promise<any>(resolve => {
       if (id === ROOM_EXPECTED.id) {
         setImmediate(() => resolve(ROOM_RAW_PAYLOAD))
       } else if (id in CONTACT_RAW_PAYLOAD_DICT) {

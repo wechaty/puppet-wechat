@@ -21,5 +21,7 @@
   , "eslint.autoFixOnSave": false
   , "tslint.autoFixOnSave": false
   , "editor.formatOnSave": false
-  , "typescript.extension.sortImports.sortOnSave": false
+  ,
+  "typescript.extension.sortImports.sortOnSave": false,
+  "python.pythonPath": "python3"
 }

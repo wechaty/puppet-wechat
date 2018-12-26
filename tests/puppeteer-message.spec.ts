@@ -81,7 +81,7 @@ test('constructor()', async t => {
     id:     '179242112323992762',
   }
   const sandbox = sinon.createSandbox()
-  const mockMessagePayload = (_: string) => {
+  const mockMessagePayload = async (_: string) => {
     const payload: MessagePayload = {
       fromId    : EXPECTED.from,
       id        : EXPECTED.id,
@@ -92,10 +92,10 @@ test('constructor()', async t => {
     return payload
   }
 
-  sandbox.stub(puppet, 'contactPayload').returns({})
+  sandbox.stub(puppet, 'contactPayload').returns({} as any)
   // sandbox.stub(puppet, 'contactPayloadCache').returns({})
 
-  sandbox.stub(puppet, 'roomPayload').returns({})
+  sandbox.stub(puppet, 'roomPayload').returns({} as any)
   // sandbox.stub(puppet, 'roomPayloadCache').returns({})
 
   sandbox.stub(puppet, 'messagePayload').callsFake(mockMessagePayload)
@@ -128,7 +128,7 @@ test('ready()', async t => {
   // Mock
   function mockContactRawPayload (id: string) {
     log.silly('TestMessage', `mocked getContact(%s)`, id)
-    return new Promise(resolve => {
+    return new Promise<any>(resolve => {
       let obj = {}
       switch (id) {
         case expectedFromUserName:
@@ -156,9 +156,9 @@ test('ready()', async t => {
     })
   }
 
-  function mockMessageRawPayload (id: string) {
+  async function mockMessageRawPayload (id: string) {
     if (id === rawPayload.MsgId) {
-      return rawPayload
+      return rawPayload as any
     }
     return {}
   }

@@ -56,7 +56,7 @@ test('Contact smoke testing', async t => {
   }
 
   const puppet = new PuppetPuppeteer()
-  sandbox.stub(puppet as any, 'contactRawPayload').callsFake(mockContactPayload)
+  sandbox.stub(puppet as any, 'contactRawPayload').callsFake(mockContactPayload as any)
 
   const contactPayload = await puppet.contactPayload(UserName)
 
