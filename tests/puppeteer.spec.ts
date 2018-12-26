@@ -133,7 +133,7 @@ test('page.on(console)', async t => {
 
   page.on('console', spy)
   await page.evaluate((...args) => {
-    console.log.apply(console, args)
+    console.log.apply(console, args as [any?, ...any[]])
   }, EXPECTED_ARG1, EXPECTED_ARG2) // , EXPECTED_ARG3)
 
   // wait a while to let chrome fire the event
