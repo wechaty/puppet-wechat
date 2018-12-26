@@ -49,6 +49,19 @@ yarn config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.or
 
 then you can check your `$HOME/.yarnrc`
 
+## HISTORY
+
+### master
+
+### v0.14 Aug 2018
+
+1. First Stable Release
+1. Follow latest typings
+
+### v0.2 May 2018
+
+1. Promote to solo package: `wechaty-puppet-puppeteer`
+
 ## AUTHOR
 
 [Huan LI](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
