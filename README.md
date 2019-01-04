@@ -35,7 +35,7 @@ Cause `storage.googleapis.com` is blocked in mainland china, you'd better config
 ```bash
 npm config set registry https://registry.npm.taobao.org
 npm config set disturl https://npm.taobao.org/dist
-npm config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
+npm config set puppeteer_download_host https://npm.taobao.org/mirrors
 ```
 
 then you can check your `$HOME/.npmrc`
@@ -45,7 +45,7 @@ then you can check your `$HOME/.npmrc`
 ```bash
 yarn config set registry https://registry.npm.taobao.org
 yarn config set disturl https://npm.taobao.org/dist
-yarn config set puppeteer_download_host https://storage.googleapis.com.cnpmjs.org
+yarn config set puppeteer_download_host https://npm.taobao.org/mirrors
 ```
 
 then you can check your `$HOME/.yarnrc`
