@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/bl": "^2.1.0",
     "@types/blue-tape": "^0.1.31",
-    "@types/lru-cache": "^4.1.1",
+    "@types/lru-cache": "^5.1.0",
     "@types/md5": "^2.1.32",
     "@types/mime": "^2.0.0",
     "@types/node": "^10.3.6",
