@@ -68,7 +68,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "file-box": "^0.8.24",
     "git-scripts": "^0.2.1",
-    "markdownlint-cli": "^0.13.0",
+    "markdownlint-cli": "^0.14.0",
     "memory-card": "^0.6.2",
     "normalize-package-data": "^2.4.0",
     "semver": "^5.5.0",
