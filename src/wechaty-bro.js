@@ -308,24 +308,24 @@
     chatFactory._recalledMsgProcess = function (msg) {
       try {
         oldRecalledMsgProcess.call(chatFactory, msg)
-        var m = Object.assign({}, msg)
-        var content = utilFactory.htmlDecode(m.MMActualContent)
-        content = utilFactory.encodeEmoji(content)
-        var revokemsg = utilFactory.xml2json(content).revokemsg
-        if (revokemsg.msgid) {
-          var chatMsgs = chatFactory.getChatMessage(m.MMPeerUserName)
-          var i = chatFactory._findMessageByMsgId(chatMsgs, revokemsg.msgid)
-          if (i > -1) {
-            m = chatMsgs[i]
-            m.MsgType = confFactory.MSGTYPE_RECALLED
-          } else {
-            m.MsgId = revokemsg.msgid
-            m.MMActualContent = m.Content = revokemsg.replacemsg.replace(/"/g, '')
-          }
-          WechatyBro.emit('message', m)
-        }
       } catch (e) {
-        log('hook recalled msg failed:' + e.message)
+        log('call oldRecalledMsgProcess failed:' + e.message)
+      }
+      var m = Object.assign({}, msg)
+      var content = utilFactory.htmlDecode(m.MMActualContent)
+      content = utilFactory.encodeEmoji(content)
+      var revokemsg = utilFactory.xml2json(content).revokemsg
+      if (revokemsg.msgid) {
+        var chatMsgs = chatFactory.getChatMessage(m.MMPeerUserName)
+        var i = chatFactory._findMessageByMsgId(chatMsgs, revokemsg.msgid)
+        if (i > -1) {
+          m = chatMsgs[i]
+          m.MsgType = confFactory.MSGTYPE_RECALLED
+        } else {
+          m.MsgId = revokemsg.msgid
+          m.MMActualContent = m.Content = revokemsg.replacemsg.replace(/"/g, '')
+        }
+        WechatyBro.emit('message', m)
       }
     }
   }
