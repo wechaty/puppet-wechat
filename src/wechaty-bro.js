@@ -306,7 +306,11 @@
     // hook chatFactory._recalledMsgProcess, resolve emit RECALLED type msg
     var oldRecalledMsgProcess = chatFactory._recalledMsgProcess
     chatFactory._recalledMsgProcess = function (msg) {
-      oldRecalledMsgProcess(msg)
+      try {
+        oldRecalledMsgProcess.call(chatFactory, msg)
+      } catch (e) {
+        log('call oldRecalledMsgProcess failed:' + e.message)
+      }
       var m = Object.assign({}, msg)
       var content = utilFactory.htmlDecode(m.MMActualContent)
       content = utilFactory.encodeEmoji(content)
