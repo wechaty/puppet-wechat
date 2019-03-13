@@ -740,7 +740,7 @@ export class PuppetPuppeteer extends Puppet {
         rawPayload = await this.bridge.getContact(id) as undefined | WebRoomRawPayload
 
         if (rawPayload) {
-          const currLength = rawPayload.MemberList && rawPayload.MemberList.length || -1
+          const currLength = rawPayload.MemberList && rawPayload.MemberList.length || 0
 
           log.silly('PuppetPuppeteer', `roomPayload() this.bridge.getContact(%s) `
                                         + `MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
