@@ -933,7 +933,7 @@ export class Bridge extends EventEmitter {
     }
 
     try {
-      const hostname = await this.page.evaluate(() => window.location.hostname) as string
+      const hostname = await this.page.evaluate(() => window.location.hostname)
       log.silly('PuppetPuppeteerBridge', 'hostname() got %s', hostname)
       return hostname
     } catch (e) {
