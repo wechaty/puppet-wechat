@@ -376,7 +376,7 @@ export class Firer {
       return false
     }
 
-    const roomId = rawPayload.ToUserName
+    const roomId = rawPayload.FromUserName
 
     const roomPayload = await this.puppet.roomPayload(roomId)
     const oldTopic = roomPayload.topic
