@@ -101,7 +101,7 @@
     "promise-retry": "^1.1.1",
     "puppeteer": "^1.11.0",
     "qr-image": "^3.2.0",
-    "read-pkg-up": "^4.0.0",
+    "read-pkg-up": "^5.0.0",
     "request": "^2.87.0",
     "rx-queue": "^0.6.1",
     "rxjs": "^6.2.1",
