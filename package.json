@@ -46,7 +46,7 @@
     "@types/lru-cache": "^4.1.1",
     "@types/md5": "^2.1.32",
     "@types/mime": "^2.0.0",
-    "@types/node": "^10.3.6",
+    "@types/node": "^11.13.4",
     "@types/normalize-package-data": "^2.4.0",
     "@types/promise-retry": "^1.1.2",
     "@types/puppeteer": "^1.11.1",
