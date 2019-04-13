@@ -92,7 +92,7 @@
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
   "dependencies": {
-    "bl": "^2.0.1",
+    "bl": "^3.0.0",
     "brolog": "^1.6.5",
     "hot-import": "^0.2.1",
     "lru-cache": "^5.0.0",
