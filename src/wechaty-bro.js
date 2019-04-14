@@ -314,18 +314,14 @@
       var m = Object.assign({}, msg)
       var content = utilFactory.htmlDecode(m.MMActualContent)
       content = utilFactory.encodeEmoji(content)
+      // remove <br/> here
+      content = content.replace(/<br.*?\/>/g, '')
       var revokemsg = utilFactory.xml2json(content).revokemsg
       if (revokemsg.msgid) {
-        var chatMsgs = chatFactory.getChatMessage(m.MMPeerUserName)
-        var i = chatFactory._findMessageByMsgId(chatMsgs, revokemsg.msgid)
-        if (i > -1) {
-          m = chatMsgs[i]
-          m.MsgType = confFactory.MSGTYPE_RECALLED
-        } else {
-          m.MsgId = revokemsg.msgid
-          m.MMActualContent = m.Content = revokemsg.replacemsg.replace(/"/g, '')
-        }
-        WechatyBro.emit('message', m)
+        // add recalled message
+        m.MsgType = confFactory.MSGTYPE_RECALLED
+        m.MMActualContent = revokemsg.msgid
+        chatFactory.addChatMessage(m)
       }
     }
   }
