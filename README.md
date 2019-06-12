@@ -30,25 +30,19 @@ Learn more about the Puppet at [Wechaty wiki: Puppet](https://github.com/Chatie/
 
 Cause `storage.googleapis.com` is blocked in mainland china, you'd better config by following guide.
 
-### `npm` user
+### 1. Linux & Mac
 
-```bash
-npm config set registry https://registry.npm.taobao.org
-npm config set disturl https://npm.taobao.org/dist
-npm config set puppeteer_download_host https://npm.taobao.org/mirrors
+```shell
+PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-puppeteer
 ```
 
-then you can check your `$HOME/.npmrc`
+### 2. Windows
 
-### `yarn` user
-
-```bash
-yarn config set registry https://registry.npm.taobao.org
-yarn config set disturl https://npm.taobao.org/dist
-yarn config set puppeteer_download_host https://npm.taobao.org/mirrors
+```shell
+SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-puppeteer
 ```
 
-then you can check your `$HOME/.yarnrc`
+Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomment-351945645>
 
 ## HISTORY
 
