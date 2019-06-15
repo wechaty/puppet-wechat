@@ -81,6 +81,9 @@ test('login/logout events', async t => {
     } as any)
     // sandbox.stub(puppet, 'waitStable').resolves()
 
+    const readySpy = sandbox.spy()
+    puppet.on('ready', readySpy)
+
     await puppet.start()
     t.pass('should be inited')
     t.is(puppet.logonoff() , false  , 'should be not logined')
@@ -107,6 +110,8 @@ test('login/logout events', async t => {
      * 3, 4, 5 is PuppetPuppeteer.waitStable() for `unchangedNum` to reach 3 times.
      */
     t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
+
+    t.ok(readySpy.called, 'should emit ready event, after login, because puppeteer login event will wait the waitStable()')
 
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')

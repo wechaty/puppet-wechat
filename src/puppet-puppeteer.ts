@@ -1074,6 +1074,7 @@ export class PuppetPuppeteer extends Puppet {
    * For issue #668
    */
   public async waitStable (): Promise<void> {
+    log.level('silly')
     log.verbose('PuppetPuppeteer', 'readyStable()')
 
     let maxNum  = 0
@@ -1091,7 +1092,7 @@ export class PuppetPuppeteer extends Puppet {
       const contactList = await this.contactList()
       curNum = contactList.length
 
-      if (curNum === maxNum) {
+      if (curNum > 0 && curNum === maxNum) {
         unchangedNum++
       } else /* curNum < maxNum */ {
         unchangedNum = 0
