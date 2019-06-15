@@ -175,7 +175,9 @@ export class PuppetPuppeteer extends Puppet {
 
       log.verbose('PuppetPuppeteer', 'start() done')
 
-      this.checkAndEmitReady()
+      this.checkAndEmitReady().catch(e => {
+        log.error('PuppetPuppeteer', 'checkAndEmitReady() rejection: %s', e && e.message)
+      })
 
       // this.emit('start')
       return
