@@ -48,6 +48,7 @@ class PuppetTest extends PuppetPuppeteer {
   public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
+
 }
 
 // test('Puppet smoke testing', async t => {
@@ -97,7 +98,15 @@ test('login/logout events', async t => {
     // t.ok((puppet.contactRawPayload as any).called,  'puppet.contactRawPayload should be called')
 
     t.ok((Bridge.prototype.contactList as any).called,       'contactList stub should be called')
-    t.is((Bridge.prototype.contactList as any).callCount, 4, 'should call stubContacList 4 times')
+
+    /**
+     * 6 times is:
+     *
+     * 0, 1, 2 is for first 3 calls for contactList()
+     *
+     * 3, 4, 5 is PuppetPuppeteer.waitStable() for `unchangedNum` to reach 3 times.
+     */
+    t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
 
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')

@@ -175,10 +175,6 @@ export class PuppetPuppeteer extends Puppet {
 
       log.verbose('PuppetPuppeteer', 'start() done')
 
-      this.checkAndEmitReady().catch(e => {
-        log.error('PuppetPuppeteer', 'checkAndEmitReady() rejection: %s', e && e.message)
-      })
-
       // this.emit('start')
       return
 
@@ -191,33 +187,6 @@ export class PuppetPuppeteer extends Puppet {
 
       throw e
     }
-  }
-
-  private async checkAndEmitReady (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'checkAndEmitReady()')
-
-    let maxNum  = 0
-    let curNum = 0
-    let stableNum = 0
-
-    while (stableNum < 3) {
-
-      // wait 1 second
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      const contactList = await this.contactSearch()
-      curNum = contactList.length
-
-      if (curNum > maxNum) {
-        maxNum = curNum
-      } else if (curNum === maxNum) {
-        stableNum++
-      } else /* curNum < maxNum */ {
-        stableNum = 0
-      }
-    }
-
-    this.emit('ready')
   }
 
   /**
@@ -1107,22 +1076,39 @@ export class PuppetPuppeteer extends Puppet {
   public async waitStable (): Promise<void> {
     log.verbose('PuppetPuppeteer', 'readyStable()')
 
-    let   prevLength = -1
-    let   ttl        = 60
-    const sleepTime  = 60 * 1000 / ttl
+    let maxNum  = 0
+    let curNum = 0
+    let unchangedNum = 0
 
-    while (ttl-- > 0) {
-      const contactIdList = await this.contactList()
-      if (prevLength === contactIdList.length) {
-        log.verbose('PuppetPuppeteer', 'readyStable() stable() READY length=%d', prevLength)
-        return
+    const SLEEP_SECOND = 1
+    const STABLE_CHECK_NUM = 3
+
+    while (unchangedNum < STABLE_CHECK_NUM) {
+
+      // wait 1 second
+      await new Promise(resolve => setTimeout(resolve, SLEEP_SECOND * 1000))
+
+      const contactList = await this.contactList()
+      curNum = contactList.length
+
+      if (curNum === maxNum) {
+        unchangedNum++
+      } else /* curNum < maxNum */ {
+        unchangedNum = 0
       }
-      prevLength = contactIdList.length
 
-      await new Promise(r => setTimeout(r, sleepTime))
+      if (curNum > maxNum) {
+        maxNum = curNum
+      }
+
+      log.silly('PuppetPuppeteer', 'readyStable() while() curNum=%s, maxNum=%s, unchangedNum=%s',
+      curNum, maxNum, unchangedNum,
+    )
+
     }
 
-    log.warn('PuppetPuppeteer', 'readyStable() TTL expired. Final length=%d', prevLength)
+    log.verbose('PuppetPuppeteer', 'readyStable() emit(ready)')
+    this.emit('ready')
   }
 
   /**
