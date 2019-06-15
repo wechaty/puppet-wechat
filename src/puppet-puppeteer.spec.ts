@@ -100,7 +100,7 @@ test('login/logout events', async t => {
     // Puppet will not ready the contact, so the contactRawPayload might not be called at here. Huan, 2018.6
     // t.ok((puppet.contactRawPayload as any).called,  'puppet.contactRawPayload should be called')
 
-    t.ok((Bridge.prototype.contactList as any).called,       'contactList stub should be called')
+    t.ok((Bridge.prototype.contactList as any).called, 'contactList stub should be called')
 
     /**
      * 6 times is:
@@ -111,7 +111,9 @@ test('login/logout events', async t => {
      */
     t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
 
-    t.ok(readySpy.called, 'should emit ready event, after login, because puppeteer login event will wait the waitStable()')
+    t.ok(readySpy.called, 'should emit ready event, after login, '
+      + 'because puppeteer login event will wait the waitStable()'
+    )
 
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')
