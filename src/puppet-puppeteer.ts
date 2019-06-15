@@ -209,7 +209,7 @@ export class PuppetPuppeteer extends Puppet {
       data: info,
       type: 'scan',
     }))
-    puppet.on('login',  user => {
+    puppet.on('login',  (/* user */) => {
       // dog.feed({
       //   data: user,
       //   type: 'login',
@@ -338,7 +338,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageUrl (messageId: string)  : Promise<UrlLinkPayload> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(messageId)
   }
 
   private async messageRawPayloadToFile (
@@ -401,7 +401,7 @@ export class PuppetPuppeteer extends Puppet {
     to             : Receiver,
     urlLinkPayload : UrlLinkPayload,
   ) : Promise<void> {
-    throwUnsupportedError()
+    throwUnsupportedError(to, urlLinkPayload)
   }
 
   /**
@@ -548,11 +548,11 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async contactSelfName (name: string): Promise<void> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(name)
   }
 
   public async contactSelfSignature (signature: string): Promise<void> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(signature)
   }
 
   /**
@@ -975,15 +975,15 @@ export class PuppetPuppeteer extends Puppet {
    *
    */
   public async roomInvitationAccept (roomInvitationId: string): Promise<void> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(roomInvitationId)
   }
 
   public async roomInvitationRawPayload (roomInvitationId: string): Promise<any> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(roomInvitationId)
   }
 
   public async roomInvitationRawPayloadParser (rawPayload: any): Promise<RoomInvitationPayload> {
-    return throwUnsupportedError()
+    return throwUnsupportedError(rawPayload)
   }
 
   /**

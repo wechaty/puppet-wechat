@@ -3,7 +3,7 @@
 /// <reference path="./typings.d.ts" />
 
 import promiseRetry = require('promise-retry')
-import { WrapOptions } from 'retry'
+import { OperationOptions } from 'retry'
 
 import {
   // Brolog,
@@ -11,6 +11,8 @@ import {
 }                   from 'brolog'
 import { FileBox }  from 'file-box'
 import qrImage      from 'qr-image'
+
+import { VERSION } from './version'
 
 // export const log = new Brolog()
 
@@ -33,7 +35,7 @@ export async function retry<T> (
   const retries    = 9
   // const unref      = true
 
-  const retryOptions: WrapOptions = {
+  const retryOptions: OperationOptions = {
     factor,
     maxTimeout,
     minTimeout,
@@ -61,14 +63,7 @@ export function qrCodeForChatie (): FileBox {
 
 export const MEMORY_SLOT = 'PUPPET_PUPPETEER'
 
-/**
- * VERSION
- */
-import readPkgUp from 'read-pkg-up'
-
-const pkg = readPkgUp.sync({ cwd: __dirname }).pkg
-export const VERSION = pkg.version
-
 export {
+  VERSION,
   log,
 }

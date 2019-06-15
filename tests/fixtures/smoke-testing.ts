@@ -9,12 +9,17 @@
 
 import {
   PuppetPuppeteer,
+  VERSION,
   log,
 }                   from 'wechaty-puppet-puppeteer'
 
 log.level('verbose')
 
 async function main () {
+  if (VERSION === '0.0.0') {
+    throw new Error('VERSION should not be 0.0.0 when publishing')
+  }
+
   const puppet = new PuppetPuppeteer()
   const future = new Promise(r => puppet.once('scan', r))
 
