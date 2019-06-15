@@ -175,6 +175,8 @@ export class PuppetPuppeteer extends Puppet {
 
       log.verbose('PuppetPuppeteer', 'start() done')
 
+      this.checkAndEmitReady()
+
       // this.emit('start')
       return
 
@@ -187,6 +189,33 @@ export class PuppetPuppeteer extends Puppet {
 
       throw e
     }
+  }
+
+  private async checkAndEmitReady (): Promise<void> {
+    log.verbose('PuppetPuppeteer', 'checkAndEmitReady()')
+
+    let maxNum  = 0
+    let curNum = 0
+    let stableNum = 0
+
+    while (stableNum < 3) {
+
+      // wait 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      const contactList = await this.contactSearch()
+      curNum = contactList.length
+
+      if (curNum > maxNum) {
+        maxNum = curNum
+      } else if (curNum === maxNum) {
+        stableNum++
+      } else /* curNum < maxNum */ {
+        stableNum = 0
+      }
+    }
+
+    this.emit('ready')
   }
 
   /**
