@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-NPM_TAG=latest
-if [ ./development-release.ts ]; then
+VERSION=$(npx pkg-jq -r .version)
+
+if npx --package @chatie/semver semver-is-prod $VERSION; then
+  NPM_TAG=latest
+else
   NPM_TAG=next
 fi
 
@@ -21,11 +24,8 @@ npm install *-*.*.*.tgz \
   @types/normalize-package-data \
   @types/promise-retry \
   @types/puppeteer \
-  @types/quick-lru \
   brolog \
   file-box \
-  hot-import \
-  lru-cache \
   memory-card \
   normalize-package-data \
   rxjs \
