@@ -38,6 +38,7 @@
  * read more about this in puppet-web-bridge.ts
  */
 
+/* eslint no-undef: off */
 (function () {
   function init () {
     if (!angularIsReady()) {
@@ -131,7 +132,7 @@
     var rootScope   = injector.get('$rootScope')
     var loginScope  = angular.element('[ng-controller="loginController"]').scope()
 
-/*
+    /*
     // method 1
     appFactory.syncOrig = appFactory.sync
     appFactory.syncCheckOrig = appFactory.syncCheck
@@ -563,8 +564,8 @@
     }
     var accountFactory = WechatyBro.glue.accountFactory
     return accountFactory
-            ? accountFactory.getUserName()
-            : null
+      ? accountFactory.getUserName()
+      : null
   }
 
   function contactList () {
@@ -579,8 +580,8 @@
       attempt = attempt || 0
 
       var contactIdList = contactFactory
-                          .getAllFriendContact()
-                          .map(c => c.UserName)
+        .getAllFriendContact()
+        .map(c => c.UserName)
 
       if (contactIdList && contactIdList.length) {
         done(contactIdList)
@@ -621,15 +622,15 @@
           count   : 3,
           timeout : 1e4,
           serial  : !0,
-        }
+        },
       })
-      .success(() => {
-        contact.RemarkName = remark
-        return resolve(true)
-      })
-      .error(() => {
-        return resolve(false)  // TODO: use reject???
-      })
+        .success(() => {
+          contact.RemarkName = remark
+          return resolve(true)
+        })
+        .error(() => {
+          return resolve(false)  // TODO: use reject???
+        })
     })
   }
 
@@ -645,8 +646,8 @@
     // }
     // log(match.toString())
     return contactFactory.getAllChatroomContact()
-                        //  .filter(r => match(r.NickName))
-                         .map(r => r.UserName)
+      //  .filter(r => match(r.NickName))
+      .map(r => r.UserName)
   }
 
   function roomDelMember (ChatRoomName, UserName) {
@@ -668,7 +669,7 @@
         return resolve(0)
       }, 10 * 1000)
 
-      chatroomFactory.addMember(ChatRoomName, UserName, function (result) {
+      chatroomFactory.addMember(ChatRoomName, UserName, function (/* result */) {
         clearTimeout(timer)
         return resolve(1)
       })
@@ -680,7 +681,7 @@
     return chatroomFactory.modTopic(ChatRoomName, topic)
   }
 
-  function roomCreate (UserNameList, topic) {
+  function roomCreate (UserNameList/* , topic */) {
     var UserNameListArg = UserNameList.map(function (n) { return { UserName: n } })
 
     var chatroomFactory = WechatyBro.glue.chatroomFactory
@@ -688,36 +689,36 @@
 
     return new Promise(resolve => {
       chatroomFactory.create(UserNameListArg)
-                      .then(function (r) {
-                        // eslint-disable-next-line
-                        if (r.BaseResponse && 0 == r.BaseResponse.Ret || -2013 == r.BaseResponse.Ret) {
-                          state.go('chat', { userName: r.ChatRoomName }) // BE CAREFUL: key name is userName, not UserName! 20161001
-                          // if (topic) {
-                          //   setTimeout(_ => roomModTopic(r.ChatRoomName, topic), 3000)
-                          // }
-                          if (!r.ChatRoomName) {
-                            throw new Error('chatroomFactory.create() got empty r.ChatRoomName')
-                          }
-                          resolve(r.ChatRoomName)
-                        } else {
-                          throw new Error('chatroomFactory.create() error with Ret: '
-                                            + r && r.BaseResponse.Ret
-                                            + 'with ErrMsg: '
-                                            + r && r.BaseResponse.ErrMsg
-                                        )
-                        }
-                      })
-                      .catch(function (e) {
-                        // TODO change to reject (BREAKIKNG CHANGES)
-                        resolve(
-                          JSON.parse(
-                            JSON.stringify(
-                              e
-                              , Object.getOwnPropertyNames(e)
-                            )
-                          )
-                        )
-                      })
+        .then(function (r) {
+          // eslint-disable-next-line
+          if (r.BaseResponse && 0 == r.BaseResponse.Ret || -2013 == r.BaseResponse.Ret) {
+            state.go('chat', { userName: r.ChatRoomName }) // BE CAREFUL: key name is userName, not UserName! 20161001
+            // if (topic) {
+            //   setTimeout(_ => roomModTopic(r.ChatRoomName, topic), 3000)
+            // }
+            if (!r.ChatRoomName) {
+              throw new Error('chatroomFactory.create() got empty r.ChatRoomName')
+            }
+            resolve(r.ChatRoomName)
+          } else {
+            throw new Error('chatroomFactory.create() error with Ret: '
+                              + r && r.BaseResponse.Ret
+                              + 'with ErrMsg: '
+                              + r && r.BaseResponse.ErrMsg
+            )
+          }
+        })
+        .catch(function (e) {
+          // TODO change to reject (BREAKIKNG CHANGES)
+          resolve(
+            JSON.parse(
+              JSON.stringify(
+                e
+                , Object.getOwnPropertyNames(e)
+              )
+            )
+          )
+        })
     })
   }
 
@@ -737,15 +738,15 @@
         Ticket,
         VerifyContent,
       })
-      .then(() => {  // succ
-        // alert('ok')
-        // log('friendAdd(' + UserName + ', ' + VerifyContent + ') done')
-        resolve(true)
-      }, (err) => {    // fail
-        // alert('not ok')
-        log('friendAdd(' + UserName + ', ' + VerifyContent + ') fail: ' + err)
-        resolve(false)
-      })
+        .then(() => {  // succ
+          // alert('ok')
+          // log('friendAdd(' + UserName + ', ' + VerifyContent + ') done')
+          resolve(true)
+        }, (err) => {    // fail
+          // alert('not ok')
+          log('friendAdd(' + UserName + ', ' + VerifyContent + ') fail: ' + err)
+          resolve(false)
+        })
     })
   }
 

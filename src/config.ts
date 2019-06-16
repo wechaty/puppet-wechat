@@ -1,8 +1,5 @@
-// tslint:disable:no-reference
-
 /// <reference path="./typings.d.ts" />
 
-import promiseRetry = require('promise-retry')
 import { OperationOptions } from 'retry'
 
 import {
@@ -14,7 +11,7 @@ import qrImage      from 'qr-image'
 
 import { VERSION } from './version'
 
-// export const log = new Brolog()
+import promiseRetry = require('promise-retry')
 
 export async function retry<T> (
   retryableFn: (

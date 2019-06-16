@@ -25,9 +25,7 @@ import fs    from 'fs'
 import path  from 'path'
 
 // tslint:disable:no-shadowed-variable
-import test  from 'blue-tape'
-import sinon from 'sinon'
-
+import { test, sinon } from 'tstest'
 import {
   Cookie,
   launch,
@@ -62,7 +60,7 @@ test('Puppeteer smoke testing', async t => {
     t.is(result, 42, 'should get 42')
 
   } catch (e) {
-    t.fail(e && e.message || e)
+    t.fail((e && e.message) || e)
   } finally {
     if (page) {
       await page.close()
@@ -84,7 +82,7 @@ test('evaluate() a function that returns a Promise', async t => {
     await page.close()
     await browser.close()
   } catch (e) {
-    t.fail(e && e.message || e)
+    t.fail((e && e.message) || e)
   }
 })
 
@@ -117,7 +115,7 @@ test('evaluate() a file and get the returns value', async t => {
     await browser.close()
 
   } catch (e) {
-    t.fail(e && e.message || e)
+    t.fail((e && e.message) || e)
   }
 })
 
@@ -133,17 +131,17 @@ test('page.on(console)', async t => {
 
   page.on('console', spy)
   await page.evaluate((...args) => {
-    console.log.apply(console, args as [any?, ...any[]])
+    console.info.apply(console, args as [any?, ...any[]])
   }, EXPECTED_ARG1, EXPECTED_ARG2) // , EXPECTED_ARG3)
 
   // wait a while to let chrome fire the event
-  await new Promise(r => setTimeout(r, 3))
+  await new Promise(resolve => setTimeout(resolve, 3))
 
   t.ok(spy.calledOnce, 'should be called once')
 
   const consoleMessage = spy.firstCall.args[0]
-  t.equal(consoleMessage.type(), 'log', 'should get log type')
-  t.equal(consoleMessage.text(), EXPECTED_ARG1 + ' ' + EXPECTED_ARG2, 'should get console.log 1st/2nd arg')
+  t.equal(consoleMessage.type(), 'info', 'should get info type for `console.info`')
+  t.equal(consoleMessage.text(), EXPECTED_ARG1 + ' ' + EXPECTED_ARG2, 'should get console.info 1st/2nd arg')
 
   await page.close()
   await browser.close()
@@ -182,8 +180,8 @@ test('other demos', async t => {
     // not the same with the document of ConsoleMessage???
 
     page.on('dialog', async dialog => {
-      console.log(dialog)
-      console.log('dialog:', dialog.type, dialog.message())
+      console.info(dialog)
+      console.info('dialog:', dialog.type, dialog.message())
       await dialog.accept('ok')
     })
 
@@ -197,11 +195,12 @@ test('other demos', async t => {
     })
 
     page.on('load', (e, ...args) => {
-      console.log('load:e:', e)
-      console.log('load:args:', args)
+      console.info('load:e:', e)
+      console.info('load:args:', args)
     })
 
-    // await page.setRequestInterception(true)
+    await page.setRequestInterception(true)
+
     page.on('request', async interceptedRequest => {
       if (interceptedRequest.url().endsWith('.png')
         || interceptedRequest.url().endsWith('.jpg')
@@ -213,12 +212,12 @@ test('other demos', async t => {
     })
 
     page.on('requestfailed', (...args: any[]) => {
-      console.log('requestfailed:args:', args)
+      console.info('requestfailed:args:', args)
     })
 
-    page.on('response', (/*res, ...args*/) => {
-      // console.log('response:res:', res)
-      // console.log('response:args:', args)
+    page.on('response', (/* res, ...args */) => {
+      // console.info('response:res:', res)
+      // console.info('response:args:', args)
     })
 
     // page.click(selector[, options])

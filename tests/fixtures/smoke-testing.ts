@@ -21,7 +21,7 @@ async function main () {
   }
 
   const puppet = new PuppetPuppeteer()
-  const future = new Promise(r => puppet.once('scan', r))
+  const future = new Promise(resolve => puppet.once('scan', resolve))
 
   await puppet.start()
   await future
@@ -35,8 +35,8 @@ async function main () {
 }
 
 main()
-.then(process.exit)
-.catch(e => {
-  console.error(e)
-  process.exit(1)
-})
+  .then(process.exit)
+  .catch(e => {
+    console.error(e)
+    process.exit(1)
+  })

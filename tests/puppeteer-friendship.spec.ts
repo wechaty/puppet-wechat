@@ -18,11 +18,10 @@
  *
  */
 
- // tslint:disable:no-shadowed-variable
-// tslint:disable:max-classes-per-file
-
-import test  from 'blue-tape'
-import sinon from 'sinon'
+import {
+  test,
+  sinon,
+}           from 'tstest'
 
 import {
   FriendshipPayload,
@@ -43,6 +42,7 @@ import {
 // }
 
 class PuppetTest extends PuppetPuppeteer {
+
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
@@ -52,6 +52,7 @@ class PuppetTest extends PuppetPuppeteer {
   public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
+
 }
 
 test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
@@ -118,7 +119,7 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
 
   const sandbox = sinon.createSandbox()
 
-  sandbox.stub(puppet, 'messageRawPayload')   .resolves(rawMessagePayload)
+  sandbox.stub(puppet, 'messageRawPayload').resolves(rawMessagePayload)
 
   sandbox.stub(puppet, 'contactPayload').resolves({} as any)
   // sandbox.stub(puppet, 'contactPayloadCache') .returns({})

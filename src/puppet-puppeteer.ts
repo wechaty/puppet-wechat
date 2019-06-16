@@ -24,10 +24,10 @@
 import path    from 'path'
 import nodeUrl from 'url'
 
-import bl       from 'bl'
-import md5      from 'md5'
-import mime     from 'mime'
-import request  from 'request'
+import BufferList from 'bl'
+import md5        from 'md5'
+import mime       from 'mime'
+import request    from 'request'
 
 import {
   FileBox,
@@ -104,6 +104,7 @@ import {
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
 export class PuppetPuppeteer extends Puppet {
+
   public static readonly VERSION = VERSION
 
   public bridge: Bridge
@@ -227,7 +228,8 @@ export class PuppetPuppeteer extends Puppet {
 
     dog.on('reset', async (food, timePast) => {
       log.warn('PuppetPuppeteer', 'initScanWatchdog() on(reset) lastFood: %s, timePast: %s',
-                            food.data, timePast)
+        food.data, timePast
+      )
       try {
         await this.bridge.reload()
       } catch (e) {
@@ -289,17 +291,17 @@ export class PuppetPuppeteer extends Puppet {
       throw e
     }
 
-    this.bridge.on('dong'     , data => this.emit('dong', data))
+    this.bridge.on('dong',      data => this.emit('dong', data))
     // this.bridge.on('ding'     , Event.onDing.bind(this))
     this.bridge.on('heartbeat', data => this.emit('watchdog', { type: 'bridge ding', data }))
 
-    this.bridge.on('error'    , e => this.emit('error', e))
-    this.bridge.on('log'      , Event.onLog.bind(this))
-    this.bridge.on('login'    , Event.onLogin.bind(this))
-    this.bridge.on('logout'   , Event.onLogout.bind(this))
-    this.bridge.on('message'  , Event.onMessage.bind(this))
-    this.bridge.on('scan'     , Event.onScan.bind(this))
-    this.bridge.on('unload'   , Event.onUnload.bind(this))
+    this.bridge.on('error',     e => this.emit('error', e))
+    this.bridge.on('log',       Event.onLog.bind(this))
+    this.bridge.on('login',     Event.onLogin.bind(this))
+    this.bridge.on('logout',    Event.onLogout.bind(this))
+    this.bridge.on('message',   Event.onMessage.bind(this))
+    this.bridge.on('scan',      Event.onScan.bind(this))
+    this.bridge.on('unload',    Event.onUnload.bind(this))
 
     try {
       await this.bridge.start()
@@ -352,7 +354,7 @@ export class PuppetPuppeteer extends Puppet {
 
     // use http instead of https, because https will only success on the very first request!
     url = url.replace(/^https/i, 'http')
-    const parsedUrl = nodeUrl.parse(url)
+    const parsedUrl = new nodeUrl.URL(url)
 
     const msgFileName = messageFilename(rawPayload)
 
@@ -414,9 +416,9 @@ export class PuppetPuppeteer extends Puppet {
   ): Promise<void> {
 
     log.silly('PuppetPuppeteer', 'forward(receiver=%s, messageId=%s)',
-                                  receiver,
-                                  messageId,
-              )
+      receiver,
+      messageId,
+    )
 
     let rawPayload = await this.messageRawPayload(messageId)
 
@@ -453,16 +455,16 @@ export class PuppetPuppeteer extends Puppet {
     // causing self () to determine the error
     newMsg.Content      = unescapeHtml(
       rawPayload.Content.replace(/^@\w+:<br\/>/, '')
-    ).replace(/^[\w\-]+:<br\/>/, '')
-    newMsg.MMIsChatRoom = receiver.roomId ? true : false
+    ).replace(/^[\w-]+:<br\/>/, '')
+    newMsg.MMIsChatRoom = !!(receiver.roomId)
 
     // The following parameters need to be overridden after calling createMessage()
 
     rawPayload = Object.assign(rawPayload, newMsg)
     // for (let i = 0; i < sendToList.length; i++) {
-      // newMsg.ToUserName = sendToList[i].id
-      // // all call success return true
-      // ret = (i === 0 ? true : ret) && await config.puppetInstance().forward(m, newMsg)
+    // newMsg.ToUserName = sendToList[i].id
+    // // all call success return true
+    // ret = (i === 0 ? true : ret) && await config.puppetInstance().forward(m, newMsg)
     // }
     newMsg.ToUserName = receiver.contactId || receiver.roomId as string
     // ret = await config.puppetInstance().forward(m, newMsg)
@@ -498,9 +500,9 @@ export class PuppetPuppeteer extends Puppet {
     }
 
     log.silly('PuppetPuppeteer', 'messageSendText() destination: %s, text: %s)',
-                                  destinationId,
-                                  text,
-              )
+      destinationId,
+      text,
+    )
 
     try {
       await this.bridge.send(destinationId, text)
@@ -576,12 +578,12 @@ export class PuppetPuppeteer extends Puppet {
     rawPayload: WebContactRawPayload,
   ): Promise<ContactPayload> {
     log.silly('PuppetPuppeteer', 'contactParseRawPayload(Object.keys(payload).length=%d)',
-                                    Object.keys(rawPayload).length,
-                )
+      Object.keys(rawPayload).length,
+    )
     if (!Object.keys(rawPayload).length) {
       log.error('PuppetPuppeteer', 'contactParseRawPayload(Object.keys(payload).length=%d)',
-                                    Object.keys(rawPayload).length,
-                )
+        Object.keys(rawPayload).length,
+      )
       log.error('PuppetPuppeteer', 'contactParseRawPayload() got empty rawPayload!')
       throw new Error('empty raw payload')
       // return {
@@ -598,8 +600,8 @@ export class PuppetPuppeteer extends Puppet {
     return {
       avatar:     rawPayload.HeadImgUrl,
       friend:     rawPayload.stranger === undefined
-                    ? undefined
-                    : !rawPayload.stranger, // assign by injectio.js
+        ? undefined
+        : !rawPayload.stranger, // assign by injectio.js
       star:       !!rawPayload.StarFriend,
 
       address:    rawPayload.Alias, // XXX: need a stable address for user
@@ -621,8 +623,8 @@ export class PuppetPuppeteer extends Puppet {
        */
       // tslint:disable-next-line
       type:      (!!rawPayload.UserName && !rawPayload.UserName.startsWith('@@') && !!(rawPayload.VerifyFlag & 8))
-                    ? ContactType.Official
-                    : ContactType.Personal,
+        ? ContactType.Official
+        : ContactType.Personal,
 
     }
   }
@@ -699,8 +701,8 @@ export class PuppetPuppeteer extends Puppet {
       const ret = await this.bridge.contactAlias(contactId, alias)
       if (!ret) {
         log.warn('PuppetPuppeteer', 'contactRemark(%s, %s) bridge.contactAlias() return false',
-                              contactId, alias,
-                            )
+          contactId, alias,
+        )
         throw new Error('bridge.contactAlias fail')
       }
     } catch (e) {
@@ -740,10 +742,11 @@ export class PuppetPuppeteer extends Puppet {
         rawPayload = await this.bridge.getContact(id) as undefined | WebRoomRawPayload
 
         if (rawPayload) {
-          const currLength = rawPayload.MemberList && rawPayload.MemberList.length || 0
+          const currLength = (rawPayload.MemberList && rawPayload.MemberList.length) || 0
 
-          log.silly('PuppetPuppeteer', `roomPayload() this.bridge.getContact(%s) `
-                                        + `MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
+          log.silly('PuppetPuppeteer',
+            `roomPayload() this.bridge.getContact(%s) `
+              + `MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
             id,
             prevLength,
             currLength,
@@ -752,24 +755,24 @@ export class PuppetPuppeteer extends Puppet {
 
           if (prevLength === currLength) {
             log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d`,
-                                          this.id,
-                                          ttl,
-                                          currLength,
-                      )
+              this.id,
+              ttl,
+              currLength,
+            )
             return rawPayload
           }
           if (currLength >= prevLength) {
             prevLength = currLength
           } else {
             log.warn('PuppetPuppeteer', 'roomRawPayload() currLength(%d) <= prevLength(%d) ???',
-                                        currLength,
-                                        prevLength,
-                    )
+              currLength,
+              prevLength,
+            )
           }
         }
 
         log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(${id}) retry at ttl:%d`, ttl)
-        await new Promise(r => setTimeout(r, 1000)) // wait for 1 second
+        await new Promise(resolve => setTimeout(resolve, 1000)) // wait for 1 second
       }
 
       throw new Error('no payload')
@@ -817,8 +820,8 @@ export class PuppetPuppeteer extends Puppet {
     // }
 
     const memberIdList = rawPayload.MemberList
-                          ? rawPayload.MemberList.map(m => m.UserName)
-                          : []
+      ? rawPayload.MemberList.map(m => m.UserName)
+      : []
 
     const roomPayload: RoomPayload = {
       id,
@@ -917,7 +920,7 @@ export class PuppetPuppeteer extends Puppet {
   public async roomAnnounce (roomId: string, text: string)  : Promise<void>
 
   public async roomAnnounce (roomId: string, text?: string) : Promise<void | string> {
-    log.warn('PuppetPuppeteer', 'roomAnnounce(%s, %s) not supported', roomId, text ? text : '')
+    log.warn('PuppetPuppeteer', 'roomAnnounce(%s, %s) not supported', roomId, text || '')
 
     if (text) {
       return
@@ -938,7 +941,7 @@ export class PuppetPuppeteer extends Puppet {
     const rawPayload = await this.roomRawPayload(roomId)
 
     const memberIdList = (rawPayload.MemberList || [])
-                        .map(member => member.UserName)
+      .map(member => member.UserName)
 
     return memberIdList
   }
@@ -1044,10 +1047,10 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.verifyUserRequest(contactId, hello)
     } catch (e) {
       log.warn('PuppetPuppeteer', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s',
-                                  contactId,
-                                  hello,
-                                  e.message,
-              )
+        contactId,
+        hello,
+        e.message,
+      )
       throw e
     }
   }
@@ -1061,10 +1064,10 @@ export class PuppetPuppeteer extends Puppet {
       await this.bridge.verifyUserOk(payload.contactId, payload.ticket)
     } catch (e) {
       log.warn('PuppetPuppeteer', 'bridge.verifyUserOk(%s, %s) rejected: %s',
-                                  payload.contactId,
-                                  payload.ticket,
-                                  e.message,
-              )
+        payload.contactId,
+        payload.ticket,
+        e.message,
+      )
       throw e
     }
   }
@@ -1074,7 +1077,6 @@ export class PuppetPuppeteer extends Puppet {
    * For issue #668
    */
   public async waitStable (): Promise<void> {
-    log.level('silly')
     log.verbose('PuppetPuppeteer', 'readyStable()')
 
     let maxNum  = 0
@@ -1103,8 +1105,8 @@ export class PuppetPuppeteer extends Puppet {
       }
 
       log.silly('PuppetPuppeteer', 'readyStable() while() curNum=%s, maxNum=%s, unchangedNum=%s',
-      curNum, maxNum, unchangedNum,
-    )
+        curNum, maxNum, unchangedNum,
+      )
 
     }
 
@@ -1285,7 +1287,7 @@ export class PuppetPuppeteer extends Puppet {
     }
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
-      file.pipe(new bl((err: Error, data: Buffer) => {
+      file.pipe(new BufferList((err: Error, data: Buffer) => {
         if (err) reject(err)
         else resolve(data)
       }))
@@ -1394,7 +1396,7 @@ export class PuppetPuppeteer extends Puppet {
                 if (typeof obj !== 'object' || obj.BaseResponse.Ret !== 0) {
                   const errMsg = obj.BaseResponse || 'api return err'
                   log.silly('PuppetPuppeteer', 'uploadMedia() checkUpload err:%s \nreq:%s\nret:%s',
-                                                JSON.stringify(errMsg), JSON.stringify(r), body)
+                    JSON.stringify(errMsg), JSON.stringify(r), body)
                   reject(new Error('chackUpload err:' + JSON.stringify(errMsg)))
                 }
                 resolve({
@@ -1484,9 +1486,9 @@ export class PuppetPuppeteer extends Puppet {
     file     : FileBox,
   ): Promise<void> {
     log.verbose('PuppetPuppeteer', 'messageSendFile(receiver=%s, file=%s)',
-                                    JSON.stringify(receiver),
-                                    file.toString(),
-                )
+      JSON.stringify(receiver),
+      file.toString(),
+    )
 
     let destinationId
 
@@ -1575,6 +1577,7 @@ export class PuppetPuppeteer extends Puppet {
 
     // TODO: unref() the puppeteer
   }
+
 }
 
 export default PuppetPuppeteer

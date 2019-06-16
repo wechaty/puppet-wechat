@@ -197,7 +197,7 @@ test('parseRoomTopic()', async (t) => {
   contentList.forEach(([content, changer, topic]) => {
     result = (firer as any).parseRoomTopic(content)
     t.ok(result, 'should check topic right for content: ' + content)
-    t.is(topic  , result[0], 'should get right topic')
+    t.is(topic,   result[0], 'should get right topic')
     t.is(changer, result[1], 'should get right changer')
   })
 

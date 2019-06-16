@@ -63,6 +63,7 @@ test('PuppetPuppeteerBridge', async (t) => {
   }
 })
 
+/* eslint indent: off */
 test('preHtmlToXml()', async (t) => {
   const BLOCKED_HTML_ZH = [
     '<pre style="word-wrap: break-word; white-space: pre-wrap;">',
@@ -204,6 +205,7 @@ test('WechatyBro.ding()', async t => {
     t.pass('should init Bridge')
 
     const retDing = await bridge.evaluate(() => {
+      // eslint-disable-next-line
       return WechatyBro.ding()
     }) as string
 

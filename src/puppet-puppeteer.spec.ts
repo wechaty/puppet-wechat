@@ -22,9 +22,7 @@
 // tslint:disable:only-arrow-functions
 // tslint:disable:arrow-parens
 
-import test  from 'blue-tape'
-import sinon from 'sinon'
-// const sinonTest   = require('sinon-test')(sinon, {
+import { test, sinon } from 'tstest'// const sinonTest   = require('sinon-test')(sinon, {
 //   useFakeTimers: {  // https://github.com/sinonjs/lolex
 //     advanceTimeDelta  : 10,
 //     shouldAdvanceTime : true,
@@ -39,6 +37,7 @@ import { Event }            from './event'
 import { PuppetPuppeteer }  from './puppet-puppeteer'
 
 class PuppetTest extends PuppetPuppeteer {
+
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
@@ -86,10 +85,10 @@ test('login/logout events', async t => {
 
     await puppet.start()
     t.pass('should be inited')
-    t.is(puppet.logonoff() , false  , 'should be not logined')
+    t.is(puppet.logonoff(), false, 'should be not logined')
 
-    const future = new Promise(r => puppet.once('login', r))
-                        .catch(e => t.fail(e))
+    const future = new Promise(resolve => puppet.once('login', resolve))
+      .catch(e => t.fail(e))
     puppet.bridge.emit('login', 'TestPuppetPuppeteer')
     await future
 

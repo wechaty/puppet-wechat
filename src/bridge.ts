@@ -67,6 +67,7 @@ export interface BridgeOptions {
 }
 
 export class Bridge extends EventEmitter {
+
   private browser : undefined | Browser
   private page    : undefined | Page
   private state   : StateSwitch
@@ -119,7 +120,7 @@ export class Bridge extends EventEmitter {
   public async initBrowser (): Promise<Browser> {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
 
-    const headless = this.options.head ? false : true
+    const headless = !(this.options.head)
     const browser = await launch({
       args: [
         '--audio-output-channels=0',
@@ -144,7 +145,7 @@ export class Bridge extends EventEmitter {
 
   public async onDialog (dialog: Dialog) {
     log.warn('PuppetPuppeteerBridge', 'onDialog() page.on(dialog) type:%s message:%s',
-                                dialog.type, dialog.message())
+      dialog.type, dialog.message())
     try {
       // XXX: Which ONE is better?
       await dialog.accept()
@@ -253,14 +254,14 @@ export class Bridge extends EventEmitter {
 
     try {
       const sourceCode = fs.readFileSync(WECHATY_BRO_JS_FILE)
-                            .toString()
+        .toString()
 
       let retObj = await page.evaluate(sourceCode) as InjectResult
 
       if (retObj && /^(2|3)/.test(retObj.code.toString())) {
         // HTTP Code 2XX & 3XX
         log.silly('PuppetPuppeteerBridge', 'inject() eval(Wechaty) return code[%d] message[%s]',
-                                      retObj.code, retObj.message)
+          retObj.code, retObj.message)
       } else {  // HTTP Code 4XX & 5XX
         throw new Error('execute injectio error: ' + retObj.code + ', ' + retObj.message)
       }
@@ -269,7 +270,7 @@ export class Bridge extends EventEmitter {
       if (retObj && /^(2|3)/.test(retObj.code.toString())) {
         // HTTP Code 2XX & 3XX
         log.silly('PuppetPuppeteerBridge', 'inject() Wechaty.init() return code[%d] message[%s]',
-                                      retObj.code, retObj.message)
+          retObj.code, retObj.message)
       } else {  // HTTP Code 4XX & 5XX
         throw new Error('execute proxyWechaty(init) error: ' + retObj.code + ', ' + retObj.message)
       }
@@ -553,9 +554,9 @@ export class Bridge extends EventEmitter {
     try {
       return await retry(async (retryException, attempt) => {
         log.silly('PuppetPuppeteerBridge', 'getMessage(%s) retry attempt %d',
-                                          id,
-                                          attempt,
-                  )
+          id,
+          attempt,
+        )
         try {
           const rawPayload = await this.proxyWechaty('getMessage', id)
 
@@ -579,9 +580,9 @@ export class Bridge extends EventEmitter {
     try {
       return await retry(async (retryException, attempt) => {
         log.silly('PuppetPuppeteerBridge', 'getContact(%s) retry attempt %d',
-                                          id,
-                                          attempt,
-                  )
+          id,
+          attempt,
+        )
         try {
           const rawPayload = await this.proxyWechaty('getContact', id)
 
@@ -599,7 +600,6 @@ export class Bridge extends EventEmitter {
       log.error('PuppetPuppeteerBridge', 'promiseRetry() getContact() finally FAIL: %s', e.message)
       throw e
     }
-    /////////////////////////////////
   }
 
   public async getBaseRequest (): Promise<string> {
@@ -688,11 +688,11 @@ export class Bridge extends EventEmitter {
     ...args     : any[]
   ): Promise<any> {
     log.silly('PuppetPuppeteerBridge', 'proxyWechaty(%s%s)',
-                                        wechatyFunc,
-                                        args.length === 0
-                                          ? ''
-                                          : ', ' + args.join(', '),
-              )
+      wechatyFunc,
+      args.length === 0
+        ? ''
+        : ', ' + args.join(', '),
+    )
 
     if (!this.page) {
       throw new Error('no page')
@@ -745,13 +745,13 @@ export class Bridge extends EventEmitter {
     log.verbose('PuppetPuppeteerBridge', 'ding(%s)', data || '')
 
     this.proxyWechaty('ding', data)
-    .then(dongData => {
-      this.emit('dong', dongData)
-    })
-    .catch(e => {
-      log.error('PuppetPuppeteerBridge', 'ding(%s) exception: %s', data, e.message)
-      this.emit('error', e)
-    })
+      .then(dongData => {
+        this.emit('dong', dongData)
+      })
+      .catch(e => {
+        log.error('PuppetPuppeteerBridge', 'ding(%s) exception: %s', data, e.message)
+        this.emit('error', e)
+      })
   }
 
   public preHtmlToXml (text: string): string {
@@ -785,7 +785,7 @@ export class Bridge extends EventEmitter {
 
     const textSnip = text.substr(0, 50).replace(/\n/, '')
     log.verbose('PuppetPuppeteerBridge', 'testBlockedMessage(%s)',
-                                  textSnip)
+      textSnip)
 
     interface BlockedMessage {
       error?: {
@@ -903,8 +903,8 @@ export class Bridge extends EventEmitter {
     // TODO: use page.$x() (with puppeteer v1.1 or above) to replace DIY version of listXpath() instead.
     // See: https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagexexpression
 
-    const XPATH_SELECTOR =
-      `//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']`
+    const XPATH_SELECTOR
+      = `//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']`
 
     try {
       // const [button] = await listXpath(page, XPATH_SELECTOR)
@@ -958,7 +958,7 @@ export class Bridge extends EventEmitter {
         log.error('PuppetPuppeteerBridge', 'cookies(%s) reject: %s', cookieList, e)
         this.emit('error', e)
       }
-      return
+      // RETURN
     } else {
       // FIXME: puppeteer typing bug
       cookieList = await this.page.cookies() as any as Cookie[]
@@ -1015,7 +1015,6 @@ export class Bridge extends EventEmitter {
     }
 
     await this.page.reload()
-    return
   }
 
   public async evaluate (fn: () => any, ...args: any[]): Promise<any> {
@@ -1033,6 +1032,7 @@ export class Bridge extends EventEmitter {
       return null
     }
   }
+
 }
 
 export {

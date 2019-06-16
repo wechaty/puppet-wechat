@@ -99,6 +99,7 @@ const REGEX_CONFIG = {
 }
 
 export class Firer {
+
   constructor (
     public puppet: PuppetPuppeteer,
   ) {
@@ -183,9 +184,9 @@ export class Firer {
       return false // not a room join message
     }
     log.silly('PuppetPuppeteerFirer', 'checkRoomJoin() inviteeList: %s, inviter: %s',
-                                      inviteeNameList.join(','),
-                                      inviterName,
-              )
+      inviteeNameList.join(','),
+      inviterName,
+    )
 
     /**
      * Convert the display name to Contact ID
@@ -207,7 +208,7 @@ export class Firer {
       log.silly('PuppetPuppeteerFirer', 'fireRoomJoin() retry() ttl %d', ttl)
 
       if (!ready) {
-        await new Promise(r => setTimeout(r, timeout))
+        await new Promise(resolve => setTimeout(resolve, timeout))
         ready = true
       }
 
@@ -228,9 +229,9 @@ export class Firer {
             await this.puppet.contactPayload(inviteeContactId)
           } catch (e) {
             log.warn('PuppetPuppeteerFirer', 'fireRoomJoin() contactPayload(%s) exception: %s',
-                                              inviteeContactId,
-                                              e.message,
-                    )
+              inviteeContactId,
+              e.message,
+            )
             ready = false
           }
         } else {
@@ -270,9 +271,9 @@ export class Firer {
 
       if (ready) {
         log.silly('PuppetPuppeteerFirer', 'fireRoomJoin() resolve() inviteeContactIdList: %s, inviterContactId: %s',
-                                            inviteeContactIdList.join(','),
-                                            inviterContactId,
-                  )
+          inviteeContactIdList.join(','),
+          inviterContactId,
+        )
         /**
          * Resolve All Payload again to make sure the data is ready.
          */
@@ -354,7 +355,7 @@ export class Firer {
      *                  it will be 2 sys message, instead of 1 sys message contains 2 leavers.
      * @huan 2018 May: we need to generilize the pattern for future usage.
      */
-    this.puppet.emit('room-leave', roomId , [leaverContactId], removerContactId)
+    this.puppet.emit('room-leave', roomId, [leaverContactId], removerContactId)
 
     setTimeout(async () => {
       await this.puppet.roomPayloadDirty(roomId)
@@ -394,7 +395,7 @@ export class Firer {
     }
 
     try {
-      this.puppet.emit('room-topic', roomId , topic, oldTopic, changerContactId)
+      this.puppet.emit('room-topic', roomId, topic, oldTopic, changerContactId)
       return true
     } catch (e) {
       log.error('PuppetPuppeteerFirer', 'fireRoomTopic() co exception: %s', e.stack)

@@ -23,9 +23,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:arrow-parens
 
-import test  from 'blue-tape'
-import sinon from 'sinon'
-
+import { test, sinon } from 'tstest'
 import {
   log,
 }                 from '../src/config'
@@ -38,7 +36,9 @@ import {
 }                     from '../src/web-schemas'
 
 class PuppetPuppeteerTest extends PuppetPuppeteer {
+
   public id?: string = undefined
+
 }
 
 // tslint:disable:max-line-length

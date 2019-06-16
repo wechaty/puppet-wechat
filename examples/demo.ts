@@ -33,11 +33,11 @@ const puppet = new PuppetPuppeteer()
  *
  */
 puppet
-.on('logout', onLogout)
-.on('login',  onLogin)
-.on('scan',   onScan)
-.on('error',  onError)
-.on('message', onMessage)
+  .on('logout', onLogout)
+  .on('login',  onLogin)
+  .on('scan',   onScan)
+  .on('error',  onError)
+  .on('message', onMessage)
 
 /**
  *
@@ -45,11 +45,11 @@ puppet
  *
  */
 puppet.start()
-.catch(async e => {
-  console.error('Bot start() fail:', e)
-  await puppet.stop()
-  process.exit(-1)
-})
+  .catch(async e => {
+    console.error('Bot start() fail:', e)
+    await puppet.stop()
+    process.exit(-1)
+  })
 
 /**
  *
@@ -71,16 +71,16 @@ function onScan (qrcode: string, status: number) {
     encodeURIComponent(qrcode),
   ].join('')
 
-  console.log(`[${status}] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
+  console.info(`[${status}] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
 }
 
 function onLogin (contactId: string) {
-  console.log(`${contactId} login`)
-  puppet.messageSendText({ contactId, }, 'Wechaty login').catch(console.error)
+  console.info(`${contactId} login`)
+  puppet.messageSendText({ contactId }, 'Wechaty login').catch(console.error)
 }
 
 function onLogout (contactId: string) {
-  console.log(`${contactId} logouted`)
+  console.info(`${contactId} logouted`)
 }
 
 function onError (e: string) {
@@ -100,7 +100,7 @@ function onError (e: string) {
  */
 async function onMessage (messageId: string) {
   const payload = await puppet.messagePayload(messageId)
-  console.log(JSON.stringify(payload))
+  console.info(JSON.stringify(payload))
 }
 
 /**
@@ -114,4 +114,4 @@ Puppet Version: ${puppet.version()}
 Please wait... I'm trying to login in...
 
 `
-console.log(welcome)
+console.info(welcome)
