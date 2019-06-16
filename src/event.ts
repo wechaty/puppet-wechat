@@ -38,6 +38,10 @@ import {
   WebMessageType,
 }                         from './web-schemas'
 
+import {
+  normalizeScanStatus,
+}                         from './pure-function-helpers/normalize-scan-status'
+
 /* tslint:disable:variable-name */
 export const Event = {
   onDing,
@@ -98,7 +102,7 @@ async function onScan (
   this.emit('watchdog', food)
 
   const qrcode = payloadFromBrowser.url.replace(/\/qrcode\//, '/l/')
-  const status = payloadFromBrowser.code
+  const status = normalizeScanStatus(payloadFromBrowser.code)
 
   this.emit('scan', qrcode, status)
 }
@@ -170,8 +174,6 @@ async function onLogin (
     log.error('PuppetPuppeteerEvent', 'onLogin() exception: %s', e)
     throw e
   }
-
-  return
 }
 
 async function onLogout (
