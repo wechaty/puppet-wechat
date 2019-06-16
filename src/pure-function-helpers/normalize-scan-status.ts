@@ -15,7 +15,7 @@ export function normalizeScanStatus (
 
     case 408:
       // No scan after 2 minute ...
-      return ScanStatus.Waiting
+      return ScanStatus.Timeout
 
     default:
       throw new Error('unsupported scan status: ' + status)
