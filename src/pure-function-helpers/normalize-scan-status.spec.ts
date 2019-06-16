@@ -34,7 +34,7 @@ test('normalizeScanStatus()', async t => {
     [0, ScanStatus.Waiting],
     [200, ScanStatus.Confirmed],
     [201, ScanStatus.Scanned],
-    [408, ScanStatus.Waiting],
+    [408, ScanStatus.Timeout],
   ]
 
   for (const [puppeteerStatus, EXPECT_PUPPET_STATUS] of SCAN_STATUS_LIST) {
