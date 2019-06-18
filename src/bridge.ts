@@ -746,7 +746,7 @@ export class Bridge extends EventEmitter {
 
     this.proxyWechaty('ding', data)
       .then(dongData => {
-        this.emit('dong', dongData)
+        return this.emit('dong', dongData)
       })
       .catch(e => {
         log.error('PuppetPuppeteerBridge', 'ding(%s) exception: %s', data, e.message)

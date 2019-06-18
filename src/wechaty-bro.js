@@ -741,8 +741,9 @@
         .then(() => {  // succ
           // alert('ok')
           // log('friendAdd(' + UserName + ', ' + VerifyContent + ') done')
-          resolve(true)
-        }, (err) => {    // fail
+          return resolve(true)
+        })
+        .catch((err) => {    // fail
           // alert('not ok')
           log('friendAdd(' + UserName + ', ' + VerifyContent + ') fail: ' + err)
           resolve(false)
@@ -764,7 +765,7 @@
         // alert('ok')
         log('friendVerify(' + UserName + ', ' + Ticket + ') done')
         return resolve(true)
-      }, err => {       // fail
+      }).catch(err => {       // fail
         // alert('err')
         log('friendVerify(' + UserName + ', ' + Ticket + ') fail' + err)
         return resolve(false)
