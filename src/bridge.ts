@@ -28,9 +28,8 @@ import {
   launch,
   Page,
 }                       from 'puppeteer'
-import StateSwitch      from 'state-switch'
+import { StateSwitch }  from 'state-switch'
 import { parseString }  from 'xml2js'
-// import { toJson }       from 'xml2json'
 
 import {
   MemoryCard,
