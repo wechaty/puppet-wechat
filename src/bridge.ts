@@ -64,7 +64,7 @@ export interface InjectResult {
 export interface BridgeOptions {
   endpoint?       : string,
   head?           : boolean,
-  launchOptions?  : LaunchOptions | unknown,
+  launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
 }
 
@@ -121,10 +121,12 @@ export class Bridge extends EventEmitter {
 
   public async initBrowser (): Promise<Browser> {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
-    const launchOptions = (this.options.launchOptions as LaunchOptions) || {}
-    const headless = !(this.options.head)
-    const executablePath = this.options.endpoint || launchOptions.executablePath
-    const launchOptionsArgs = launchOptions.args || []
+    const launchOptions : LaunchOptions = { ...this.options.launchOptions }
+    const headless                      = !(this.options.head)
+    const launchOptionsArgs             = launchOptions.args || []
+    if (this.options.endpoint) {
+      launchOptions.executablePath = this.options.endpoint
+    }
     const browser = await launch({
       ...launchOptions,
       args: [
@@ -140,7 +142,6 @@ export class Bridge extends EventEmitter {
         '--no-sandbox',
         ...launchOptionsArgs,
       ],
-      executablePath,
       headless,
     })
 
