@@ -89,7 +89,7 @@ const bot = new Wechaty({
 
 ### 1. chrome-linux/chrome: error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory
 
-You need to be able to run chrome in your Linux environment. If you are using Ubuntu Linux: 
+You need to be able to run chrome in your Linux environment. If you are using Ubuntu Linux:
 
 ```sh
 sudo apt-get install libxss1
