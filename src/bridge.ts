@@ -61,8 +61,9 @@ export interface InjectResult {
 }
 
 export interface BridgeOptions {
-  head?  : boolean,
-  memory : MemoryCard,
+  endpoint?       : string,
+  head?           : boolean,
+  memory          : MemoryCard,
 }
 
 export class Bridge extends EventEmitter {
@@ -120,6 +121,7 @@ export class Bridge extends EventEmitter {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
 
     const headless = !(this.options.head)
+    const executablePath = this.options.endpoint
     const browser = await launch({
       args: [
         '--audio-output-channels=0',
@@ -133,6 +135,7 @@ export class Bridge extends EventEmitter {
         '--mute-audio',
         '--no-sandbox',
       ],
+      executablePath,
       headless,
     })
 
