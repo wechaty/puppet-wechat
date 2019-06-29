@@ -63,6 +63,7 @@ export interface InjectResult {
 
 export interface BridgeOptions {
   head?           : boolean,
+  endpoint?       : string,
   launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
 }
@@ -123,6 +124,7 @@ export class Bridge extends EventEmitter {
 
     const launchOptions = this.options.launchOptions || {}
     const headless = !(this.options.head || launchOptions.headless)
+    const executablePath = this.options.endpoint || launchOptions.executablePath
     const browser = await launch({
       ...launchOptions,
       args: [
@@ -138,6 +140,7 @@ export class Bridge extends EventEmitter {
         '--no-sandbox',
         ...launchOptions.args || [],
       ],
+      executablePath,
       headless,
     })
 
