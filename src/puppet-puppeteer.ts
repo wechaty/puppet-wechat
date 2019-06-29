@@ -28,6 +28,9 @@ import BufferList from 'bl'
 import md5        from 'md5'
 import mime       from 'mime'
 import request    from 'request'
+import {
+  LaunchOptions,
+}                 from 'puppeteer'
 
 import {
   FileBox,
@@ -123,6 +126,7 @@ export class PuppetPuppeteer extends Puppet {
     this.bridge = new Bridge({
       endpoint      : options.endpoint,
       head          : envHead(),
+      launchOptions : options.launchOptions as LaunchOptions,
       memory        : this.memory,
     })
 

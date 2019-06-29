@@ -44,6 +44,34 @@ SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-p
 
 Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomment-351945645>
 
+## How to set puppeteer launchOptions?
+
+An example of adding executablePath to puppeteer.launch():
+
+```js
+const bot = new Wechaty({
+  name: 'mybot',
+  puppet: 'wechaty-puppet-puppeteer',
+  // ...
+  puppetOptions: {
+    endpoint: '<executablePath>'
+  }
+});
+
+// or
+const bot = new Wechaty({
+  name: 'mybot',
+  puppet: 'wechaty-puppet-puppeteer',
+  // ...
+  puppetOptions: {
+    launchOptions: {
+      executablePath: '<executablePath>',
+      // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
+    }
+  }
+});
+```
+
 ## HISTORY
 
 ### v0.15 master
