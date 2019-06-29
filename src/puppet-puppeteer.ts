@@ -123,6 +123,7 @@ export class PuppetPuppeteer extends Puppet {
     this.bridge = new Bridge({
       endpoint      : options.endpoint,
       head          : envHead(),
+      launchOptions : options.launchOptions,
       memory        : this.memory,
     })
 
