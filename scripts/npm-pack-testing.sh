@@ -20,7 +20,7 @@ cp tests/fixtures/smoke-testing.ts "$TMPDIR"
 cd $TMPDIR
 npm init -y
 npm install *-*.*.*.tgz \
-  @types/node \
+  @chatie/tsconfig \
   @types/normalize-package-data \
   @types/promise-retry \
   @types/puppeteer \
@@ -31,7 +31,6 @@ npm install *-*.*.*.tgz \
   rxjs \
   rx-queue \
   state-switch \
-  typescript \
   "wechaty-puppet@$NPM_TAG" \
   qr-image \
   promise-retry \
