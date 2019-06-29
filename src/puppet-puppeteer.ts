@@ -121,8 +121,9 @@ export class PuppetPuppeteer extends Puppet {
 
     this.fileId = 0
     this.bridge = new Bridge({
-      head   : envHead(),
-      memory : this.memory,
+      endpoint      : options.endpoint,
+      head          : envHead(),
+      memory        : this.memory,
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes

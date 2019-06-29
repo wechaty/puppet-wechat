@@ -26,7 +26,6 @@ import {
   Cookie,
   Dialog,
   launch,
-  LaunchOptions,
   Page,
 }                       from 'puppeteer'
 import { StateSwitch }  from 'state-switch'
@@ -62,9 +61,8 @@ export interface InjectResult {
 }
 
 export interface BridgeOptions {
-  head?           : boolean,
   endpoint?       : string,
-  launchOptions?  : LaunchOptions,
+  head?           : boolean,
   memory          : MemoryCard,
 }
 
@@ -122,11 +120,9 @@ export class Bridge extends EventEmitter {
   public async initBrowser (): Promise<Browser> {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
 
-    const launchOptions = this.options.launchOptions || {}
-    const headless = !(this.options.head || launchOptions.headless)
-    const executablePath = this.options.endpoint || launchOptions.executablePath
+    const headless = !(this.options.head)
+    const executablePath = this.options.endpoint
     const browser = await launch({
-      ...launchOptions,
       args: [
         '--audio-output-channels=0',
         '--disable-default-apps',
@@ -138,7 +134,6 @@ export class Bridge extends EventEmitter {
         '--hide-scrollbars',
         '--mute-audio',
         '--no-sandbox',
-        ...launchOptions.args || [],
       ],
       executablePath,
       headless,
