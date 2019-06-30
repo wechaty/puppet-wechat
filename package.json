@@ -41,7 +41,7 @@
     "url": "https://github.com/Chatie/wechaty-puppet-puppeteer/issues"
   },
   "devDependencies": {
-    "@chatie/eslint-config": "^0.6.17",
+    "@chatie/eslint-config": "^0.8.1",
     "@chatie/git-scripts": "^0.2.4",
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^0.6.1",
