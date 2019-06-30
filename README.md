@@ -44,6 +44,34 @@ SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-p
 
 Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomment-351945645>
 
+## How to set puppeteer launchOptions?
+
+An example of adding executablePath to puppeteer.launch():
+
+```js
+const bot = new Wechaty({
+  name: 'mybot',
+  puppet: 'wechaty-puppet-puppeteer',
+  // ...
+  puppetOptions: {
+    endpoint: '<executablePath>'
+  }
+});
+
+// or
+const bot = new Wechaty({
+  name: 'mybot',
+  puppet: 'wechaty-puppet-puppeteer',
+  // ...
+  puppetOptions: {
+    launchOptions: {
+      executablePath: '<executablePath>',
+      // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
+    }
+  }
+});
+```
+
 ## HISTORY
 
 ### v0.15 master
@@ -56,6 +84,18 @@ Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomm
 ### v0.2 May 2018
 
 1. Promote to solo package: `wechaty-puppet-puppeteer`
+
+## FAQ
+
+### 1. chrome-linux/chrome: error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory
+
+You need to be able to run chrome in your Linux environment. If you are using Ubuntu Linux:
+
+```sh
+sudo apt-get install libxss1
+```
+
+See: <https://github.com/Chatie/wechaty/issues/1152>
 
 ## AUTHOR
 
