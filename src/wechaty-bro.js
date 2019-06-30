@@ -39,6 +39,8 @@
  */
 
 /* eslint no-undef: off */
+/* eslint sort-keys: off */
+
 (function () {
   function init () {
     if (!angularIsReady()) {
@@ -164,14 +166,14 @@
 
     // get all we need from wx in browser(angularjs)
     WechatyBro.glue = {
-      injector,
       http,
+      injector,
       mmHttp,
       state,
 
       accountFactory,
-      chatroomFactory,
       chatFactory,
+      chatroomFactory,
       confFactory,
       contactFactory,
       emojiFactory,
