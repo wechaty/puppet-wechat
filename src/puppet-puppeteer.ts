@@ -1435,21 +1435,23 @@ export class PuppetPuppeteer extends Puppet {
      *  chunk: the index of chunks
      */
     const BASE_LENGTH = 512 * 1024
-    const chunks = Math.ceil(buffer.length / BASE_LENGTH);
+    const chunks = Math.ceil(buffer.length / BASE_LENGTH)
 
-    const bufferData = [];
-    for(let i = 0; i < chunks; i++) {
+    const bufferData = []
+    for (let i = 0; i < chunks; i++) {
       let tempBuffer
-      if(i === chunks - 1) {
+      if (i === chunks - 1) {
         tempBuffer = buffer.slice(i * BASE_LENGTH)
       } else {
         tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
       }
-      bufferData.push(tempBuffer);
+      bufferData.push(tempBuffer)
     }
 
-    async function getMediaId(buffer: Buffer, index: number) : Promise <string> {
+    async function getMediaId (buffer: Buffer, index: number) : Promise <string> {
       const formData = {
+        chunk: index,
+        chunks,
         filename: {
           options: {
             contentType,
@@ -1458,8 +1460,6 @@ export class PuppetPuppeteer extends Puppet {
           },
           value: buffer,
         },
-        chunks,
-        chunk: index,
         id,
         lastModifiedDate: Date().toString(),
         mediatype,
@@ -1498,13 +1498,19 @@ export class PuppetPuppeteer extends Puppet {
       }
     }
     let funcList = []
-    for(let i = 0; i < bufferData.length - 1; i++) {
+    for (let i = 0; i < bufferData.length - 1; i++) {
       funcList.push(await getMediaId(bufferData[i], i))
     }
     // use promise.all() make the former upload of this buffer quickly
-    Promise.all(funcList)
-    const lastOne = bufferData.length - 1;
-    let mediaId = await getMediaId(bufferData[lastOne], lastOne)
+    let mediaId: string
+    try {
+      await Promise.all(funcList)
+      const lastOne = bufferData.length - 1
+      mediaId = await getMediaId(bufferData[lastOne], lastOne)
+    } catch {
+      log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
+      throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
+    }
     if (!mediaId) {
       log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
       throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
