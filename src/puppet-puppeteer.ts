@@ -1492,19 +1492,9 @@ export class PuppetPuppeteer extends Puppet {
         throw new Error('uploadMedia err: ' + e.message)
       }
     }
-    let funcList = []
-    for (let i = 0; i < bufferData.length - 1; i++) {
-      funcList.push(await getMediaId(bufferData[i], i))
-    }
-    // use promise.all() make the former upload of this buffer quickly
-    let mediaId: string
-    try {
-      const lastBuffer = bufferData.pop()
-      await Promise.all(bufferData.map(getMediaId))
-      mediaId = await getMediaId(lastBuffer, bufferData.length)
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'uploadMedia exception: %s', e.message)
-      throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
+    let mediaId = ''
+    for (let i = 0; i < bufferData.length; i++) {
+      mediaId = await getMediaId(bufferData[i], i)
     }
     if (!mediaId) {
       log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
