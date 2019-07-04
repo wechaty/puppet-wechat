@@ -1439,12 +1439,7 @@ export class PuppetPuppeteer extends Puppet {
 
     const bufferData = []
     for (let i = 0; i < chunks; i++) {
-      let tempBuffer
-      if (i === chunks - 1) {
-        tempBuffer = buffer.slice(i * BASE_LENGTH)
-      } else {
-        tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
-      }
+      let tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
       bufferData.push(tempBuffer)
     }
 
