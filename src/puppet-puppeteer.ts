@@ -1427,52 +1427,84 @@ export class PuppetPuppeteer extends Puppet {
     log.verbose('PuppetPuppeteer', 'uploadMedia() webwx_data_ticket: %s', webwxDataTicket)
     log.verbose('PuppetPuppeteer', 'uploadMedia() pass_ticket: %s', passTicket)
 
-    const formData = {
-      filename: {
-        options: {
-          contentType,
-          filename,
-          size,
+    /**
+     * If FILE.SIZE > 1M, file buffer need to split for upload.
+     * Split strategy：
+     *  BASE_LENGTH: 512 * 1024
+     *  chunks: split number
+     *  chunk: the index of chunks
+     */
+    const BASE_LENGTH = 512 * 1024
+    const chunks = Math.ceil(buffer.length / BASE_LENGTH);
+
+    const bufferData = [];
+    for(let i = 0; i < chunks; i++) {
+      let tempBuffer
+      if(i === chunks - 1) {
+        tempBuffer = buffer.slice(i * BASE_LENGTH)
+      } else {
+        tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
+      }
+      bufferData.push(tempBuffer);
+    }
+
+    async function getMediaId(buffer: Buffer, index: number) : Promise <string> {
+      const formData = {
+        filename: {
+          options: {
+            contentType,
+            filename,
+            size,
+          },
+          value: buffer,
         },
-        value: buffer,
-      },
-      id,
-      lastModifiedDate: Date().toString(),
-      mediatype,
-      name: filename,
-      pass_ticket: passTicket || '',
-      size,
-      type: contentType,
-      uploadmediarequest: JSON.stringify(uploadMediaRequest),
-      webwx_data_ticket: webwxDataTicket,
-    }
-    let mediaId: string
-    try {
-      mediaId = await new Promise<string>((resolve, reject) => {
-        try {
-          request.post({
-            formData,
-            headers,
-            url: uploadMediaUrl + '?f=json',
-          }, (err, _, body) => {
-            if (err) {
-              reject(err)
-            } else {
-              let obj = body
-              if (typeof body !== 'object') {
-                obj = JSON.parse(body)
+        chunks,
+        chunk: index,
+        id,
+        lastModifiedDate: Date().toString(),
+        mediatype,
+        name: filename,
+        pass_ticket: passTicket || '',
+        size,
+        type: contentType,
+        uploadmediarequest: JSON.stringify(uploadMediaRequest),
+        webwx_data_ticket: webwxDataTicket,
+      }
+      try {
+        return await new Promise<string>((resolve, reject) => {
+          try {
+            request.post({
+              formData,
+              headers,
+              url: uploadMediaUrl + '?f=json',
+            }, (err, _, body) => {
+              if (err) {
+                reject(err)
+              } else {
+                let obj = body
+                if (typeof body !== 'object') {
+                  obj = JSON.parse(body)
+                }
+                resolve(obj.MediaId || '')
               }
-              resolve(obj.MediaId || '')
-            }
-          })
-        } catch (e) {
-          reject(e)
-        }
-      })
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'uploadMedia() uploadMedia exception: %s', e.message)
-      throw new Error('uploadMedia err: ' + e.message)
+            })
+          } catch (e) {
+            reject(e)
+          }
+        })
+      } catch (e) {
+        log.error('PuppetPuppeteer', 'uploadMedia() uploadMedia exception: %s', e.message)
+        throw new Error('uploadMedia err: ' + e.message)
+      }
     }
+    let funcList = []
+    for(let i = 0; i < bufferData.length - 1; i++) {
+      funcList.push(await getMediaId(bufferData[i], i))
+    }
+    // use promise.all() make the former upload of this buffer quickly
+    Promise.all(funcList)
+    const lastOne = bufferData.length - 1;
+    let mediaId = await getMediaId(bufferData[lastOne], lastOne)
     if (!mediaId) {
       log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
       throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
