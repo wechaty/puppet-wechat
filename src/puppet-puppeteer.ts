@@ -1499,11 +1499,11 @@ export class PuppetPuppeteer extends Puppet {
     // use promise.all() make the former upload of this buffer quickly
     let mediaId: string
     try {
-      await Promise.all(funcList)
-      const lastOne = bufferData.length - 1
-      mediaId = await getMediaId(bufferData[lastOne], lastOne)
-    } catch {
-      log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
+      const lastBuffer = bufferData.pop()
+      await Promise.all(bufferData.map(getMediaId))
+      mediaId = await getMediaId(lastBuffer, bufferData.length)
+    } catch (e) {
+      log.error('PuppetPuppeteer', 'uploadMedia exception: %s', e.message)
       throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
     }
     if (!mediaId) {
