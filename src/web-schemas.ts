@@ -275,10 +275,10 @@ export interface WebRecomendInfo {
 }
 
 export const enum WebMediaType {
-  Image      = 1,
-  Video      = 2,
-  Audio      = 3,
-  Attachment = 4,
+  Image      = 'pic',
+  Video      = 'video',
+  Attachment = 'doc',
+  // Audio      = 3, useless now
 }
 
 export interface WebRoomRawMember {
