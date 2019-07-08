@@ -63,6 +63,7 @@ class PuppetTest extends PuppetPuppeteer {
 
 test('login/logout events', async t => {
   const sandbox = sinon.createSandbox()
+
   try {
     const puppet  = new PuppetTest()
 
@@ -96,6 +97,9 @@ test('login/logout events', async t => {
 
     t.ok((puppet.bridge.getUserName as any).called, 'bridge.getUserName should be called')
 
+    // TODO(huan) July 2018: use sinon.clock / sinon.useFakeTimers() at here
+    await new Promise(resolve => setTimeout(resolve, 7000))
+
     // Puppet will not ready the contact, so the contactRawPayload might not be called at here. Huan, 2018.6
     // t.ok((puppet.contactRawPayload as any).called,  'puppet.contactRawPayload should be called')
 
@@ -110,9 +114,7 @@ test('login/logout events', async t => {
      */
     t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
 
-    t.ok(readySpy.called, 'should emit ready event, after login, '
-      + 'because puppeteer login event will wait the waitStable()'
-    )
+    t.ok(readySpy.called, 'should emit ready event, after login')
 
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')

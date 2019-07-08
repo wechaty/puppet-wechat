@@ -1076,7 +1076,7 @@ export class PuppetPuppeteer extends Puppet {
    * For issue #668
    */
   public async waitStable (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'readyStable()')
+    log.verbose('PuppetPuppeteer', 'waitStable()')
 
     let maxNum  = 0
     let curNum = 0
@@ -1088,7 +1088,9 @@ export class PuppetPuppeteer extends Puppet {
     while (unchangedNum < STABLE_CHECK_NUM) {
 
       // wait 1 second
+      console.info('waitStable before promise 1 sec')
       await new Promise(resolve => setTimeout(resolve, SLEEP_SECOND * 1000))
+      console.info('waitStable after promise 1 sec')
 
       const contactList = await this.contactList()
       curNum = contactList.length
