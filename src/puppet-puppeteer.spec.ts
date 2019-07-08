@@ -97,6 +97,7 @@ test('login/logout events', async t => {
 
     t.ok((puppet.bridge.getUserName as any).called, 'bridge.getUserName should be called')
 
+    // FIXME: improve the performance of the test by mocking the time
     // TODO(huan) July 2018: use sinon.clock / sinon.useFakeTimers() at here
     await new Promise(resolve => setTimeout(resolve, 7000))
 
