@@ -298,7 +298,7 @@ export class PuppetPuppeteer extends Puppet {
 
     this.bridge.on('dong',      data => this.emit('dong', data))
     // this.bridge.on('ding'     , Event.onDing.bind(this))
-    this.bridge.on('heartbeat', data => this.emit('watchdog', { type: 'bridge ding', data }))
+    this.bridge.on('heartbeat', data => this.emit('watchdog', { data, type: 'bridge ding' }))
 
     this.bridge.on('error',     e => this.emit('error', e))
     this.bridge.on('log',       Event.onLog.bind(this))
@@ -370,22 +370,7 @@ export class PuppetPuppeteer extends Puppet {
     const cookies = await this.cookies()
 
     const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) '
-                    + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
-
-      // Accept: 'image/webp,image/*,*/*;q=0.8',
-      // Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', //  MsgType.IMAGE | VIDEO
       Accept: '*/*',
-
-      Host: parsedUrl.hostname!, // 'wx.qq.com',  // MsgType.VIDEO | IMAGE
-
-      // Referer: protocol + '//wx.qq.com/',
-      Referer: url,
-
-      // 'Upgrade-Insecure-Requests': 1, // MsgType.VIDEO | IMAGE
-
-      Range: 'bytes=0-',
-
       // 'Accept-Encoding': 'gzip, deflate, sdch',
       // 'Accept-Encoding': 'gzip, deflate, sdch, br', // MsgType.IMAGE | VIDEO
       'Accept-Encoding': 'identity;q=1, *;q=0',
@@ -393,10 +378,24 @@ export class PuppetPuppeteer extends Puppet {
       'Accept-Language': 'zh-CN,zh;q=0.8', // MsgType.IMAGE | VIDEO
       // 'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.6,en-US;q=0.4,en;q=0.2',
 
+      Cookie: cookies.map(c => `${c.name}=${c.value}`).join('; '),
+
+      // Accept: 'image/webp,image/*,*/*;q=0.8',
+      // Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', //  MsgType.IMAGE | VIDEO
+
+      Host: parsedUrl.hostname!, // 'wx.qq.com',  // MsgType.VIDEO | IMAGE
+
+      Range: 'bytes=0-',
+      // Referer: protocol + '//wx.qq.com/',
+      Referer: url,
+
+      // 'Upgrade-Insecure-Requests': 1, // MsgType.VIDEO | IMAGE
+
       /**
        * pgv_pvi=6639183872; pgv_si=s8359147520; webwx_data_ticket=gSeBbuhX+0kFdkXbgeQwr6Ck
        */
-      Cookie: cookies.map(c => `${c.name}=${c.value}`).join('; '),
+      'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) '
+                    + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
     }
 
     const fileBox = FileBox.fromUrl(url, msgFileName, headers)
@@ -603,34 +602,29 @@ export class PuppetPuppeteer extends Puppet {
     // uin:        rawPayload.Uin,    // stable id: 4763975 || getCookie("wxuin")
 
     return {
+      address:    rawPayload.Alias, // XXX: need a stable address for user
+      alias:      rawPayload.RemarkName,
       avatar:     rawPayload.HeadImgUrl,
+      city:       rawPayload.City,
       friend:     rawPayload.stranger === undefined
         ? undefined
         : !rawPayload.stranger, // assign by injectio.js
-      star:       !!rawPayload.StarFriend,
-
-      address:    rawPayload.Alias, // XXX: need a stable address for user
-
-      alias:      rawPayload.RemarkName,
-      city:       rawPayload.City,
       gender:     rawPayload.Sex,
       id:         rawPayload.UserName,
       name:       plainText(rawPayload.NickName || ''),
       province:   rawPayload.Province,
       signature:  rawPayload.Signature,
-      weixin:     rawPayload.Alias,  // Wechat ID
-
+      star:       !!rawPayload.StarFriend,
       /**
-       * @see 1. https://github.com/Chatie/webwx-app-tracker/blob/
-       *  7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L3243
-       * @see 2. https://github.com/Urinx/WeixinBot/blob/master/README.md
-       * @ignore
-       */
-      // tslint:disable-next-line
+        * @see 1. https://github.com/Chatie/webwx-app-tracker/blob/
+        *  7c59d35c6ea0cff38426a4c5c912a086c4c512b2/formatted/webwxApp.js#L3243
+        * @see 2. https://github.com/Urinx/WeixinBot/blob/master/README.md
+        * @ignore
+        */
       type:      (!!rawPayload.UserName && !rawPayload.UserName.startsWith('@@') && !!(rawPayload.VerifyFlag & 8))
         ? ContactType.Official
         : ContactType.Personal,
-
+      weixin:     rawPayload.Alias,  // Wechat ID
     }
   }
 
@@ -1433,51 +1427,74 @@ export class PuppetPuppeteer extends Puppet {
     log.verbose('PuppetPuppeteer', 'uploadMedia() webwx_data_ticket: %s', webwxDataTicket)
     log.verbose('PuppetPuppeteer', 'uploadMedia() pass_ticket: %s', passTicket)
 
-    const formData = {
-      filename: {
-        options: {
-          contentType,
-          filename,
-          size,
-        },
-        value: buffer,
-      },
-      id,
-      lastModifiedDate: Date().toString(),
-      mediatype,
-      name: filename,
-      pass_ticket: passTicket || '',
-      size,
-      type: contentType,
-      uploadmediarequest: JSON.stringify(uploadMediaRequest),
-      webwx_data_ticket: webwxDataTicket,
+    /**
+     * If FILE.SIZE > 1M, file buffer need to split for upload.
+     * Split strategy：
+     *  BASE_LENGTH: 512 * 1024
+     *  chunks: split number
+     *  chunk: the index of chunks
+     */
+    const BASE_LENGTH = 512 * 1024
+    const chunks = Math.ceil(buffer.length / BASE_LENGTH)
+
+    const bufferData = []
+    for (let i = 0; i < chunks; i++) {
+      let tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
+      bufferData.push(tempBuffer)
     }
-    let mediaId: string
-    try {
-      mediaId = await new Promise<string>((resolve, reject) => {
-        try {
-          request.post({
-            formData,
-            headers,
-            url: uploadMediaUrl + '?f=json',
-          }, (err, _, body) => {
-            if (err) {
-              reject(err)
-            } else {
-              let obj = body
-              if (typeof body !== 'object') {
-                obj = JSON.parse(body)
+
+    async function getMediaId (buffer: Buffer, index: number) : Promise <string> {
+      const formData = {
+        chunk: index,
+        chunks,
+        filename: {
+          options: {
+            contentType,
+            filename,
+            size,
+          },
+          value: buffer,
+        },
+        id,
+        lastModifiedDate: Date().toString(),
+        mediatype,
+        name: filename,
+        pass_ticket: passTicket || '',
+        size,
+        type: contentType,
+        uploadmediarequest: JSON.stringify(uploadMediaRequest),
+        webwx_data_ticket: webwxDataTicket,
+      }
+      try {
+        return await new Promise<string>((resolve, reject) => {
+          try {
+            request.post({
+              formData,
+              headers,
+              url: uploadMediaUrl + '?f=json',
+            }, (err, _, body) => {
+              if (err) {
+                reject(err)
+              } else {
+                let obj = body
+                if (typeof body !== 'object') {
+                  obj = JSON.parse(body)
+                }
+                resolve(obj.MediaId || '')
               }
-              resolve(obj.MediaId || '')
-            }
-          })
-        } catch (e) {
-          reject(e)
-        }
-      })
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'uploadMedia() uploadMedia exception: %s', e.message)
-      throw new Error('uploadMedia err: ' + e.message)
+            })
+          } catch (e) {
+            reject(e)
+          }
+        })
+      } catch (e) {
+        log.error('PuppetPuppeteer', 'uploadMedia() uploadMedia exception: %s', e.message)
+        throw new Error('uploadMedia err: ' + e.message)
+      }
+    }
+    let mediaId = ''
+    for (let i = 0; i < bufferData.length; i++) {
+      mediaId = await getMediaId(bufferData[i], i)
     }
     if (!mediaId) {
       log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
