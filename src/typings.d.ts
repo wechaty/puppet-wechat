@@ -6,3 +6,13 @@ interface Window {
 }
 
 declare const WechatyBro: any
+
+declare module 'puppeteer-extra-plugin-stealth' {
+  function plugin(config?:any): any;
+  export = plugin;
+}
+
+declare module 'puppeteer-extra' {
+  export function use(plugin:any): any;
+  export function launch(opts:LaunchOptions): Promise<Browser>;
+}
