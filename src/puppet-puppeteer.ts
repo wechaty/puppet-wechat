@@ -129,7 +129,7 @@ export class PuppetPuppeteer extends Puppet {
       head          : envHead() || options.head as boolean | undefined,
       launchOptions : options.launchOptions as LaunchOptions,
       memory        : this.memory,
-      stealth : !envDisableExtra() && !options.stealth,
+      stealth       : !(envDisableExtra() || options.stealth === false),
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
