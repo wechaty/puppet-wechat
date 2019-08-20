@@ -42,7 +42,6 @@ import {
 // const retryPromise  = require('retry-promise').default
 
 import {
-  envDisableExtra,
   log,
   MEMORY_SLOT,
   retry,
@@ -69,6 +68,7 @@ export interface BridgeOptions {
   head?           : boolean,
   launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
+  stealth?        : boolean,
 }
 
 export class Bridge extends EventEmitter {
@@ -148,10 +148,9 @@ export class Bridge extends EventEmitter {
       headless,
     }
 
-    const extraIsDisabled = envDisableExtra()
     let browser
 
-    if (!extraIsDisabled) {
+    if (this.options.stealth) {
       puppeteerExtra.use(stealthPlugin())
       browser = await puppeteerExtra.launch(options)
     } else {

@@ -13,8 +13,8 @@
 
 Wechaty Puppet for Puppeteer
 
-* This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-puppeteer/issues/1>
-* Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/Chatie/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
+- This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-puppeteer/issues/1>
+- Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/Chatie/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
 
 ## KNOWN LIMITATIONS
 
@@ -65,13 +65,23 @@ const bot = new Wechaty({
   // ...
   puppetOptions: {
     launchOptions: {
-      executablePath: '<executablePath>',
+      executablePath: '<executablePath>'
       // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
     }
   }
 });
 ```
+
 We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want to disabled it, just set the `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED` environment variable to `true`. eg. `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED=true && ts-node your-bot.ts`
+
+## puppetOptions
+
+| Option        |  value  | default value | description                                                                                                                 |
+| ------------- | :-----: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------- |
+| endpoint      | string  |       -       | puppeteerlaunchoptions.executablePath                                                                                       |
+| head          | boolean |     true      | puppeteerlaunchoptions.headless                                                                                             |
+| launchOptions | object  |       -       | same to [puppeteerlaunchoptions](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions) |
+| stealth       | boolean |     true      | use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) or not                                          |
 
 ## HISTORY
 
@@ -108,6 +118,6 @@ See: <https://github.com/Chatie/wechaty/issues/1152>
 
 ## COPYRIGHT & LICENSE
 
-* Code & Docs © 2016-2019 Huan LI \<zixia@zixia.net\>
-* Code released under the Apache-2.0 License
-* Docs released under Creative Commons
+- Code & Docs © 2016-2019 Huan LI \<zixia@zixia.net\>
+- Code released under the Apache-2.0 License
+- Docs released under Creative Commons
