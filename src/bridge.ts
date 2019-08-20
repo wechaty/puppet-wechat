@@ -22,10 +22,10 @@ import { EventEmitter } from 'events'
 import fs               from 'fs'
 import path             from 'path'
 import {
-  launch,
   Browser,
   Cookie,
   Dialog,
+  launch,
   LaunchOptions,
   Page,
 }                       from 'puppeteer'
