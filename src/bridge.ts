@@ -22,6 +22,7 @@ import { EventEmitter } from 'events'
 import fs               from 'fs'
 import path             from 'path'
 import {
+  launch,
   Browser,
   Cookie,
   Dialog,
@@ -41,6 +42,7 @@ import {
 // const retryPromise  = require('retry-promise').default
 
 import {
+  envDisableExtra,
   log,
   MEMORY_SLOT,
   retry,
@@ -68,8 +70,6 @@ export interface BridgeOptions {
   launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
 }
-
-puppeteerExtra.use(stealthPlugin())
 
 export class Bridge extends EventEmitter {
 
@@ -130,7 +130,7 @@ export class Bridge extends EventEmitter {
     if (this.options.endpoint) {
       launchOptions.executablePath = this.options.endpoint
     }
-    const browser = await puppeteerExtra.launch({
+    const options = {
       ...launchOptions,
       args: [
         '--audio-output-channels=0',
@@ -146,7 +146,17 @@ export class Bridge extends EventEmitter {
         ...launchOptionsArgs,
       ],
       headless,
-    })
+    }
+
+    const extraIsDisabled = envDisableExtra()
+    let browser
+
+    if (!extraIsDisabled) {
+      puppeteerExtra.use(stealthPlugin())
+      browser = await puppeteerExtra.launch(options)
+    } else {
+      browser = await launch(options)
+    }
 
     const version = await browser.version()
     log.verbose('PuppetPuppeteerBridge', 'initBrowser() version: %s', version)

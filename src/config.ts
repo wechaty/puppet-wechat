@@ -49,6 +49,14 @@ export function envHead (): boolean {
 
 }
 
+export function envDisableExtra (): boolean {
+  const KEY = 'WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED'
+  return KEY in process.env
+    ? !!process.env[KEY]
+    : false
+
+}
+
 export function qrCodeForChatie (): FileBox {
   const CHATIE_OFFICIAL_ACCOUNT_QRCODE = 'http://weixin.qq.com/r/qymXj7DEO_1ErfTs93y5'
   const name                           = 'qrcode-for-chatie.png'

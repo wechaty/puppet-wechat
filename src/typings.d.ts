@@ -13,6 +13,7 @@ declare module 'puppeteer-extra-plugin-stealth' {
 }
 
 declare module 'puppeteer-extra' {
+  import { Browser, LaunchOptions } from 'puppeteer'
   export function use(plugin:any): any;
-  export function launch(opts:LaunchOptions): Promise<Browser>;
+  export function launch(opts?:LaunchOptions): Promise<Browser>;
 }
