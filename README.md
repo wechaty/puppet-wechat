@@ -71,7 +71,7 @@ const bot = new Wechaty({
   }
 });
 ```
-We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want disabled it, just set the `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED` environment variable to `true`. eg. `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED=true && ts-node your-bot.ts`
+We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want to disabled it, just set the `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED` environment variable to `true`. eg. `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED=true && ts-node your-bot.ts`
 
 ## HISTORY
 
