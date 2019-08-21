@@ -49,11 +49,9 @@ export function envHead (): boolean {
 
 }
 
-export function envDisableExtra (): boolean {
-  const KEY = 'WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED'
-  return KEY in process.env
-    ? !!process.env[KEY]
-    : false
+export function envStealthless (): boolean {
+  const KEY = 'WECHATY_PUPPET_PUPPETEER_STEALTHLESS'
+  return !!process.env[KEY]
 
 }
 

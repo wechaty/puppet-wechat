@@ -68,7 +68,7 @@ export interface BridgeOptions {
   head?           : boolean,
   launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
-  stealth?        : boolean,
+  stealthless?    : boolean,
 }
 
 export class Bridge extends EventEmitter {
@@ -150,7 +150,7 @@ export class Bridge extends EventEmitter {
 
     let browser
 
-    if (this.options.stealth) {
+    if (!this.options.stealthless) {
       puppeteerExtra.use(stealthPlugin())
       browser = await puppeteerExtra.launch(options)
     } else {

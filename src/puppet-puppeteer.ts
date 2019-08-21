@@ -70,7 +70,7 @@ import {
 }                           from 'wechaty-puppet'
 
 import {
-  envDisableExtra,
+  envStealthless,
   envHead,
   log,
   MEMORY_SLOT,
@@ -126,10 +126,10 @@ export class PuppetPuppeteer extends Puppet {
     this.fileId = 0
     this.bridge = new Bridge({
       endpoint      : options.endpoint,
-      head          : envHead() || options.head as boolean | undefined,
+      head          : typeof options.head === 'boolean' ? options.head : envHead(),
       launchOptions : options.launchOptions as LaunchOptions,
       memory        : this.memory,
-      stealth       : !(envDisableExtra() || options.stealth === false),
+      stealthless   : typeof options.stealthless === 'boolean' ? options.stealthless : envStealthless(),
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes

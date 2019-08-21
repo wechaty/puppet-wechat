@@ -65,23 +65,23 @@ const bot = new Wechaty({
   // ...
   puppetOptions: {
     launchOptions: {
-      executablePath: '<executablePath>'
+      executablePath: '<executablePath>',
       // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
     }
   }
 });
 ```
 
-We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want to disabled it, just set the `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED` environment variable to `true`. eg. `WECHATY_PUPPET_PUPPETEER_EXTRA_DISABLED=true && ts-node your-bot.ts`
+We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want to disabled it, just set the `WECHATY_PUPPET_PUPPETEER_STEALTHLESS` environment variable to `1`. eg. `WECHATY_PUPPET_PUPPETEER_STEALTHLESS=1 ts-node your-bot.ts`
 
 ## puppetOptions
 
 | Option        |  value  | default value | description                                                                                                                 |
 | ------------- | :-----: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------- |
 | endpoint      | string  |       -       | puppeteerlaunchoptions.executablePath                                                                                       |
-| head          | boolean |     true      | puppeteerlaunchoptions.headless                                                                                             |
+| head          | boolean |     false     | puppeteerlaunchoptions.headless                                                                                             |
 | launchOptions | object  |       -       | same to [puppeteerlaunchoptions](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions) |
-| stealth       | boolean |     true      | use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) or not                                          |
+| stealthless   | boolean |     false     | disabled [puppeteer-extra-plugin-stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) or not              |
 
 ## HISTORY
 
