@@ -49,6 +49,12 @@ export function envHead (): boolean {
 
 }
 
+export function envStealthless (): boolean {
+  const KEY = 'WECHATY_PUPPET_PUPPETEER_STEALTHLESS'
+  return !!process.env[KEY]
+
+}
+
 export function qrCodeForChatie (): FileBox {
   const CHATIE_OFFICIAL_ACCOUNT_QRCODE = 'http://weixin.qq.com/r/qymXj7DEO_1ErfTs93y5'
   const name                           = 'qrcode-for-chatie.png'
