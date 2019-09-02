@@ -29,6 +29,8 @@ import {
   LaunchOptions,
   Page,
 }                       from 'puppeteer'
+import puppeteerExtra   from 'puppeteer-extra'
+import stealthPlugin    from 'puppeteer-extra-plugin-stealth'
 import { StateSwitch }  from 'state-switch'
 import { parseString }  from 'xml2js'
 
@@ -43,14 +45,14 @@ import {
   log,
   MEMORY_SLOT,
   retry,
-}               from './config'
+}                       from './config'
 
 import {
   WebContactRawPayload,
   WebMessageMediaPayload,
   WebMessageRawPayload,
   WebRoomRawPayload,
-}                               from './web-schemas'
+}                        from './web-schemas'
 
 import {
   unescapeHtml,
@@ -66,6 +68,7 @@ export interface BridgeOptions {
   head?           : boolean,
   launchOptions?  : LaunchOptions,
   memory          : MemoryCard,
+  stealthless?    : boolean,
 }
 
 export class Bridge extends EventEmitter {
@@ -127,7 +130,7 @@ export class Bridge extends EventEmitter {
     if (this.options.endpoint) {
       launchOptions.executablePath = this.options.endpoint
     }
-    const browser = await launch({
+    const options = {
       ...launchOptions,
       args: [
         '--audio-output-channels=0',
@@ -143,7 +146,16 @@ export class Bridge extends EventEmitter {
         ...launchOptionsArgs,
       ],
       headless,
-    })
+    }
+
+    let browser
+
+    if (!this.options.stealthless) {
+      puppeteerExtra.use(stealthPlugin())
+      browser = await puppeteerExtra.launch(options)
+    } else {
+      browser = await launch(options)
+    }
 
     const version = await browser.version()
     log.verbose('PuppetPuppeteerBridge', 'initBrowser() version: %s', version)
