@@ -77,6 +77,7 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
     hello,
     id,
     ticket,
+    timestamp: Math.floor(Date.now() / 1000), // in seconds
     type,
   }
 
@@ -114,6 +115,7 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
   const friendshipPayload: FriendshipPayload = {
     contactId : CONTACT_ID,
     id        : 'id',
+    timestamp : Math.floor(Date.now() / 1000), // in seconds
     type      : FriendshipType.Confirm,
   }
 

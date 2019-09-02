@@ -290,7 +290,8 @@ export class Firer {
         await this.puppet.contactPayload(inviterContactId)
         await this.puppet.roomPayload(roomId)
 
-        this.puppet.emit('room-join', roomId, inviteeContactIdList, inviterContactId)
+        const timestamp = Math.floor(Date.now() / 1000) // in seconds
+        this.puppet.emit('room-join', roomId, inviteeContactIdList, inviterContactId, timestamp)
 
         return true
       }
@@ -355,7 +356,8 @@ export class Firer {
      *                  it will be 2 sys message, instead of 1 sys message contains 2 leavers.
      * @huan 2018 May: we need to generilize the pattern for future usage.
      */
-    this.puppet.emit('room-leave', roomId, [leaverContactId], removerContactId)
+    const timestamp = Math.floor(Date.now() / 1000) // in seconds
+    this.puppet.emit('room-leave', roomId, [leaverContactId], removerContactId, timestamp)
 
     setTimeout(async () => {
       await this.puppet.roomPayloadDirty(roomId)
@@ -395,7 +397,8 @@ export class Firer {
     }
 
     try {
-      this.puppet.emit('room-topic', roomId, topic, oldTopic, changerContactId)
+      const timestamp = Math.floor(Date.now() / 1000) // in seconds
+      this.puppet.emit('room-topic', roomId, topic, oldTopic, changerContactId, timestamp)
       return true
     } catch (e) {
       log.error('PuppetPuppeteerFirer', 'fireRoomTopic() co exception: %s', e.stack)

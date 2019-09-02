@@ -55,6 +55,8 @@ import {
   MessagePayload,
   MessageType,
 
+  MiniProgramPayload,
+
   Puppet,
   PuppetOptions,
   PuppetQrcodeScanEvent,
@@ -348,6 +350,11 @@ export class PuppetPuppeteer extends Puppet {
     return throwUnsupportedError(messageId)
   }
 
+  public async messageMiniProgram (messageId: string): Promise<MiniProgramPayload> {
+    log.verbose('PuppetPuppeteer', 'messageMiniProgram(%s)', messageId)
+    return throwUnsupportedError(messageId)
+  }
+
   private async messageRawPayloadToFile (
     rawPayload: WebMessageRawPayload,
   ): Promise<FileBox> {
@@ -408,6 +415,14 @@ export class PuppetPuppeteer extends Puppet {
     urlLinkPayload : UrlLinkPayload,
   ) : Promise<void> {
     throwUnsupportedError(to, urlLinkPayload)
+  }
+
+  public async messageSendMiniProgram (receiver: Receiver, miniProgramPayload: MiniProgramPayload): Promise<void> {
+    log.verbose('PuppetPuppeteer', 'messageSendMiniProgram("%s", %s)',
+      JSON.stringify(receiver),
+      JSON.stringify(miniProgramPayload),
+    )
+    throwUnsupportedError(receiver, miniProgramPayload)
   }
 
   /**
@@ -1006,6 +1021,8 @@ export class PuppetPuppeteer extends Puppet {
   public async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
     log.warn('PuppetPuppeteer', 'friendshipRawPayloadParser(%s)', rawPayload)
 
+    const timestamp = Math.floor(Date.now() / 1000) // in seconds
+
     switch (rawPayload.MsgType) {
       case WebMessageType.VERIFYMSG:
         if (!rawPayload.RecommendInfo) {
@@ -1022,6 +1039,7 @@ export class PuppetPuppeteer extends Puppet {
           hello     : recommendInfo.Content,
           id        : rawPayload.MsgId,
           ticket    : recommendInfo.Ticket,
+          timestamp,
           type      : FriendshipType.Receive,
         }
         return payloadReceive
@@ -1030,6 +1048,7 @@ export class PuppetPuppeteer extends Puppet {
         const payloadConfirm: FriendshipPayloadConfirm = {
           contactId : rawPayload.FromUserName,
           id        : rawPayload.MsgId,
+          timestamp,
           type      : FriendshipType.Confirm,
         }
         return payloadConfirm
