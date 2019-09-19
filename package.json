@@ -70,7 +70,7 @@
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
   "dependencies": {
-    "bl": "^3.0.0",
+    "bl": "^4.0.0",
     "brolog": "^1.6.5",
     "md5": "^2.2.1",
     "mime": "^2.3.1",
