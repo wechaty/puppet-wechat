@@ -1596,7 +1596,12 @@ export class PuppetPuppeteer extends Puppet {
     contactId : string,
   ): Promise<void> {
     log.verbose('PuppetPuppeteer', 'messageSend("%s", %s)', JSON.stringify(receiver), contactId)
-    throw new Error('not support')
+    return throwUnsupportedError()
+  }
+
+  public async messageContact (messageId: string): Promise<string> {
+    log.verbose('PuppetPuppeteer', 'messageContact(%s)', messageId)
+    return throwUnsupportedError(messageId)
   }
 
   private async getBaseRequest (): Promise<any> {

@@ -62,11 +62,11 @@
     "pkg-jq": "^0.2.2",
     "shx": "^0.3.1",
     "tstest": "^0.4.2",
-    "wechaty-puppet": "^0.16.1"
+    "wechaty-puppet": "^0.17.1"
   },
   "peerDependencies": {
     "file-box": "^0.8.22",
-    "wechaty-puppet": "^0.16.1"
+    "wechaty-puppet": "^0.17.1"
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
   "dependencies": {
