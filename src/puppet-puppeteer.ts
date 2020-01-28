@@ -327,6 +327,10 @@ export class PuppetPuppeteer extends Puppet {
     return this.bridge
   }
 
+  public async messageRecall (messageId: string) : Promise<boolean> {
+    return throwUnsupportedError(messageId)
+  }
+
   public async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
     const rawPayload = await this.bridge.getMessage(id)
     return rawPayload
@@ -558,6 +562,31 @@ export class PuppetPuppeteer extends Puppet {
       this.id = undefined
       this.emit('logout', user)
     }
+  }
+
+  /**
+   *
+   * Tag
+   *
+   */
+  // add a tag for a Contact. Create it first if it not exist.
+  public async tagContactAdd (id: string, contactId: string) : Promise<void> {
+    return throwUnsupportedError(id, contactId)
+  }
+
+  // remove a tag from the Contact
+  public async tagContactRemove (id: string, contactId: string) : Promise<void> {
+    return throwUnsupportedError(id, contactId)
+  }
+
+  // delete a tag from Wechat
+  public async tagContactDelete (id: string) : Promise<void> {
+    return throwUnsupportedError(id)
+  }
+
+  // get tags from a specific Contact
+  public async tagContactList (contactId?: string) : Promise<string[]> {
+    return throwUnsupportedError(contactId)
   }
 
   /**
@@ -1010,6 +1039,16 @@ export class PuppetPuppeteer extends Puppet {
    * Friendship
    *
    */
+  // return contact id by phone number
+  public async friendshipSearchPhone (phone: string) : Promise<string | null> {
+    return throwUnsupportedError(phone)
+  }
+
+  // return contact id by weixin id
+  public async friendshipSearchWeixin (weixin: string) : Promise<string | null> {
+    return throwUnsupportedError(weixin)
+  }
+
   public async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
     log.warn('PuppetPuppeteer', 'friendshipRawPayload(%s)', id)
 
