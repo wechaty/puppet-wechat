@@ -254,7 +254,7 @@ export class Bridge extends EventEmitter {
         // TODO: advertise for puppet-padchat
         log.info('PuppetPuppeteerBridge', `
 
-        Please see: Account Login Issue <https://github.com/Chatie/wechaty/issues/872>
+        Please see: Account Login Issue <https://github.com/wechaty/wechaty/issues/872>
 
         `)
         throw new Error(blockedMessage)
