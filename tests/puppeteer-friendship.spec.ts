@@ -82,7 +82,11 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
   }
 
   const sandbox = sinon.createSandbox()
-  sandbox.stub(puppet, 'friendshipPayload').resolves(payload)
+
+  // Huan(202002)
+  //  FIXME: Argument of type 'FriendshipPayloadReceive' is not assignable to parameter of type 'void | undefined'.
+  //  Type 'FriendshipPayloadReceive' is not assignable to type 'void'.ts(2345)
+  sandbox.stub(puppet, 'friendshipPayload').resolves(payload as any)
   // sandbox.stub(puppet, 'friendshipPayloadCache').returns(payload)
 
   // const contact = wechaty.Contact.load(info.UserName)
@@ -126,7 +130,12 @@ test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
   sandbox.stub(puppet, 'contactPayload').resolves({} as any)
   // sandbox.stub(puppet, 'contactPayloadCache') .returns({})
 
-  sandbox.stub(puppet, 'friendshipPayload').resolves(friendshipPayload)
+  /**
+   * Huan(202002)
+   *  FIXME: Argument of type 'FriendshipPayloadReceive' is not assignable to parameter of type 'void | undefined'.
+   *  Type 'FriendshipPayloadReceive' is not assignable to type 'void'.ts(2345)
+   */
+  sandbox.stub(puppet, 'friendshipPayload').resolves(friendshipPayload as any)
   // sandbox.stub(puppet, 'friendshipPayloadCache') .returns(friendshipPayload)
 
   // const msg = wechaty.Message.create(rawMessagePayload.MsgId)

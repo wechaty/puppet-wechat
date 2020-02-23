@@ -33,9 +33,6 @@ import {
 }                 from 'puppeteer'
 
 import {
-  FileBox,
-}                   from 'file-box'
-import {
   ThrottleQueue,
 }                   from 'rx-queue'
 import {
@@ -52,6 +49,8 @@ import {
   FriendshipPayloadReceive,
   FriendshipType,
 
+  FileBox,
+
   MessagePayload,
   MessageType,
 
@@ -59,8 +58,7 @@ import {
 
   Puppet,
   PuppetOptions,
-  PuppetQrcodeScanEvent,
-  Receiver,
+  PuppetQRCodeScanEvent,
 
   RoomInvitationPayload,
   RoomMemberPayload,
@@ -69,6 +67,7 @@ import {
   throwUnsupportedError,
 
   UrlLinkPayload,
+  ImageType,
 }                           from 'wechaty-puppet'
 
 import {
@@ -85,6 +84,7 @@ import {
   messageRawPayloadParser,
   plainText,
   unescapeHtml,
+  isRoomId,
 }                           from './pure-function-helpers'
 
 import {
@@ -115,7 +115,7 @@ export class PuppetPuppeteer extends Puppet {
 
   public bridge: Bridge
 
-  public scanPayload? : PuppetQrcodeScanEvent
+  public scanPayload? : PuppetQRCodeScanEvent
   public scanWatchdog : Watchdog<ScanFoodType>
 
   private fileId: number
@@ -327,10 +327,33 @@ export class PuppetPuppeteer extends Puppet {
     return this.bridge
   }
 
-  public async messageRecall (messageId: string) : Promise<boolean> {
-    return throwUnsupportedError(messageId)
+  private async getBaseRequest (): Promise<any> {
+    try {
+      const json = await this.bridge.getBaseRequest()
+      const obj = JSON.parse(json)
+      return obj.BaseRequest
+    } catch (e) {
+      log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
+      throw e
+    }
   }
 
+  public unref (): void {
+    log.verbose('PuppetPuppeteer', 'unref ()')
+    super.unref()
+
+    if (this.scanWatchdog) {
+      this.scanWatchdog.unref()
+    }
+
+    // TODO: unref() the puppeteer
+  }
+
+  /**
+   *
+   * Message
+   *
+   */
   public async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
     const rawPayload = await this.bridge.getMessage(id)
     return rawPayload
@@ -344,6 +367,10 @@ export class PuppetPuppeteer extends Puppet {
     const payload = messageRawPayloadParser(rawPayload)
 
     return payload
+  }
+
+  public async messageRecall (messageId: string): Promise<boolean> {
+    return throwUnsupportedError(messageId)
   }
 
   public async messageFile (messageId: string): Promise<FileBox> {
@@ -417,18 +444,18 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageSendUrl (
-    to             : Receiver,
+    conversationId : string,
     urlLinkPayload : UrlLinkPayload,
   ) : Promise<void> {
-    throwUnsupportedError(to, urlLinkPayload)
+    throwUnsupportedError(conversationId, urlLinkPayload)
   }
 
-  public async messageSendMiniProgram (receiver: Receiver, miniProgramPayload: MiniProgramPayload): Promise<void> {
+  public async messageSendMiniProgram (conversationId: string, miniProgramPayload: MiniProgramPayload): Promise<void> {
     log.verbose('PuppetPuppeteer', 'messageSendMiniProgram("%s", %s)',
-      JSON.stringify(receiver),
+      conversationId,
       JSON.stringify(miniProgramPayload),
     )
-    throwUnsupportedError(receiver, miniProgramPayload)
+    throwUnsupportedError(conversationId, miniProgramPayload)
   }
 
   /**
@@ -436,12 +463,12 @@ export class PuppetPuppeteer extends Puppet {
    */
   // public async forward(baseData: MsgRawObj, patchData: MsgRawObj): Promise<boolean> {
   public async messageForward (
-    receiver  : Receiver,
+    conversationId  : string,
     messageId : string,
   ): Promise<void> {
 
     log.silly('PuppetPuppeteer', 'forward(receiver=%s, messageId=%s)',
-      receiver,
+      conversationId,
       messageId,
     )
 
@@ -481,7 +508,7 @@ export class PuppetPuppeteer extends Puppet {
     newMsg.Content      = unescapeHtml(
       rawPayload.Content.replace(/^@\w+:<br\/>/, '')
     ).replace(/^[\w-]+:<br\/>/, '')
-    newMsg.MMIsChatRoom = !!(receiver.roomId)
+    newMsg.MMIsChatRoom = isRoomId(conversationId)
 
     // The following parameters need to be overridden after calling createMessage()
 
@@ -491,7 +518,7 @@ export class PuppetPuppeteer extends Puppet {
     // // all call success return true
     // ret = (i === 0 ? true : ret) && await config.puppetInstance().forward(m, newMsg)
     // }
-    newMsg.ToUserName = receiver.contactId || receiver.roomId as string
+    newMsg.ToUserName = conversationId
     // ret = await config.puppetInstance().forward(m, newMsg)
     // return ret
     const baseData  = rawPayload
@@ -509,28 +536,13 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageSendText (
-    receiver : Receiver,
-    text     : string,
+    conversationId : string,
+    text           : string,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSendText(receiver=%s, text=%s)', JSON.stringify(receiver), text)
-
-    let destinationId
-
-    if (receiver.roomId) {
-      destinationId = receiver.roomId
-    } else if (receiver.contactId) {
-      destinationId = receiver.contactId
-    } else {
-      throw new Error('PuppetPuppeteer.messageSendText(): message with neither room nor to?')
-    }
-
-    log.silly('PuppetPuppeteer', 'messageSendText() destination: %s, text: %s)',
-      destinationId,
-      text,
-    )
+    log.verbose('PuppetPuppeteer', 'messageSendText(%s, %s)', conversationId, text)
 
     try {
-      await this.bridge.send(destinationId, text)
+      await this.bridge.send(conversationId, text)
     } catch (e) {
       log.error('PuppetPuppeteer', 'messageSendText() exception: %s', e.message)
       throw e
@@ -566,36 +578,11 @@ export class PuppetPuppeteer extends Puppet {
 
   /**
    *
-   * Tag
-   *
-   */
-  // add a tag for a Contact. Create it first if it not exist.
-  public async tagContactAdd (id: string, contactId: string) : Promise<void> {
-    return throwUnsupportedError(id, contactId)
-  }
-
-  // remove a tag from the Contact
-  public async tagContactRemove (id: string, contactId: string) : Promise<void> {
-    return throwUnsupportedError(id, contactId)
-  }
-
-  // delete a tag from Wechat
-  public async tagContactDelete (id: string) : Promise<void> {
-    return throwUnsupportedError(id)
-  }
-
-  // get tags from a specific Contact
-  public async tagContactList (contactId?: string) : Promise<string[]> {
-    return throwUnsupportedError(contactId)
-  }
-
-  /**
-   *
    * ContactSelf
    *
    *
    */
-  public async contactSelfQrcode (): Promise<string> {
+  public async contactSelfQRCode (): Promise<string> {
     return throwUnsupportedError()
   }
 
@@ -869,6 +856,7 @@ export class PuppetPuppeteer extends Puppet {
       : []
 
     const roomPayload: RoomPayload = {
+      adminIdList: [],
       id,
       memberIdList,
       topic: plainText(rawPayload.NickName || ''),
@@ -977,8 +965,8 @@ export class PuppetPuppeteer extends Puppet {
     log.warn('PuppetPuppeteer', 'roomQuit(%s) not supported by Web API', roomId)
   }
 
-  public async roomQrcode (roomId: string): Promise<string> {
-    throw new Error('not support ' + roomId)
+  public async roomQRCode (roomId: string): Promise<string> {
+    return throwUnsupportedError(roomId)
   }
 
   public async roomMemberList (roomId: string) : Promise<string[]> {
@@ -1039,16 +1027,6 @@ export class PuppetPuppeteer extends Puppet {
    * Friendship
    *
    */
-  // return contact id by phone number
-  public async friendshipSearchPhone (phone: string) : Promise<string | null> {
-    return throwUnsupportedError(phone)
-  }
-
-  // return contact id by weixin id
-  public async friendshipSearchWeixin (weixin: string) : Promise<string | null> {
-    return throwUnsupportedError(weixin)
-  }
-
   public async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
     log.warn('PuppetPuppeteer', 'friendshipRawPayload(%s)', id)
 
@@ -1096,6 +1074,14 @@ export class PuppetPuppeteer extends Puppet {
       default:
         throw new Error('not supported friend request message raw payload')
     }
+  }
+
+  public async friendshipSearchPhone (phone: string): Promise<null | string> {
+    throw throwUnsupportedError(phone)
+  }
+
+  public async friendshipSearchWeixin (weixin: string): Promise<null | string> {
+    throw throwUnsupportedError(weixin)
   }
 
   public async friendshipAdd (
@@ -1564,30 +1550,20 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageSendFile (
-    receiver : Receiver,
-    file     : FileBox,
+    conversationId : string,
+    file           : FileBox,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSendFile(receiver=%s, file=%s)',
-      JSON.stringify(receiver),
+    log.verbose('PuppetPuppeteer', 'messageSendFile(%s, file=%s)',
+      conversationId,
       file.toString(),
     )
-
-    let destinationId
-
-    if (receiver.roomId) {
-      destinationId = receiver.roomId
-    } else if (receiver.contactId) {
-      destinationId = receiver.contactId
-    } else {
-      throw new Error('PuppetPuppeteer.messageSendFile(): message with neither room nor to?')
-    }
 
     let mediaData: WebMessageMediaPayload
     let rawPayload = {} as WebMessageRawPayload
 
     if (!rawPayload || !rawPayload.MediaId) {
       try {
-        mediaData = await this.uploadMedia(file, destinationId)
+        mediaData = await this.uploadMedia(file, conversationId)
         rawPayload = Object.assign(rawPayload, mediaData)
         log.silly('PuppetPuppeteer', 'Upload completed, new rawObj:%s', JSON.stringify(rawPayload))
       } catch (e) {
@@ -1603,7 +1579,7 @@ export class PuppetPuppeteer extends Puppet {
         MMFileExt  : rawPayload.MMFileExt,
         MediaId    : rawPayload.MediaId,
         MsgType    : rawPayload.MsgType,
-        ToUserName : destinationId,
+        ToUserName : conversationId,
       }
       if (rawPayload.Signature) {
         mediaData.Signature = rawPayload.Signature
@@ -1614,7 +1590,7 @@ export class PuppetPuppeteer extends Puppet {
 
     mediaData.MsgType = this.extToType(path.extname(file.name))
     log.silly('PuppetPuppeteer', 'sendMedia() destination: %s, mediaId: %s, MsgType; %s)',
-      destinationId,
+      conversationId,
       mediaData.MediaId,
       mediaData.MsgType,
     )
@@ -1631,11 +1607,16 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageSendContact (
-    receiver  : Receiver,
-    contactId : string,
+    conversationId : string,
+    contactId      : string,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSend("%s", %s)', JSON.stringify(receiver), contactId)
+    log.verbose('PuppetPuppeteer', 'messageSend("%s", %s)', conversationId, contactId)
     return throwUnsupportedError()
+  }
+
+  public async messageImage (messageId: string, imageType: ImageType): Promise<FileBox> {
+    log.verbose('PuppetPuppeteer', 'messageImage(%s, %s)', messageId, imageType)
+    return this.messageFile(messageId)
   }
 
   public async messageContact (messageId: string): Promise<string> {
@@ -1643,26 +1624,25 @@ export class PuppetPuppeteer extends Puppet {
     return throwUnsupportedError(messageId)
   }
 
-  private async getBaseRequest (): Promise<any> {
-    try {
-      const json = await this.bridge.getBaseRequest()
-      const obj = JSON.parse(json)
-      return obj.BaseRequest
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
-      throw e
-    }
+  /**
+   *
+   * Tag
+   *
+   */
+  public async tagContactAdd (tagId: string, contactId: string): Promise<void> {
+    return throwUnsupportedError(tagId, contactId)
   }
 
-  public unref (): void {
-    log.verbose('PuppetPuppeteer', 'unref ()')
-    super.unref()
+  public async tagContactRemove (tagId: string, contactId: string): Promise<void> {
+    return throwUnsupportedError(tagId, contactId)
+  }
 
-    if (this.scanWatchdog) {
-      this.scanWatchdog.unref()
-    }
+  public async tagContactDelete (tagId: string) : Promise<void> {
+    return throwUnsupportedError(tagId)
+  }
 
-    // TODO: unref() the puppeteer
+  public async tagContactList (contactId?: string) : Promise<string[]> {
+    return throwUnsupportedError(contactId)
   }
 
 }

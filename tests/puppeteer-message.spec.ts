@@ -87,11 +87,12 @@ test('constructor()', async t => {
   const sandbox = sinon.createSandbox()
   const mockMessagePayload = async (/* _: string */) => {
     const payload: MessagePayload = {
-      fromId    : EXPECTED.from,
-      id        : EXPECTED.id,
-      timestamp : Date.now(),
-      toId      : 'toId',
-      type      : MessageType.Text,
+      fromId        : EXPECTED.from,
+      id            : EXPECTED.id,
+      mentionIdList : [],
+      timestamp     : Date.now(),
+      toId          : 'toId',
+      type          : MessageType.Text,
     }
     return payload
   }

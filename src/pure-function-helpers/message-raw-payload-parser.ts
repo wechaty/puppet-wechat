@@ -57,6 +57,7 @@ export function messageRawPayloadParser (
     filename: msgFileName,
     fromId,
     id,
+    mentionIdList: [],
     text,
     timestamp,
     type,
