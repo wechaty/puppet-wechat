@@ -65,7 +65,7 @@
     "wechaty-puppet": "^0.18.3"
   },
   "peerDependencies": {
-    "file-box": "^0.8.22",
+    "file-box": "^0.10.6",
     "wechaty-puppet": "^0.18.3"
   },
   "homepage": "https://github.com/Chatie/wechaty-puppet-puppeteer#readme",
