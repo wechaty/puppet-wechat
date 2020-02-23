@@ -9,6 +9,11 @@ else
   NPM_TAG=next
 fi
 
+#
+# Huan(202002): Lock NPM TAG for branch
+#
+NPM_TAG=^0.18.3
+
 npm run dist
 npm run pack
 
