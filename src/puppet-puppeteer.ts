@@ -327,6 +327,33 @@ export class PuppetPuppeteer extends Puppet {
     return this.bridge
   }
 
+  private async getBaseRequest (): Promise<any> {
+    try {
+      const json = await this.bridge.getBaseRequest()
+      const obj = JSON.parse(json)
+      return obj.BaseRequest
+    } catch (e) {
+      log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
+      throw e
+    }
+  }
+
+  public unref (): void {
+    log.verbose('PuppetPuppeteer', 'unref ()')
+    super.unref()
+
+    if (this.scanWatchdog) {
+      this.scanWatchdog.unref()
+    }
+
+    // TODO: unref() the puppeteer
+  }
+
+  /**
+   *
+   * Message
+   *
+   */
   public async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
     const rawPayload = await this.bridge.getMessage(id)
     return rawPayload
@@ -340,6 +367,14 @@ export class PuppetPuppeteer extends Puppet {
     const payload = messageRawPayloadParser(rawPayload)
 
     return payload
+  }
+
+  public async messageContact (messageId: string): Promise<string> {
+    return throwUnsupportedError(messageId)
+  }
+
+  public async messageRecall (messageId: string): Promise<boolean> {
+    return throwUnsupportedError(messageId)
   }
 
   public async messageFile (messageId: string): Promise<FileBox> {
@@ -1059,6 +1094,14 @@ export class PuppetPuppeteer extends Puppet {
     }
   }
 
+  public async friendshipSearchPhone (phone: string): Promise<null | string> {
+    throw throwUnsupportedError(phone)
+  }
+
+  public async friendshipSearchWeixin (weixin: string): Promise<null | string> {
+    throw throwUnsupportedError(weixin)
+  }
+
   public async friendshipAdd (
     contactId : string,
     hello     : string,
@@ -1599,26 +1642,25 @@ export class PuppetPuppeteer extends Puppet {
     throw new Error('not support')
   }
 
-  private async getBaseRequest (): Promise<any> {
-    try {
-      const json = await this.bridge.getBaseRequest()
-      const obj = JSON.parse(json)
-      return obj.BaseRequest
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
-      throw e
-    }
+  /**
+   *
+   * Tag
+   *
+   */
+  public async tagContactAdd (tagId: string, contactId: string): Promise<void> {
+    return throwUnsupportedError(tagId, contactId)
   }
 
-  public unref (): void {
-    log.verbose('PuppetPuppeteer', 'unref ()')
-    super.unref()
+  public async tagContactRemove (tagId: string, contactId: string): Promise<void> {
+    return throwUnsupportedError(tagId, contactId)
+  }
 
-    if (this.scanWatchdog) {
-      this.scanWatchdog.unref()
-    }
+  public async tagContactDelete (tagId: string) : Promise<void> {
+    return throwUnsupportedError(tagId)
+  }
 
-    // TODO: unref() the puppeteer
+  public async tagContactList (contactId?: string) : Promise<string[]> {
+    return throwUnsupportedError(contactId)
   }
 
 }
