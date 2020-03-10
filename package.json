@@ -77,7 +77,7 @@
     "puppeteer-extra-plugin-stealth": "^2.2.2",
     "qr-image": "^3.2.0",
     "request": "^2.87.0",
-    "rx-queue": "^0.8.1",
+    "rx-queue": "^0.9.3",
     "rxjs": "^6.2.1",
     "state-switch": "^0.6.2",
     "watchdog": "^0.8.15",
