@@ -104,7 +104,7 @@ async function onScan (
   const qrcode = payloadFromBrowser.url.replace(/\/qrcode\//, '/l/')
   const status = normalizeScanStatus(payloadFromBrowser.code)
 
-  this.emit('scan', qrcode, status)
+  this.emit('scan', { qrcode, status })
 }
 
 function onLog (data: any): void {
@@ -121,7 +121,7 @@ async function onLogin (
   const TTL_WAIT_MILLISECONDS = 1 * 1000
   if (ttl <= 0) {
     log.verbose('PuppetPuppeteerEvent', 'onLogin(%s) TTL expired')
-    this.emit('error', new Error('onLogin() TTL expired.'))
+    this.emit('error', { data: 'onLogin() TTL expired.' })
     return
   }
 
@@ -205,7 +205,7 @@ async function onMessage (
   switch (rawPayload.MsgType) {
 
     case WebMessageType.VERIFYMSG:
-      this.emit('friendship', rawPayload.MsgId)
+      this.emit('friendship', { friendshipId: rawPayload.MsgId })
       // firer.checkFriendRequest(rawPayload)
       break
 
@@ -227,7 +227,7 @@ async function onMessage (
       break
   }
 
-  this.emit('message', rawPayload.MsgId)
+  this.emit('message', { messageId: rawPayload.MsgId })
 }
 
 async function onUnload (this: PuppetPuppeteer): Promise<void> {

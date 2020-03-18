@@ -161,7 +161,7 @@ export class Firer {
 
     // this.puppet.cacheFriendRequestPayload.set(id, payloadConfirm)
 
-    this.puppet.emit('friendship', rawPayload.MsgId)
+    this.puppet.emit('friendship', { friendshipId: rawPayload.MsgId })
   }
 
   public async checkRoomJoin (
@@ -291,7 +291,12 @@ export class Firer {
         await this.puppet.roomPayload(roomId)
 
         const timestamp = Math.floor(Date.now() / 1000) // in seconds
-        this.puppet.emit('room-join', roomId, inviteeContactIdList, inviterContactId, timestamp)
+        this.puppet.emit('room-join', {
+          inviteeIdList : inviteeContactIdList,
+          inviterId     : inviterContactId,
+          roomId,
+          timestamp,
+        })
 
         return true
       }
@@ -357,7 +362,13 @@ export class Firer {
      * @huan 2018 May: we need to generilize the pattern for future usage.
      */
     const timestamp = Math.floor(Date.now() / 1000) // in seconds
-    this.puppet.emit('room-leave', roomId, [leaverContactId], removerContactId, timestamp)
+
+    this.puppet.emit('room-leave', {
+      removeeIdList : [leaverContactId],
+      removerId     : removerContactId,
+      roomId,
+      timestamp,
+    })
 
     setTimeout(async () => {
       await this.puppet.roomPayloadDirty(roomId)
@@ -398,7 +409,14 @@ export class Firer {
 
     try {
       const timestamp = Math.floor(Date.now() / 1000) // in seconds
-      this.puppet.emit('room-topic', roomId, topic, oldTopic, changerContactId, timestamp)
+
+      this.puppet.emit('room-topic', {
+        changerId : changerContactId,
+        newTopic  : topic,
+        oldTopic,
+        roomId,
+        timestamp,
+      })
       return true
     } catch (e) {
       log.error('PuppetPuppeteerFirer', 'fireRoomTopic() co exception: %s', e.stack)

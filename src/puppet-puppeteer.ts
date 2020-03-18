@@ -58,7 +58,6 @@ import {
 
   Puppet,
   PuppetOptions,
-  PuppetQRCodeScanEvent,
 
   RoomInvitationPayload,
   RoomMemberPayload,
@@ -68,6 +67,7 @@ import {
 
   UrlLinkPayload,
   ImageType,
+  EventScanPayload,
 }                           from 'wechaty-puppet'
 
 import {
@@ -115,7 +115,7 @@ export class PuppetPuppeteer extends Puppet {
 
   public bridge: Bridge
 
-  public scanPayload? : PuppetQRCodeScanEvent
+  public scanPayload? : EventScanPayload
   public scanWatchdog : Watchdog<ScanFoodType>
 
   private fileId: number
@@ -300,11 +300,11 @@ export class PuppetPuppeteer extends Puppet {
       throw e
     }
 
-    this.bridge.on('dong',      data => this.emit('dong', data))
+    this.bridge.on('dong',      (data: string) => this.emit('dong', { data }))
     // this.bridge.on('ding'     , Event.onDing.bind(this))
-    this.bridge.on('heartbeat', data => this.emit('watchdog', { data, type: 'bridge ding' }))
+    this.bridge.on('heartbeat', (data: string) => this.emit('watchdog', { data: data + 'bridge ding' }))
 
-    this.bridge.on('error',     e => this.emit('error', e))
+    this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && e.message) || String(e) }))
     this.bridge.on('log',       Event.onLog.bind(this))
     this.bridge.on('login',     Event.onLogin.bind(this))
     this.bridge.on('logout',    Event.onLogout.bind(this))
@@ -572,7 +572,7 @@ export class PuppetPuppeteer extends Puppet {
       throw e
     } finally {
       this.id = undefined
-      this.emit('logout', user)
+      this.emit('logout', { contactId: user, data: 'logout()' })
     }
   }
 
@@ -1156,7 +1156,7 @@ export class PuppetPuppeteer extends Puppet {
     }
 
     log.verbose('PuppetPuppeteer', 'readyStable() emit(ready)')
-    this.emit('ready')
+    this.emit('ready', { data: 'stable' })
   }
 
   /**
