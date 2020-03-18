@@ -143,6 +143,12 @@ export class PuppetPuppeteer extends Puppet {
   public async start (): Promise<void> {
     log.verbose('PuppetPuppeteer', `start() with ${this.memory.name}`)
 
+    if (this.state.on()) {
+      log.warn('PuppetPuppeteer', 'start() is called on a ON puppet. await ready(on) and return.')
+      await this.state.ready('on')
+      return
+    }
+
     this.state.on('pending')
 
     try {
