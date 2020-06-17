@@ -153,7 +153,13 @@ export class Bridge extends EventEmitter {
     let browser
 
     if (!this.options.stealthless) {
-      puppeteerExtra.use(stealthPlugin())
+      /**
+        * Puppeteer 4.0
+        *   https://github.com/berstend/puppeteer-extra/issues/211#issuecomment-636283110
+        */
+      const plugin = stealthPlugin()
+      plugin.onBrowser = () => {}
+      puppeteerExtra.use(plugin)
       browser = await puppeteerExtra.launch(options)
     } else {
       browser = await launch(options)

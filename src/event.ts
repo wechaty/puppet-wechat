@@ -61,7 +61,7 @@ function onDing (
   data: any,
 ): void {
   log.silly('PuppetPuppeteerEvent', 'onDing(%s)', data)
-  this.emit('watchdog', { data })
+  this.emit('heartbeat', { data })
 }
 
 async function onScan (
@@ -99,7 +99,7 @@ async function onScan (
     data: payloadFromBrowser,
     type: 'scan',
   }
-  this.emit('watchdog', food)
+  this.emit('heartbeat', food)
 
   const qrcode = payloadFromBrowser.url.replace(/\/qrcode\//, '/l/')
   const status = normalizeScanStatus(payloadFromBrowser.code)

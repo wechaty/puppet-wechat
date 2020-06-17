@@ -177,13 +177,13 @@ export class PuppetPuppeteer extends Puppet {
         data: 'inited',
         timeout: 2 * 60 * 1000, // 2 mins for first login
       }
-      this.emit('watchdog', food)
+      this.emit('heartbeat', food)
 
       /**
        * Save cookie for every 5 minutes
        */
       const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
-      this.on('watchdog', data => throttleQueue.next(data))
+      this.on('heartbeat', data => throttleQueue.next(data))
       throttleQueue.subscribe(async (data: any) => {
         log.verbose('PuppetPuppeteer', 'start() throttleQueue.subscribe() new item: %s', data)
         await this.saveCookie()
@@ -203,6 +203,41 @@ export class PuppetPuppeteer extends Puppet {
 
       throw e
     }
+  }
+
+  public async stop (): Promise<void> {
+    log.verbose('PuppetPuppeteer', 'stop()')
+
+    if (this.state.off()) {
+      log.warn('PuppetPuppeteer', 'stop() is called on a OFF puppet. await ready(off) and return.')
+      await this.state.ready('off')
+      return
+    }
+    this.state.off('pending')
+
+    log.verbose('PuppetPuppeteer', 'stop() make watchdog sleep before do stop')
+
+    /**
+     * Clean listeners for `watchdog`
+     */
+    // this.watchdog.sleep()
+    this.scanWatchdog.sleep()
+    // this.watchdog.removeAllListeners()
+    this.scanWatchdog.removeAllListeners()
+    this.removeAllListeners('watchdog')
+
+    try {
+      await this.bridge.stop()
+      // register the removeListeners micro task at then end of the task queue
+      setImmediate(() => this.bridge.removeAllListeners())
+    } catch (e) {
+      log.error('PuppetPuppeteer', 'this.bridge.quit() exception: %s', e.message)
+      throw e
+    } finally {
+      this.state.off(true)
+      // this.emit('stop')
+    }
+
   }
 
   /**
@@ -262,41 +297,6 @@ export class PuppetPuppeteer extends Puppet {
     })
   }
 
-  public async stop (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'stop()')
-
-    if (this.state.off()) {
-      log.warn('PuppetPuppeteer', 'stop() is called on a OFF puppet. await ready(off) and return.')
-      await this.state.ready('off')
-      return
-    }
-    this.state.off('pending')
-
-    log.verbose('PuppetPuppeteer', 'stop() make watchdog sleep before do stop')
-
-    /**
-     * Clean listeners for `watchdog`
-     */
-    // this.watchdog.sleep()
-    this.scanWatchdog.sleep()
-    // this.watchdog.removeAllListeners()
-    this.scanWatchdog.removeAllListeners()
-    this.removeAllListeners('watchdog')
-
-    try {
-      await this.bridge.stop()
-      // register the removeListeners micro task at then end of the task queue
-      setImmediate(() => this.bridge.removeAllListeners())
-    } catch (e) {
-      log.error('PuppetPuppeteer', 'this.bridge.quit() exception: %s', e.message)
-      throw e
-    } finally {
-      this.state.off(true)
-      // this.emit('stop')
-    }
-
-  }
-
   private async initBridge (): Promise<Bridge> {
     log.verbose('PuppetPuppeteer', 'initBridge()')
 
@@ -308,7 +308,7 @@ export class PuppetPuppeteer extends Puppet {
 
     this.bridge.on('dong',      (data: string) => this.emit('dong', { data }))
     // this.bridge.on('ding'     , Event.onDing.bind(this))
-    this.bridge.on('heartbeat', (data: string) => this.emit('watchdog', { data: data + 'bridge ding' }))
+    this.bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
 
     this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && e.message) || String(e) }))
     this.bridge.on('log',       Event.onLog.bind(this))
