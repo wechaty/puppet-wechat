@@ -148,6 +148,8 @@ export class Bridge extends EventEmitter {
       headless,
     }
 
+    log.verbose('PuppetPuppeteerBridge', 'initBrowser() with options=%s', JSON.stringify(options))
+
     let browser
 
     if (!this.options.stealthless) {
