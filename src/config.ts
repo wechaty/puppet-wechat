@@ -3,10 +3,9 @@
 import { OperationOptions } from 'retry'
 
 import {
-  // Brolog,
+  FileBox,
   log,
-}                   from 'brolog'
-import { FileBox }  from 'wechaty-puppet'
+}                  from 'wechaty-puppet'
 import qrImage      from 'qr-image'
 
 import { VERSION } from './version'
