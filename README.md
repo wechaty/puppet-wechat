@@ -4,8 +4,7 @@
 [![NPM Version](https://badge.fury.io/js/wechaty-puppet-puppeteer.svg)](https://badge.fury.io/js/wechaty-puppet-puppeteer)
 [![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-puppeteer/next.svg)](https://www.npmjs.com/package/wechaty-puppet-puppeteer?activeTab=versions)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-[![Linux/Mac Build Status](https://travis-ci.com/Chatie/wechaty-puppet-puppeteer.svg?branch=master)](https://travis-ci.com/Chatie/wechaty-puppet-puppeteer)
-[![Greenkeeper badge](https://badges.greenkeeper.io/Chatie/wechaty-puppet-puppeteer.svg)](https://greenkeeper.io/)
+[![NPM](https://github.com/wechaty/wechaty-puppet-puppeteer/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-puppeteer/actions?query=workflow%3ANPM)
 
 [![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-puppeteer/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-puppeteer)
 
@@ -85,14 +84,16 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### v0.15 master
+### v0.22 (Jun 18, 2020)
 
-### v0.14 Aug 2018
+Release a version before upgrade.
+
+### v0.14 (Aug, 2018)
 
 1. First Stable Release
 1. Follow latest typings
 
-### v0.2 May 2018
+### v0.2 (May, 2018)
 
 1. Promote to solo package: `wechaty-puppet-puppeteer`
 
