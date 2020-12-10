@@ -154,7 +154,7 @@ test('page.exposeFunction()', async t => {
   const spy = sinon.spy()
 
   await page.exposeFunction('nodeFunc', spy)
-  await page.evaluate(`nodeFunc(42)`)
+  await page.evaluate('nodeFunc(42)')
   t.ok(spy.calledOnce, 'should be called once inside browser')
   t.equal(spy.firstCall.args[0], 42, 'should be called with 42')
 

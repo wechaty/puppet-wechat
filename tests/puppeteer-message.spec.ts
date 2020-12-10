@@ -57,9 +57,11 @@ class PuppetTest extends PuppetPuppeteer {
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
+
   public roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
+
   public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
@@ -132,7 +134,7 @@ test('ready()', async t => {
 
   // Mock
   function mockContactRawPayload (id: string) {
-    log.silly('TestMessage', `mocked getContact(%s)`, id)
+    log.silly('TestMessage', 'mocked getContact(%s)', id)
     return new Promise<any>(resolve => {
       let obj = {}
       switch (id) {
@@ -149,7 +151,7 @@ test('ready()', async t => {
           }
           break
         default:
-          log.error('TestMessage', `mocked getContact(%s) unknown`, id)
+          log.error('TestMessage', 'mocked getContact(%s) unknown', id)
           t.fail(`mocked getContact(${id}) unknown`)
           break
       }

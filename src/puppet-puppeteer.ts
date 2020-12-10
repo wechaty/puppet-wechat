@@ -783,8 +783,8 @@ export class PuppetPuppeteer extends Puppet {
           const currLength = (rawPayload.MemberList && rawPayload.MemberList.length) || 0
 
           log.silly('PuppetPuppeteer',
-            `roomPayload() this.bridge.getContact(%s) `
-              + `MemberList.length:(prev:%d, curr:%d) at ttl:%d`,
+            'roomPayload() this.bridge.getContact(%s) '
+              + 'MemberList.length:(prev:%d, curr:%d) at ttl:%d',
             id,
             prevLength,
             currLength,
@@ -792,7 +792,7 @@ export class PuppetPuppeteer extends Puppet {
           )
 
           if (prevLength === currLength) {
-            log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d`,
+            log.silly('PuppetPuppeteer', 'roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d',
               this.id,
               ttl,
               currLength,
@@ -1049,7 +1049,7 @@ export class PuppetPuppeteer extends Puppet {
     const timestamp = Math.floor(Date.now() / 1000) // in seconds
 
     switch (rawPayload.MsgType) {
-      case WebMessageType.VERIFYMSG:
+      case WebMessageType.VERIFYMSG: {
         if (!rawPayload.RecommendInfo) {
           throw new Error('no RecommendInfo')
         }
@@ -1068,8 +1068,8 @@ export class PuppetPuppeteer extends Puppet {
           type      : FriendshipType.Receive,
         }
         return payloadReceive
-
-      case WebMessageType.SYS:
+      }
+      case WebMessageType.SYS: {
         const payloadConfirm: FriendshipPayloadConfirm = {
           contactId : rawPayload.FromUserName,
           id        : rawPayload.MsgId,
@@ -1077,6 +1077,7 @@ export class PuppetPuppeteer extends Puppet {
           type      : FriendshipType.Confirm,
         }
         return payloadConfirm
+      }
       default:
         throw new Error('not supported friend request message raw payload')
     }
@@ -1262,10 +1263,11 @@ export class PuppetPuppeteer extends Puppet {
               url = rawPayload.Url
               break
 
-            default:
+            default: {
               const e = new Error('ready() unsupported typeApp(): ' + rawPayload.AppMsgType)
               log.warn('PuppeteerMessage', e.message)
               throw e
+            }
           }
           break
 
@@ -1472,8 +1474,8 @@ export class PuppetPuppeteer extends Puppet {
       uploadMediaRequest.AESKey    = ret.AESKey
       mediaData.Signature          = ret.Signature
     } else {
-      delete uploadMediaRequest.Signature
-      delete uploadMediaRequest.AESKey
+      delete (uploadMediaRequest as any).Signature
+      delete (uploadMediaRequest as any).AESKey
     }
 
     log.verbose('PuppetPuppeteer', 'uploadMedia() webwx_data_ticket: %s', webwxDataTicket)
@@ -1491,7 +1493,7 @@ export class PuppetPuppeteer extends Puppet {
 
     const bufferData = []
     for (let i = 0; i < chunks; i++) {
-      let tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
+      const tempBuffer = buffer.slice(i * BASE_LENGTH, (i + 1) * BASE_LENGTH)
       bufferData.push(tempBuffer)
     }
 

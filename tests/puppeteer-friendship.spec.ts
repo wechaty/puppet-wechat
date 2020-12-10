@@ -46,9 +46,11 @@ class PuppetTest extends PuppetPuppeteer {
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
+
   public roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
+
   public messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }

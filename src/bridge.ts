@@ -253,7 +253,7 @@ export class Bridge extends EventEmitter {
     log.verbose('PuppetPuppeteerBridge', 'readyAngular()')
 
     try {
-      await page.waitForFunction(`typeof window.angular !== 'undefined'`)
+      await page.waitForFunction("typeof window.angular !== 'undefined'")
     } catch (e) {
       log.verbose('PuppetPuppeteerBridge', 'readyAngular() exception: %s', e)
 
@@ -932,7 +932,7 @@ export class Bridge extends EventEmitter {
     // See: https://github.com/GoogleChrome/puppeteer/blob/v1.1.0/docs/api.md#pagexexpression
 
     const XPATH_SELECTOR
-      = `//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']`
+      = "//div[contains(@class,'association') and contains(@class,'show')]/a[@ng-click='qrcodeLogin()']"
 
     try {
       // const [button] = await listXpath(page, XPATH_SELECTOR)

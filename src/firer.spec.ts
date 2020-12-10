@@ -45,12 +45,12 @@ test('parseFriendConfirm()', async (t) => {
       '李卓桓',
     ],
     [
-      `johnbassserver@gmail.com just added you to his/her contacts list. Send a message to him/her now!`,
-      `johnbassserver@gmail.com`,
+      'johnbassserver@gmail.com just added you to his/her contacts list. Send a message to him/her now!',
+      'johnbassserver@gmail.com',
     ],
     [
-      `johnbassserver@gmail.com刚刚把你添加到通讯录，现在可以开始聊天了。`,
-      `johnbassserver@gmail.com`,
+      'johnbassserver@gmail.com刚刚把你添加到通讯录，现在可以开始聊天了。',
+      'johnbassserver@gmail.com',
     ],
   ]
   let result: boolean
@@ -69,53 +69,53 @@ test('parseFriendConfirm()', async (t) => {
 test('parseRoomJoin()', async (t) => {
   const contentList: Array<[string, string, string[]]> = [
     [
-      `You invited 管理员 to the group chat.   `,
-      `You`,
-      [`管理员`],
+      'You invited 管理员 to the group chat.   ',
+      'You',
+      ['管理员'],
     ],
     [
-      `You invited 李卓桓.PreAngel、Bruce LEE to the group chat.   `,
-      `You`,
-      [`李卓桓.PreAngel`, `Bruce LEE`],
+      'You invited 李卓桓.PreAngel、Bruce LEE to the group chat.   ',
+      'You',
+      ['李卓桓.PreAngel', 'Bruce LEE'],
     ],
     [
-      `管理员 invited 小桔建群助手 to the group chat`,
-      `管理员`,
-      [`小桔建群助手`],
+      '管理员 invited 小桔建群助手 to the group chat',
+      '管理员',
+      ['小桔建群助手'],
     ],
     [
-      `管理员 invited 庆次、小桔妹 to the group chat`,
-      `管理员`,
+      '管理员 invited 庆次、小桔妹 to the group chat',
+      '管理员',
       ['庆次', '小桔妹'],
     ],
     [
-      `你邀请"管理员"加入了群聊  `,
-      `你`,
+      '你邀请"管理员"加入了群聊  ',
+      '你',
       ['管理员'],
     ],
     [
-      `"管理员"邀请"宁锐锋"加入了群聊`,
-      `管理员`,
+      '"管理员"邀请"宁锐锋"加入了群聊',
+      '管理员',
       ['宁锐锋'],
     ],
     [
-      `"管理员"通过扫描你分享的二维码加入群聊  `,
-      `你`,
+      '"管理员"通过扫描你分享的二维码加入群聊  ',
+      '你',
       ['管理员'],
     ],
     [
-      `" 桔小秘"通过扫描"李佳芮"分享的二维码加入群聊`,
-      `李佳芮`,
+      '" 桔小秘"通过扫描"李佳芮"分享的二维码加入群聊',
+      '李佳芮',
       ['桔小秘'],
     ],
     [
-      `"管理员" joined group chat via the QR code you shared.  `,
-      `you`,
+      '"管理员" joined group chat via the QR code you shared.  ',
+      'you',
       ['管理员'],
     ],
     [
-      `"宁锐锋" joined the group chat via the QR Code shared by "管理员".`,
-      `管理员`,
+      '"宁锐锋" joined the group chat via the QR Code shared by "管理员".',
+      '管理员',
       ['宁锐锋'],
     ],
   ]
@@ -138,8 +138,8 @@ test('parseRoomJoin()', async (t) => {
 test('parseRoomLeave()', async (t) => {
   const contentLeaverList = [
     [
-      `You removed "Bruce LEE" from the group chat`,
-      `Bruce LEE`,
+      'You removed "Bruce LEE" from the group chat',
+      'Bruce LEE',
     ],
     [
       '你将"李佳芮"移出了群聊',
@@ -149,8 +149,8 @@ test('parseRoomLeave()', async (t) => {
 
   const contentRemoverList = [
     [
-      `You were removed from the group chat by "桔小秘"`,
-      `桔小秘`,
+      'You were removed from the group chat by "桔小秘"',
+      '桔小秘',
     ],
     [
       '你被"李佳芮"移出群聊',
@@ -180,9 +180,9 @@ test('parseRoomLeave()', async (t) => {
 test('parseRoomTopic()', async (t) => {
   const contentList = [
     [
-      `"李卓桓.PreAngel" changed the group name to "ding"`,
-      `李卓桓.PreAngel`,
-      `ding`,
+      '"李卓桓.PreAngel" changed the group name to "ding"',
+      '李卓桓.PreAngel',
+      'ding',
     ],
     [
       '"李佳芮"修改群名为“dong”',

@@ -470,7 +470,7 @@ export class Firer {
      * 管理员 invited 庆次、小桔妹 to the group chat
      * "管理员"通过扫描你分享的二维码加入群聊
      */
-    const [inviter, inviteeStr] = foundInvite ? [ foundInvite[1], foundInvite[2] ] : [ foundQrcode[2], foundQrcode[1] ]
+    const [inviter, inviteeStr] = foundInvite ? [foundInvite[1], foundInvite[2]] : [foundQrcode[2], foundQrcode[1]]
 
     // FIXME: should also compatible english split
     const inviteeList = inviteeStr.split(/、/)

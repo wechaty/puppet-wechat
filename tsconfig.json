@@ -19,6 +19,7 @@
     "examples/**/*.ts",
     "scripts/**/*.ts",
     "src/**/*.ts",
+    "src/wechaty-bro.js",
     "tests/**/*.spec.ts",
   ],
 }
