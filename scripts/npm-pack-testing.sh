@@ -39,7 +39,7 @@ npm install *-*.*.*.tgz \
 ./node_modules/.bin/tsc \
   --esModuleInterop \
   --lib dom,esnext \
-  --skipLib \
+  --skipLibCheck \
   --noEmitOnError \
   --noImplicitAny \
   --target es6 \
