@@ -101,7 +101,7 @@
   }
 
   function heartBeat (firstTime) {
-    var TIMEOUT = 15000 // 15s
+    const TIMEOUT = 15000 // 15s
     if (firstTime && WechatyBro.vars.heartBeatTimmer) {
       log('heartBeat timer exist when 1st time is true? return for do nothing')
       return
@@ -112,27 +112,27 @@
   }
 
   function glueToAngular () {
-    var injector  = angular.element(document).injector()
+    const injector  = angular.element(document).injector()
     if (!injector) {
       throw new Error('glueToAngular cant get injector(right now)')
     }
-    var accountFactory  = injector.get('accountFactory')
+    const accountFactory  = injector.get('accountFactory')
     // var appFactory      = injector.get('appFactory')
-    var chatroomFactory = injector.get('chatroomFactory')
-    var chatFactory     = injector.get('chatFactory')
-    var contactFactory  = injector.get('contactFactory')
-    var confFactory     = injector.get('confFactory')
-    var emojiFactory    = injector.get('emojiFactory')
-    var loginFactory    = injector.get('loginFactory')
-    var utilFactory     = injector.get('utilFactory')
+    const chatroomFactory = injector.get('chatroomFactory')
+    const chatFactory     = injector.get('chatFactory')
+    const contactFactory  = injector.get('contactFactory')
+    const confFactory     = injector.get('confFactory')
+    const emojiFactory    = injector.get('emojiFactory')
+    const loginFactory    = injector.get('loginFactory')
+    const utilFactory     = injector.get('utilFactory')
 
-    var http            = injector.get('$http')
-    var state           = injector.get('$state')
-    var mmHttp          = injector.get('mmHttp')
+    const http            = injector.get('$http')
+    const state           = injector.get('$state')
+    const mmHttp          = injector.get('mmHttp')
 
-    var appScope    = angular.element('[ng-controller="appController"]').scope()
-    var rootScope   = injector.get('$rootScope')
-    var loginScope  = angular.element('[ng-controller="loginController"]').scope()
+    const appScope    = angular.element('[ng-controller="appController"]').scope()
+    const rootScope   = injector.get('$rootScope')
+    const loginScope  = angular.element('[ng-controller="loginController"]').scope()
 
     /*
     // method 1
@@ -161,7 +161,7 @@
      * generate $scope with a contoller (as it is not assigned in html staticly)
      * https://github.com/angular/angular.js/blob/a4e60cb6970d8b6fa9e0af4b9f881ee3ba7fdc99/test/ng/controllerSpec.js#L24
      */
-    var contentChatScope  = rootScope.$new()
+    const contentChatScope  = rootScope.$new()
     injector.get('$controller')('contentChatController', { $scope: contentChatScope })
 
     // get all we need from wx in browser(angularjs)
@@ -211,8 +211,8 @@
     // 408: 未确认（显示二维码后30秒触发）
     // 201: 扫描，未确认
     // 200: 登录成功
-    var code  = +loginScope.code
-    var url   =  loginScope.qrcodeUrl
+    const code  = +loginScope.code
+    const url   =  loginScope.qrcodeUrl
     log('checkScan() code:' + code + ' url:' + url + ' scanCode:' + WechatyBro.vars.scanCode)
 
     if (url && code !== WechatyBro.vars.scanCode) {
@@ -274,8 +274,8 @@
   }
 
   function hookEvents () {
-    var rootScope = WechatyBro.glue.rootScope
-    var appScope = WechatyBro.glue.appScope
+    const rootScope = WechatyBro.glue.rootScope
+    const appScope = WechatyBro.glue.appScope
     if (!rootScope || !appScope) {
       log('hookEvents() no rootScope')
       return false
@@ -302,24 +302,24 @@
   }
 
   function hookRecalledMsgProcess () {
-    var chatFactory = WechatyBro.glue.chatFactory
-    var utilFactory = WechatyBro.glue.utilFactory
-    var confFactory = WechatyBro.glue.confFactory
+    const chatFactory = WechatyBro.glue.chatFactory
+    const utilFactory = WechatyBro.glue.utilFactory
+    const confFactory = WechatyBro.glue.confFactory
 
     // hook chatFactory._recalledMsgProcess, resolve emit RECALLED type msg
-    var oldRecalledMsgProcess = chatFactory._recalledMsgProcess
+    const oldRecalledMsgProcess = chatFactory._recalledMsgProcess
     chatFactory._recalledMsgProcess = function (msg) {
       try {
         oldRecalledMsgProcess.call(chatFactory, msg)
       } catch (e) {
         log('call oldRecalledMsgProcess failed:' + e.message)
       }
-      var m = Object.assign({}, msg)
-      var content = utilFactory.htmlDecode(m.MMActualContent)
+      const m = Object.assign({}, msg)
+      let content = utilFactory.htmlDecode(m.MMActualContent)
       content = utilFactory.encodeEmoji(content)
       // remove <br/> here
       content = content.replace(/<br.*?\/>/g, '')
-      var revokemsg = utilFactory.xml2json(content).revokemsg
+      const revokemsg = utilFactory.xml2json(content).revokemsg
       if (revokemsg.msgid) {
         // add recalled message
         m.MsgType = confFactory.MSGTYPE_RECALLED
@@ -336,29 +336,29 @@
    *  getMsgImg(message.MsgId,'big',message)
    */
   function getMsgImg (id, type, message) {
-    var contentChatScope = WechatyBro.glue.contentChatScope
+    const contentChatScope = WechatyBro.glue.contentChatScope
     if (!contentChatScope) {
       throw new Error('getMsgImg() contentChatScope not found')
     }
-    var path = contentChatScope.getMsgImg(id, type, message)
+    const path = contentChatScope.getMsgImg(id, type, message)
     return window.location.origin + path
     // https://wx.qq.com/?&lang=en_US/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=4520385745174034093&skey=%40crypt_f9cec94b_a3aa5c868466d81bc518293eb292926e
     // https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=8454987316459381112&skey=%40crypt_f9cec94b_bd210b2224f217afeab8d462af70cf53
   }
 
   function getMsgEmoticon (id) {
-    var chatFactory = WechatyBro.glue.chatFactory
+    const chatFactory = WechatyBro.glue.chatFactory
 
-    var message = chatFactory.getMsg(id)
+    const message = chatFactory.getMsg(id)
     return message.MMPreviewSrc || getMsgImg(message.MsgId, 'big', message)  || message.MMThumbSrc
   }
 
   function getMsgVideo (id) {
-    var contentChatScope = WechatyBro.glue.contentChatScope
+    const contentChatScope = WechatyBro.glue.contentChatScope
     if (!contentChatScope) {
       throw new Error('getMsgVideo() contentChatScope not found')
     }
-    var path = contentChatScope.getMsgVideo(id)
+    const path = contentChatScope.getMsgVideo(id)
     return window.location.origin + path
   }
 
@@ -366,43 +366,43 @@
    * from playVoice()
    */
   function getMsgVoice (id) {
-    var confFactory     = WechatyBro.glue.confFactory
-    var accountFactory  = WechatyBro.glue.accountFactory
+    const confFactory     = WechatyBro.glue.confFactory
+    const accountFactory  = WechatyBro.glue.accountFactory
 
-    var path = confFactory.API_webwxgetvoice + '?msgid=' + id + '&skey=' + accountFactory.getSkey()
+    const path = confFactory.API_webwxgetvoice + '?msgid=' + id + '&skey=' + accountFactory.getSkey()
     return window.location.origin + path
   }
 
   function getMsgPublicLinkImg (id) {
-    var path = '/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg?url=xxx&msgid=' + id + '&pictype=location'
+    const path = '/cgi-bin/mmwebwx-bin/webwxgetpubliclinkimg?url=xxx&msgid=' + id + '&pictype=location'
     return window.location.origin + path
   }
 
   function getBaseRequest () {
-    var accountFactory = WechatyBro.glue.accountFactory
-    var BaseRequest = accountFactory.getBaseRequest()
+    const accountFactory = WechatyBro.glue.accountFactory
+    const BaseRequest = accountFactory.getBaseRequest()
 
     return JSON.stringify(BaseRequest)
   }
 
   function getPassticket () {
-    var accountFactory = WechatyBro.glue.accountFactory
+    const accountFactory = WechatyBro.glue.accountFactory
     return accountFactory.getPassticket()
   }
 
   function getCheckUploadUrl () {
-    var confFactory = WechatyBro.glue.confFactory
+    const confFactory = WechatyBro.glue.confFactory
     return confFactory.API_checkupload
   }
 
   function getUploadMediaUrl () {
-    var confFactory = WechatyBro.glue.confFactory
+    const confFactory = WechatyBro.glue.confFactory
     return confFactory.API_webwxuploadmedia
   }
 
   function sendMedia (data) {
-    var chatFactory = WechatyBro.glue.chatFactory
-    var confFactory = WechatyBro.glue.confFactory
+    const chatFactory = WechatyBro.glue.chatFactory
+    const confFactory = WechatyBro.glue.confFactory
 
     if (!chatFactory || !confFactory) {
       log('sendMedia() chatFactory or confFactory not exist.')
@@ -410,7 +410,7 @@
     }
 
     try {
-      var d = {
+      const d = {
         ToUserName: data.ToUserName,
         MediaId: data.MediaId,
         MsgType: data.MsgType,
@@ -423,7 +423,7 @@
         d.Signature = data.Signature
       }
 
-      var m = chatFactory.createMessage(d)
+      const m = chatFactory.createMessage(d)
 
       m.MMFileStatus = confFactory.MM_SEND_FILE_STATUS_SUCCESS
       m.MMStatus = confFactory.MSG_SEND_STATUS_SUCC
@@ -439,8 +439,8 @@
   }
 
   function forward (baseData, patchData) {
-    var chatFactory = WechatyBro.glue.chatFactory
-    var confFactory = WechatyBro.glue.confFactory
+    const chatFactory = WechatyBro.glue.chatFactory
+    const confFactory = WechatyBro.glue.confFactory
 
     if (!chatFactory || !confFactory) {
       log('forward() chatFactory or confFactory not exist.')
@@ -448,7 +448,7 @@
     }
 
     try {
-      var m = chatFactory.createMessage(baseData)
+      let m = chatFactory.createMessage(baseData)
 
       // Need to override the parametes after called createMessage()
       m = Object.assign(m, patchData)
@@ -463,15 +463,15 @@
   }
 
   function send (ToUserName, Content) {
-    var chatFactory = WechatyBro.glue.chatFactory
-    var confFactory = WechatyBro.glue.confFactory
+    const chatFactory = WechatyBro.glue.chatFactory
+    const confFactory = WechatyBro.glue.confFactory
 
     if (!chatFactory || !confFactory) {
       log('send() chatFactory or confFactory not exist.')
       return false
     }
     try {
-      var m = chatFactory.createMessage({
+      const m = chatFactory.createMessage({
         ToUserName: ToUserName,
         Content:    Content,
         MsgType:    confFactory.MSGTYPE_TEXT,
@@ -486,18 +486,18 @@
   }
 
   function getMessage (id) {
-    var chatFactory = WechatyBro.glue.chatFactory
+    const chatFactory = WechatyBro.glue.chatFactory
     if (!chatFactory) {
       log('chatFactory not inited')
       return null
     }
-    var msg = chatFactory.getMsg(id)
+    const msg = chatFactory.getMsg(id)
 
     if (!msg) {
       return null
     }
 
-    var msgWithoutFunction = {}
+    const msgWithoutFunction = {}
     Object.keys(msg).forEach(function (k) {
       if (typeof msg[k] !== 'function') {
         msgWithoutFunction[k] = msg[k]
@@ -507,13 +507,13 @@
   }
 
   function getContact (id) {
-    var contactFactory = WechatyBro.glue.contactFactory
+    const contactFactory = WechatyBro.glue.contactFactory
     if (!contactFactory) {
       log('contactFactory not inited')
       return null
     }
-    var contact = contactFactory.getContact(id)
-    var contactWithoutFunction = {}
+    let contact = contactFactory.getContact(id)
+    let contactWithoutFunction = {}
 
     if (contact) {
       if (contact.isContact) {
@@ -564,14 +564,14 @@
     if (!WechatyBro.loginState()) {
       return null
     }
-    var accountFactory = WechatyBro.glue.accountFactory
+    const accountFactory = WechatyBro.glue.accountFactory
     return accountFactory
       ? accountFactory.getUserName()
       : null
   }
 
   function contactList () {
-    var contactFactory = WechatyBro.glue.contactFactory
+    const contactFactory = WechatyBro.glue.contactFactory
 
     return new Promise(resolve => retryFind(0, resolve))
 
@@ -581,7 +581,7 @@
     function retryFind (attempt, done) {
       attempt = attempt || 0
 
-      var contactIdList = contactFactory
+      const contactIdList = contactFactory
         .getAllFriendContact()
         .map(c => c.UserName)
 
@@ -601,15 +601,15 @@
       remark = ''
     }
 
-    var contact = _contacts[UserName]
+    const contact = _contacts[UserName]
     if (!contact) {
       throw new Error('contactRemark() can not found UserName ' + UserName)
     }
 
-    var accountFactory  = WechatyBro.glue.accountFactory
-    var confFactory     = WechatyBro.glue.confFactory
-    var emojiFactory    = WechatyBro.glue.emojiFactory
-    var mmHttp          = WechatyBro.glue.mmHttp
+    const accountFactory  = WechatyBro.glue.accountFactory
+    const confFactory     = WechatyBro.glue.confFactory
+    const emojiFactory    = WechatyBro.glue.emojiFactory
+    const mmHttp          = WechatyBro.glue.mmHttp
 
     return new Promise(resolve => {
       mmHttp({
@@ -638,7 +638,7 @@
 
   // function roomFind(filterFunction) {
   function roomList () {
-    var contactFactory = WechatyBro.glue.contactFactory
+    const contactFactory = WechatyBro.glue.contactFactory
 
     // var match
     // if (!filterFunction) {
@@ -653,19 +653,19 @@
   }
 
   function roomDelMember (ChatRoomName, UserName) {
-    var chatroomFactory = WechatyBro.glue.chatroomFactory
+    const chatroomFactory = WechatyBro.glue.chatroomFactory
     return chatroomFactory.delMember(ChatRoomName, UserName)
   }
 
   function roomAddMember (ChatRoomName, UserName) {
-    var chatroomFactory = WechatyBro.glue.chatroomFactory
+    const chatroomFactory = WechatyBro.glue.chatroomFactory
     // log(ChatRoomName)
     // log(UserName)
 
     return new Promise(resolve => {
       // There's no return value of addMember :(
       // https://github.com/wechaty/webwx-app-tracker/blob/f22cb043ff4201ee841990dbeb59e22643092f92/formatted/webwxApp.js#L2404-L2413
-      var timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         log('roomAddMember() timeout')
         // TODO change to reject here. (BREAKING CHANGES)
         return resolve(0)
@@ -679,15 +679,15 @@
   }
 
   function roomModTopic (ChatRoomName, topic) {
-    var chatroomFactory = WechatyBro.glue.chatroomFactory
+    const chatroomFactory = WechatyBro.glue.chatroomFactory
     return chatroomFactory.modTopic(ChatRoomName, topic)
   }
 
   function roomCreate (UserNameList/* , topic */) {
-    var UserNameListArg = UserNameList.map(function (n) { return { UserName: n } })
+    const UserNameListArg = UserNameList.map(function (n) { return { UserName: n } })
 
-    var chatroomFactory = WechatyBro.glue.chatroomFactory
-    var state           = WechatyBro.glue.state
+    const chatroomFactory = WechatyBro.glue.chatroomFactory
+    const state           = WechatyBro.glue.state
 
     return new Promise(resolve => {
       chatroomFactory.create(UserNameListArg)
@@ -727,10 +727,10 @@
   function verifyUserRequest (UserName, VerifyContent) {
     VerifyContent = VerifyContent || ''
 
-    var contactFactory  = WechatyBro.glue.contactFactory
-    var confFactory     = WechatyBro.glue.confFactory
+    const contactFactory  = WechatyBro.glue.contactFactory
+    const confFactory     = WechatyBro.glue.confFactory
 
-    var Ticket = '' // what's this?
+    const Ticket = '' // what's this?
 
     return new Promise(resolve => {
       contactFactory.verifyUser({
@@ -754,8 +754,8 @@
   }
 
   function verifyUserOk (UserName, Ticket) {
-    var contactFactory  = WechatyBro.glue.contactFactory
-    var confFactory     = WechatyBro.glue.confFactory
+    const contactFactory  = WechatyBro.glue.contactFactory
+    const confFactory     = WechatyBro.glue.confFactory
 
     return new Promise(resolve => {
       contactFactory.verifyUser({
@@ -783,7 +783,7 @@
    * WechatyBro injectio must return this object.
    * PuppetPuppeteerBridge need this to decide if injection is successful.
    */
-  var retObj = {
+  const retObj = {
     code: 200, // 2XX ok, 4XX/5XX error. HTTP like
     message: 'any message',
   }
@@ -794,7 +794,7 @@
     return retObj
   }
 
-  var WechatyBro = {
+  const WechatyBro = {
     glue: {
       // will be initialized by glueToAngular() function
     },
