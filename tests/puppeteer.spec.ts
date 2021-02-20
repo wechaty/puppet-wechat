@@ -25,11 +25,14 @@ import fs    from 'fs'
 import path  from 'path'
 
 // tslint:disable:no-shadowed-variable
-import { test, sinon } from 'tstest'
 import {
-  Cookie,
+  test,
+  sinon,
+}             from 'tstest'
+import {
+  Protocol,
   launch,
-}                 from 'puppeteer'
+}             from 'puppeteer'
 
 const PUPPETEER_LAUNCH_OPTIONS = {
   args: [
@@ -222,16 +225,18 @@ test('other demos', async t => {
 
     // page.click(selector[, options])
     // await page.injectFile(path.join(__dirname, 'wechaty-bro.js'))
-    const cookieList = await page.cookies() as any as Cookie[]
+    const cookieList = await page.cookies()
     t.ok(cookieList.length,   'should get cookies')
     t.ok(cookieList[0].name,  'should get cookies with name')
 
-    const cookie: Cookie = {
+    const cookie: Protocol.Network.Cookie = {
       domain   : 'qq.com',
       expires  : 1234324132,
       httpOnly : false,
       name     : 'test-name',
       path     : '/',
+      priority: 'Medium',
+      sameParty: true,
       sameSite : 'Strict',
       secure   : false,
       session  : true,

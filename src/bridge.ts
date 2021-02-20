@@ -23,11 +23,12 @@ import fs               from 'fs'
 import path             from 'path'
 import {
   Browser,
-  Cookie,
+  ChromeArgOptions,
   Dialog,
   launch,
   LaunchOptions,
   Page,
+  Protocol,
 }                       from 'puppeteer'
 import puppeteerExtra   from 'puppeteer-extra'
 import stealthPlugin    from 'puppeteer-extra-plugin-stealth'
@@ -124,9 +125,9 @@ export class Bridge extends EventEmitter {
 
   public async initBrowser (): Promise<Browser> {
     log.verbose('PuppetPuppeteerBridge', 'initBrowser()')
-    const launchOptions : LaunchOptions = { ...this.options.launchOptions }
-    const headless                      = !(this.options.head)
-    const launchOptionsArgs             = launchOptions.args || []
+    const launchOptions     = { ...this.options.launchOptions } as LaunchOptions & ChromeArgOptions
+    const headless          = !(this.options.head)
+    const launchOptionsArgs = launchOptions.args || []
     if (this.options.endpoint) {
       launchOptions.executablePath = this.options.endpoint
     }
@@ -228,7 +229,7 @@ export class Bridge extends EventEmitter {
 
     page.on('dialog', this.onDialog.bind(this))
 
-    const cookieList = (await this.options.memory.get(MEMORY_SLOT)) as Cookie[]
+    const cookieList = (await this.options.memory.get(MEMORY_SLOT)) as Protocol.Network.Cookie[]
     const url        = this.entryUrl(cookieList)
 
     log.verbose('PuppetPuppeteerBridge', 'initPage() before page.goto(url)')
@@ -974,7 +975,7 @@ export class Bridge extends EventEmitter {
   public async cookies (cookieList: Cookie[]): Promise<void>
   public async cookies (): Promise<Cookie[]>
 
-  public async cookies (cookieList?: Cookie[]): Promise<void | Cookie[]> {
+  public async cookies (cookieList?: Protocol.Network.Cookie[]): Promise<void | Protocol.Network.Cookie[]> {
     if (!this.page) {
       throw new Error('no page')
     }
@@ -988,8 +989,7 @@ export class Bridge extends EventEmitter {
       }
       // RETURN
     } else {
-      // FIXME: puppeteer typing bug
-      cookieList = await this.page.cookies() as any as Cookie[]
+      cookieList = await this.page.cookies()
       return cookieList
     }
   }
@@ -997,7 +997,7 @@ export class Bridge extends EventEmitter {
   /**
    * name
    */
-  public entryUrl (cookieList?: Cookie[]): string {
+  public entryUrl (cookieList?: Protocol.Network.Cookie[]): string {
     log.verbose('PuppetPuppeteerBridge', 'cookieDomain(%s)', cookieList)
 
     const DEFAULT_URL = 'https://wx.qq.com'
@@ -1063,7 +1063,5 @@ export class Bridge extends EventEmitter {
 
 }
 
-export {
-  Cookie,
-}
+export type Cookie = Protocol.Network.Cookie
 export default Bridge
