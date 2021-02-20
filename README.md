@@ -84,6 +84,13 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
+### master
+
+### v0.24 (Feb 20, 2021)
+
+1. Puppeteer from v5 to v7
+1. Upgrade other deps
+
 ### v0.22 (Jun 18, 2020)
 
 Release a version before upgrade.
