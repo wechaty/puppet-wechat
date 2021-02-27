@@ -69,7 +69,7 @@ function onScan (payload: EventScanPayload) {
     // Generate a QR Code online via
     // http://goqr.me/api/doc/create-qr-code/
     const qrcodeImageUrl = [
-      'https://api.qrserver.com/v1/create-qr-code/?data=',
+      'https://wechaty.js.org/qrcode/',
       encodeURIComponent(payload.qrcode),
     ].join('')
 
