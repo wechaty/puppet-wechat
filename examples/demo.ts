@@ -73,9 +73,9 @@ function onScan (payload: EventScanPayload) {
       encodeURIComponent(payload.qrcode),
     ].join('')
 
-    console.info(`[${status}] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
+    console.info(`[${payload.status}] ${qrcodeImageUrl}\nScan QR Code above to log in: `)
   } else {
-    console.info(`[${status}]`)
+    console.info(`[${payload.status}]`)
   }
 }
 
