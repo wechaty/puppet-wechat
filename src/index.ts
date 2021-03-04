@@ -24,6 +24,6 @@ export {
 }              from './config'
 
 export {
-  PuppetWeChat as PuppetWeChat,
+  PuppetWeChat,
 }
 export default PuppetWeChat
