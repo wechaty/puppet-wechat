@@ -29,19 +29,19 @@ import {
 }                         from 'wechaty-puppet'
 
 import {
-  PuppetPuppeteer,
-}                         from '../src/puppet-puppeteer'
+  PuppetWeChat,
+}                         from '../src/puppet-wechat'
 import {
   WebMessageRawPayload,
 }                         from '../src/web-schemas'
 
 // class WechatyTest extends Wechaty {
-//   public initPuppetAccessory (puppet: PuppetPuppeteer) {
+//   public initPuppetAccessory (puppet: PuppetWeChat) {
 //     super.initPuppetAccessory(puppet)
 //   }
 // }
 
-class PuppetTest extends PuppetPuppeteer {
+class PuppetTest extends PuppetWeChat {
 
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
@@ -57,7 +57,7 @@ class PuppetTest extends PuppetPuppeteer {
 
 }
 
-test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
+test('PuppetWeChatFriendship.receive smoke testing', async (t) => {
   const puppet  = new PuppetTest()
   // const wechaty = new WechatyTest({ puppet })
   // wechaty.initPuppetAccessory(puppet)
@@ -105,7 +105,7 @@ test('PuppetPuppeteerFriendship.receive smoke testing', async (t) => {
   sandbox.restore()
 })
 
-test('PuppetPuppeteerFriendship.confirm smoke testing', async (t) => {
+test('PuppetWeChatFriendship.confirm smoke testing', async (t) => {
 
   const CONTACT_ID = 'contact-id'
 

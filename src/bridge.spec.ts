@@ -49,7 +49,7 @@ const PUPPETEER_LAUNCH_OPTIONS = {
   headless: true,
 }
 
-test('PuppetPuppeteerBridge', async (t) => {
+test('PuppetWeChatBridge', async (t) => {
   const memory = new MemoryCard()
   await memory.load()
 

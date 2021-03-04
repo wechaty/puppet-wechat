@@ -20,7 +20,7 @@
 /**
  * Wechaty - Wechat for Bot, and human who talk to bot.
  *
- * PuppetPuppeteer: WechatyBro
+ * PuppetWeChat: WechatyBro
  *
  * Inject this js code to browser,
  * in order to interactive with wechat web program.
@@ -781,7 +781,7 @@
 
   /*
    * WechatyBro injectio must return this object.
-   * PuppetPuppeteerBridge need this to decide if injection is successful.
+   * PuppetWeChatBridge need this to decide if injection is successful.
    */
   const retObj = {
     code: 200, // 2XX ok, 4XX/5XX error. HTTP like
@@ -815,7 +815,7 @@
 
     // funcs
     ding,   // simple return 'dong'
-    emit:   window.wechatyPuppetBridgeEmit,  // send event to PuppetPuppeteerBridge in Node.js
+    emit:   window.wechatyPuppetBridgeEmit,  // send event to PuppetWeChatBridge in Node.js
     init,   // initialize WechatyBro @ Browser
     log,    // log to Node.js
     logout, // logout current logined user

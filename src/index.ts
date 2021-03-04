@@ -16,7 +16,7 @@
  *   limitations under the License.
  *
  */
-import { PuppetPuppeteer }  from './puppet-puppeteer'
+import { PuppetWeChat }  from './puppet-wechat'
 
 export {
   VERSION,
@@ -24,6 +24,6 @@ export {
 }              from './config'
 
 export {
-  PuppetPuppeteer,
+  PuppetWeChat as PuppetWeChat,
 }
-export default PuppetPuppeteer
+export default PuppetWeChat

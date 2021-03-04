@@ -8,7 +8,7 @@
 // tslint:disable:no-console
 
 import {
-  PuppetPuppeteer,
+  PuppetWeChat,
   VERSION,
   log,
 }                   from 'wechaty-puppet-wechat'
@@ -20,7 +20,7 @@ async function main () {
     throw new Error('VERSION should not be 0.0.0 when publishing')
   }
 
-  const puppet = new PuppetPuppeteer()
+  const puppet = new PuppetWeChat()
   const future = new Promise(resolve => puppet.once('scan', resolve))
 
   await puppet.start()

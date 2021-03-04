@@ -27,12 +27,12 @@ import test  from 'blue-tape'
 // import sinon from 'sinon'
 
 import { Firer }            from './firer'
-import { PuppetPuppeteer }  from './puppet-puppeteer'
+import { PuppetWeChat }  from './puppet-wechat'
 
 const SELF_ID = 'self-id'
-const mockPuppetPuppeteer = {
+const mockPuppetWeChat = {
   selfId: () => SELF_ID,
-} as any as PuppetPuppeteer
+} as any as PuppetWeChat
 
 test('parseFriendConfirm()', async (t) => {
   const contentList = [
@@ -55,7 +55,7 @@ test('parseFriendConfirm()', async (t) => {
   ]
   let result: boolean
 
-  const firer = new Firer(mockPuppetPuppeteer)
+  const firer = new Firer(mockPuppetWeChat)
 
   contentList.forEach(([content]) => {
     result = (firer as any).parseFriendConfirm(content)
@@ -120,7 +120,7 @@ test('parseRoomJoin()', async (t) => {
     ],
   ]
 
-  const firer = new Firer(mockPuppetPuppeteer)
+  const firer = new Firer(mockPuppetWeChat)
 
   let result
   contentList.forEach(([content, inviter, inviteeList]) => {
@@ -158,7 +158,7 @@ test('parseRoomLeave()', async (t) => {
     ],
   ]
 
-  const firer = new Firer(mockPuppetPuppeteer)
+  const firer = new Firer(mockPuppetWeChat)
 
   contentLeaverList.forEach(([content, leaver]) => {
     const resultLeaver = (firer as any).parseRoomLeave(content)[0]
@@ -191,7 +191,7 @@ test('parseRoomTopic()', async (t) => {
     ],
   ]
 
-  const firer = new Firer(mockPuppetPuppeteer)
+  const firer = new Firer(mockPuppetWeChat)
 
   let result
   contentList.forEach(([content, changer, topic]) => {

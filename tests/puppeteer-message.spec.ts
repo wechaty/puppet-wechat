@@ -39,20 +39,20 @@ import {
 }                 from 'wechaty-puppet'
 
 import {
-  PuppetPuppeteer,
-}                         from '../src/puppet-puppeteer'
+  PuppetWeChat,
+}                         from '../src/puppet-wechat'
 import {
   WebMessageRawPayload,
   // WebRoomRawPayload,
 }                         from '../src/web-schemas'
 
 // class WechatyTest extends Wechaty {
-//   public initPuppetAccessory (puppet: PuppetPuppeteer) {
+//   public initPuppetAccessory (puppet: PuppetWeChat) {
 //     super.initPuppetAccessory(puppet)
 //   }
 // }
 
-class PuppetTest extends PuppetPuppeteer {
+class PuppetTest extends PuppetWeChat {
 
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
@@ -68,7 +68,7 @@ class PuppetTest extends PuppetPuppeteer {
 
 }
 
-// class PuppetPuppeteerTest extends PuppetPuppeteer {
+// class PuppetWeChatTest extends PuppetWeChat {
 //   public id?: string = undefined
 // }
 
@@ -204,7 +204,7 @@ test('ready()', async t => {
 })
 
 // test('find()', async t => {
-//   const puppet  = new PuppetPuppeteer()
+//   const puppet  = new PuppetWeChat()
 //   // const wechaty = new WechatyTest({ puppet })
 //   // wechaty.initPuppetAccessory(puppet)
 

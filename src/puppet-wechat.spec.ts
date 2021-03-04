@@ -34,9 +34,9 @@ import { test, sinon } from 'tstest'// const sinonTest   = require('sinon-test')
 
 import { Bridge }           from './bridge'
 import { Event }            from './event'
-import { PuppetPuppeteer }  from './puppet-puppeteer'
+import { PuppetWeChat }  from './puppet-wechat'
 
-class PuppetTest extends PuppetPuppeteer {
+class PuppetTest extends PuppetWeChat {
 
   public contactRawPayload (id: string) {
     return super.contactRawPayload(id)
@@ -92,7 +92,7 @@ test('login/logout events', async t => {
 
     const future = new Promise(resolve => puppet.once('login', resolve))
       .catch(e => t.fail(e))
-    puppet.bridge.emit('login', 'TestPuppetPuppeteer')
+    puppet.bridge.emit('login', 'TestPuppetWeChat')
     await future
 
     t.is(puppet.logonoff(), true, 'should be logined')
@@ -113,7 +113,7 @@ test('login/logout events', async t => {
      *
      * 0, 1, 2 is for first 3 calls for contactList()
      *
-     * 3, 4, 5 is PuppetPuppeteer.waitStable() for `unchangedNum` to reach 3 times.
+     * 3, 4, 5 is PuppetWeChat.waitStable() for `unchangedNum` to reach 3 times.
      */
     t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
 
@@ -136,7 +136,7 @@ test('login/logout events', async t => {
  * FIXME: increase test times from 1 to 3 Huan(202006)
  */
 test('restart() 1 times', async t => {
-  const puppet = new PuppetPuppeteer()
+  const puppet = new PuppetWeChat()
 
   let n = 1
 

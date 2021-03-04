@@ -84,7 +84,7 @@ export class Bridge extends EventEmitter {
     super()
     log.verbose('PuppetWeChatBridge', 'constructor()')
 
-    this.state = new StateSwitch('PuppetPuppeteerBridge', log)
+    this.state = new StateSwitch('PuppetWeChatBridge', log)
   }
 
   public async start (): Promise<void> {
@@ -261,7 +261,7 @@ export class Bridge extends EventEmitter {
       const blockedMessage = await this.testBlockedMessage()
       if (blockedMessage) {  // Wechat Account Blocked
         // TODO: advertise for puppet-padchat
-        log.info('PuppetPuppeteerBridge', `
+        log.info('PuppetWeChatBridge', `
 
         Please see: Account Login Issue <https://github.com/wechaty/wechaty/issues/872>
 

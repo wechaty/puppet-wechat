@@ -29,13 +29,13 @@ import {
 }                 from '../src/config'
 
 import {
-  PuppetPuppeteer,
-}                     from '../src/puppet-puppeteer'
+  PuppetWeChat,
+}                     from '../src/puppet-wechat'
 import {
   WebRoomRawPayload,
 }                     from '../src/web-schemas'
 
-class PuppetPuppeteerTest extends PuppetPuppeteer {
+class PuppetWeChatTest extends PuppetWeChat {
 
   public id?: string = undefined
 
@@ -77,7 +77,7 @@ test('Room smoke testing', async t => {
 
   const sandbox = sinon.createSandbox()
 
-  const puppet = new PuppetPuppeteerTest()
+  const puppet = new PuppetWeChatTest()
 
   sandbox.stub(puppet, 'contactRawPayload').callsFake(mockContactRoomRawPayload)
   sandbox.stub(puppet, 'roomRawPayload').callsFake(mockContactRoomRawPayload)
@@ -147,7 +147,7 @@ test('Room smoke testing', async t => {
 
 // test('Room static method', async t => {
 
-//   const puppet = new PuppetPuppeteer()
+//   const puppet = new PuppetWeChat()
 //   const wechaty = new WechatyTest({ puppet })
 //   wechaty.initPuppetAccessory(puppet)
 

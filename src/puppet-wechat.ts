@@ -945,7 +945,7 @@ export class PuppetWeChat extends Puppet {
     try {
       const roomId = await this.bridge.roomCreate(contactIdList, topic)
       if (!roomId) {
-        throw new Error('PuppetPuppeteer.roomCreate() roomId "' + roomId + '" not found')
+        throw new Error('PuppetWeChat.roomCreate() roomId "' + roomId + '" not found')
       }
       return roomId
 
@@ -1552,7 +1552,7 @@ export class PuppetWeChat extends Puppet {
     }
     if (!mediaId) {
       log.error('PuppetWeChat', 'uploadMedia(): upload fail')
-      throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
+      throw new Error('PuppetWeChat.uploadMedia(): upload fail')
     }
     return Object.assign(mediaData, { MediaId: mediaId })
   }
