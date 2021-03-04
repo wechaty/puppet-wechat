@@ -41,7 +41,7 @@ export async function retry<T> (
 }
 
 export function envHead (): boolean {
-  const KEY = 'WECHATY_PUPPET_PUPPETEER_HEAD'
+  const KEY = 'WECHATY_PUPPET_WECHAT_HEAD'
   return KEY in process.env
     ? !!process.env[KEY]
     : false
@@ -49,7 +49,7 @@ export function envHead (): boolean {
 }
 
 export function envStealthless (): boolean {
-  const KEY = 'WECHATY_PUPPET_PUPPETEER_STEALTHLESS'
+  const KEY = 'WECHATY_PUPPET_WECHAT_STEALTHLESS'
   return !!process.env[KEY]
 
 }
@@ -63,7 +63,7 @@ export function qrCodeForChatie (): FileBox {
   return FileBox.fromStream(qrStream, name)
 }
 
-export const MEMORY_SLOT = 'PUPPET_PUPPETEER'
+export const MEMORY_SLOT = 'PUPPET_WECHAT'
 
 export {
   VERSION,
