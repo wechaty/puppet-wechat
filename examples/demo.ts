@@ -19,8 +19,16 @@
 
 // tslint:disable:no-console
 
-import { PuppetWeChat } from '../src/'
-import { EventLogoutPayload, EventLoginPayload, EventScanPayload, EventErrorPayload, EventMessagePayload } from 'wechaty-puppet'
+import { PuppetWeChat } from '../src/mod'
+
+import {
+  EventLogoutPayload,
+  EventLoginPayload,
+  EventScanPayload,
+  EventErrorPayload,
+  EventMessagePayload,
+}                       from 'wechaty-puppet'
+
 /**
  *
  * 1. Declare your Bot!

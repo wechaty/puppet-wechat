@@ -85,7 +85,7 @@ import {
   plainText,
   unescapeHtml,
   isRoomId,
-}                           from './pure-function-helpers'
+}                           from './pure-function-helpers/mod'
 
 import {
   Bridge,

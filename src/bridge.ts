@@ -57,7 +57,7 @@ import {
 
 import {
   unescapeHtml,
-}                       from './pure-function-helpers'
+}                       from './pure-function-helpers/mod'
 
 export interface InjectResult {
   code:    number,
