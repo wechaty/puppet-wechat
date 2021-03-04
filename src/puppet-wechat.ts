@@ -109,7 +109,7 @@ import {
 
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
-export class PuppetPuppeteer extends Puppet {
+export class PuppetWeChat extends Puppet {
 
   public static readonly VERSION = VERSION
 
@@ -141,10 +141,10 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async start (): Promise<void> {
-    log.verbose('PuppetPuppeteer', `start() with ${this.memory.name}`)
+    log.verbose('PuppetWeChat', `start() with ${this.memory.name}`)
 
     if (this.state.on()) {
-      log.warn('PuppetPuppeteer', 'start() is called on a ON puppet. await ready(on) and return.')
+      log.warn('PuppetWeChat', 'start() is called on a ON puppet. await ready(on) and return.')
       await this.state.ready('on')
       return
     }
@@ -162,7 +162,7 @@ export class PuppetPuppeteer extends Puppet {
       // this.initWatchdogForScan()
 
       this.bridge = await this.initBridge()
-      log.verbose('PuppetPuppeteer', 'initBridge() done')
+      log.verbose('PuppetWeChat', 'initBridge() done')
 
       /**
        *  state must set to `live`
@@ -185,17 +185,17 @@ export class PuppetPuppeteer extends Puppet {
       const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
       this.on('heartbeat', data => throttleQueue.next(data))
       throttleQueue.subscribe(async (data: any) => {
-        log.verbose('PuppetPuppeteer', 'start() throttleQueue.subscribe() new item: %s', data)
+        log.verbose('PuppetWeChat', 'start() throttleQueue.subscribe() new item: %s', data)
         await this.saveCookie()
       })
 
-      log.verbose('PuppetPuppeteer', 'start() done')
+      log.verbose('PuppetWeChat', 'start() done')
 
       // this.emit('start')
       return
 
     } catch (e) {
-      log.error('PuppetPuppeteer', 'start() exception: %s', e)
+      log.error('PuppetWeChat', 'start() exception: %s', e)
 
       // this.state.off(true)
       this.emit('error', e)
@@ -206,16 +206,16 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async stop (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'stop()')
+    log.verbose('PuppetWeChat', 'stop()')
 
     if (this.state.off()) {
-      log.warn('PuppetPuppeteer', 'stop() is called on a OFF puppet. await ready(off) and return.')
+      log.warn('PuppetWeChat', 'stop() is called on a OFF puppet. await ready(off) and return.')
       await this.state.ready('off')
       return
     }
     this.state.off('pending')
 
-    log.verbose('PuppetPuppeteer', 'stop() make watchdog sleep before do stop')
+    log.verbose('PuppetWeChat', 'stop() make watchdog sleep before do stop')
 
     /**
      * Clean listeners for `watchdog`
@@ -231,7 +231,7 @@ export class PuppetPuppeteer extends Puppet {
       // register the removeListeners micro task at then end of the task queue
       setImmediate(() => this.bridge.removeAllListeners())
     } catch (e) {
-      log.error('PuppetPuppeteer', 'this.bridge.quit() exception: %s', e.message)
+      log.error('PuppetWeChat', 'this.bridge.quit() exception: %s', e.message)
       throw e
     } finally {
       this.state.off(true)
@@ -248,7 +248,7 @@ export class PuppetPuppeteer extends Puppet {
    * so we need to refresh the page after a while
    */
   private initWatchdogForScan (): void {
-    log.verbose('PuppetPuppeteer', 'initWatchdogForScan()')
+    log.verbose('PuppetWeChat', 'initWatchdogForScan()')
 
     const puppet = this
     const dog    = this.scanWatchdog
@@ -277,20 +277,20 @@ export class PuppetPuppeteer extends Puppet {
     }))
 
     dog.on('reset', async (food, timePast) => {
-      log.warn('PuppetPuppeteer', 'initScanWatchdog() on(reset) lastFood: %s, timePast: %s',
+      log.warn('PuppetWeChat', 'initScanWatchdog() on(reset) lastFood: %s, timePast: %s',
         food.data, timePast
       )
       try {
         await this.bridge.reload()
       } catch (e) {
-        log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) exception: %s', e)
+        log.error('PuppetWeChat', 'initScanWatchdog() on(reset) exception: %s', e)
         try {
-          log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) try to recover by bridge.{quit,init}()', e)
+          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) try to recover by bridge.{quit,init}()', e)
           await this.bridge.stop()
           await this.bridge.start()
-          log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) recover successful')
+          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover successful')
         } catch (e) {
-          log.error('PuppetPuppeteer', 'initScanWatchdog() on(reset) recover FAIL: %s', e)
+          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover FAIL: %s', e)
           this.emit('error', e)
         }
       }
@@ -298,11 +298,11 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   private async initBridge (): Promise<Bridge> {
-    log.verbose('PuppetPuppeteer', 'initBridge()')
+    log.verbose('PuppetWeChat', 'initBridge()')
 
     if (this.state.off()) {
       const e = new Error('initBridge() found targetState != live, no init anymore')
-      log.warn('PuppetPuppeteer', e.message)
+      log.warn('PuppetWeChat', e.message)
       throw e
     }
 
@@ -321,9 +321,9 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.start()
     } catch (e) {
-      log.error('PuppetPuppeteer', 'initBridge() exception: %s', e.message)
+      log.error('PuppetWeChat', 'initBridge() exception: %s', e.message)
       await this.bridge.stop().catch(e => {
-        log.error('PuppetPuppeteer', 'initBridge() this.bridge.stop() rejection: %s', e)
+        log.error('PuppetWeChat', 'initBridge() this.bridge.stop() rejection: %s', e)
       })
       this.emit('error', e)
 
@@ -339,13 +339,13 @@ export class PuppetPuppeteer extends Puppet {
       const obj = JSON.parse(json)
       return obj.BaseRequest
     } catch (e) {
-      log.error('PuppetPuppeteer', 'send() exception: %s', e.message)
+      log.error('PuppetWeChat', 'send() exception: %s', e.message)
       throw e
     }
   }
 
   public unref (): void {
-    log.verbose('PuppetPuppeteer', 'unref ()')
+    log.verbose('PuppetWeChat', 'unref ()')
     super.unref()
 
     if (this.scanWatchdog) {
@@ -368,7 +368,7 @@ export class PuppetPuppeteer extends Puppet {
   public async messageRawPayloadParser (
     rawPayload: WebMessageRawPayload,
   ): Promise<MessagePayload> {
-    log.verbose('PuppetPuppeteer', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
+    log.verbose('PuppetWeChat', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
 
     const payload = messageRawPayloadParser(rawPayload)
 
@@ -390,7 +390,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageMiniProgram (messageId: string): Promise<MiniProgramPayload> {
-    log.verbose('PuppetPuppeteer', 'messageMiniProgram(%s)', messageId)
+    log.verbose('PuppetWeChat', 'messageMiniProgram(%s)', messageId)
     return throwUnsupportedError(messageId)
   }
 
@@ -457,7 +457,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async messageSendMiniProgram (conversationId: string, miniProgramPayload: MiniProgramPayload): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSendMiniProgram("%s", %s)',
+    log.verbose('PuppetWeChat', 'messageSendMiniProgram("%s", %s)',
       conversationId,
       JSON.stringify(miniProgramPayload),
     )
@@ -473,7 +473,7 @@ export class PuppetPuppeteer extends Puppet {
     messageId : string,
   ): Promise<void> {
 
-    log.silly('PuppetPuppeteer', 'forward(receiver=%s, messageId=%s)',
+    log.silly('PuppetWeChat', 'forward(receiver=%s, messageId=%s)',
       conversationId,
       messageId,
     )
@@ -536,7 +536,7 @@ export class PuppetPuppeteer extends Puppet {
         throw new Error('forward failed')
       }
     } catch (e) {
-      log.error('PuppetPuppeteer', 'forward() exception: %s', e.message)
+      log.error('PuppetWeChat', 'forward() exception: %s', e.message)
       throw e
     }
   }
@@ -545,12 +545,12 @@ export class PuppetPuppeteer extends Puppet {
     conversationId : string,
     text           : string,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSendText(%s, %s)', conversationId, text)
+    log.verbose('PuppetWeChat', 'messageSendText(%s, %s)', conversationId, text)
 
     try {
       await this.bridge.send(conversationId, text)
     } catch (e) {
-      log.error('PuppetPuppeteer', 'messageSendText() exception: %s', e.message)
+      log.error('PuppetWeChat', 'messageSendText() exception: %s', e.message)
       throw e
     }
   }
@@ -563,18 +563,18 @@ export class PuppetPuppeteer extends Puppet {
    * logout from browser, then server will emit `logout` event
    */
   public async logout (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'logout()')
+    log.verbose('PuppetWeChat', 'logout()')
 
     const user = this.selfId()
     if (!user) {
-      log.warn('PuppetPuppeteer', 'logout() without self()')
+      log.warn('PuppetWeChat', 'logout() without self()')
       return
     }
 
     try {
       await this.bridge.logout()
     } catch (e) {
-      log.error('PuppetPuppeteer', 'logout() exception: %s', e.message)
+      log.error('PuppetWeChat', 'logout() exception: %s', e.message)
       throw e
     } finally {
       this.id = undefined
@@ -606,12 +606,12 @@ export class PuppetPuppeteer extends Puppet {
    *
    */
   public async contactRawPayload (id: string): Promise<WebContactRawPayload> {
-    log.silly('PuppetPuppeteer', 'contactRawPayload(%s) @ %s', id, this)
+    log.silly('PuppetWeChat', 'contactRawPayload(%s) @ %s', id, this)
     try {
       const rawPayload = await this.bridge.getContact(id) as WebContactRawPayload
       return rawPayload
     } catch (e) {
-      log.error('PuppetPuppeteer', 'contactRawPayload(%s) exception: %s', id, e.message)
+      log.error('PuppetWeChat', 'contactRawPayload(%s) exception: %s', id, e.message)
       throw e
     }
 
@@ -620,14 +620,14 @@ export class PuppetPuppeteer extends Puppet {
   public async contactRawPayloadParser (
     rawPayload: WebContactRawPayload,
   ): Promise<ContactPayload> {
-    log.silly('PuppetPuppeteer', 'contactParseRawPayload(Object.keys(payload).length=%d)',
+    log.silly('PuppetWeChat', 'contactParseRawPayload(Object.keys(payload).length=%d)',
       Object.keys(rawPayload).length,
     )
     if (!Object.keys(rawPayload).length) {
-      log.error('PuppetPuppeteer', 'contactParseRawPayload(Object.keys(payload).length=%d)',
+      log.error('PuppetWeChat', 'contactParseRawPayload(Object.keys(payload).length=%d)',
         Object.keys(rawPayload).length,
       )
-      log.error('PuppetPuppeteer', 'contactParseRawPayload() got empty rawPayload!')
+      log.error('PuppetWeChat', 'contactParseRawPayload() got empty rawPayload!')
       throw new Error('empty raw payload')
       // return {
       //   gender: Gender.Unknown,
@@ -668,7 +668,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public ding (data?: string): void {
-    log.verbose('PuppetPuppeteer', 'ding(%s)', data || '')
+    log.verbose('PuppetWeChat', 'ding(%s)', data || '')
     this.bridge.ding(data)
   }
 
@@ -676,7 +676,7 @@ export class PuppetPuppeteer extends Puppet {
   public async contactAvatar (contactId: string, file: FileBox) : Promise<void>
 
   public async contactAvatar (contactId: string, file?: FileBox): Promise<void | FileBox> {
-    log.verbose('PuppetPuppeteer', 'contactAvatar(%s)', contactId)
+    log.verbose('PuppetWeChat', 'contactAvatar(%s)', contactId)
 
     if (file) {
       throw new Error('not support')
@@ -738,13 +738,13 @@ export class PuppetPuppeteer extends Puppet {
     try {
       const ret = await this.bridge.contactAlias(contactId, alias)
       if (!ret) {
-        log.warn('PuppetPuppeteer', 'contactRemark(%s, %s) bridge.contactAlias() return false',
+        log.warn('PuppetWeChat', 'contactRemark(%s, %s) bridge.contactAlias() return false',
           contactId, alias,
         )
         throw new Error('bridge.contactAlias fail')
       }
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'contactRemark(%s, %s) rejected: %s', contactId, alias, e.message)
+      log.warn('PuppetWeChat', 'contactRemark(%s, %s) rejected: %s', contactId, alias, e.message)
       throw e
     }
   }
@@ -760,7 +760,7 @@ export class PuppetPuppeteer extends Puppet {
    *
    */
   public async roomRawPayload (id: string): Promise<WebRoomRawPayload> {
-    log.verbose('PuppetPuppeteer', 'roomRawPayload(%s)', id)
+    log.verbose('PuppetWeChat', 'roomRawPayload(%s)', id)
 
     try {
       let rawPayload: undefined | WebRoomRawPayload
@@ -782,7 +782,7 @@ export class PuppetPuppeteer extends Puppet {
         if (rawPayload) {
           const currLength = (rawPayload.MemberList && rawPayload.MemberList.length) || 0
 
-          log.silly('PuppetPuppeteer',
+          log.silly('PuppetWeChat',
             'roomPayload() this.bridge.getContact(%s) '
               + 'MemberList.length:(prev:%d, curr:%d) at ttl:%d',
             id,
@@ -792,7 +792,7 @@ export class PuppetPuppeteer extends Puppet {
           )
 
           if (prevLength === currLength) {
-            log.silly('PuppetPuppeteer', 'roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d',
+            log.silly('PuppetWeChat', 'roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d',
               this.id,
               ttl,
               currLength,
@@ -802,21 +802,21 @@ export class PuppetPuppeteer extends Puppet {
           if (currLength >= prevLength) {
             prevLength = currLength
           } else {
-            log.warn('PuppetPuppeteer', 'roomRawPayload() currLength(%d) <= prevLength(%d) ???',
+            log.warn('PuppetWeChat', 'roomRawPayload() currLength(%d) <= prevLength(%d) ???',
               currLength,
               prevLength,
             )
           }
         }
 
-        log.silly('PuppetPuppeteer', `roomPayload() puppet.getContact(${id}) retry at ttl:%d`, ttl)
+        log.silly('PuppetWeChat', `roomPayload() puppet.getContact(${id}) retry at ttl:%d`, ttl)
         await new Promise(resolve => setTimeout(resolve, 1000)) // wait for 1 second
       }
 
       throw new Error('no payload')
 
     } catch (e) {
-      log.error('PuppetPuppeteer', 'roomRawPayload(%s) exception: %s', id, e.message)
+      log.error('PuppetWeChat', 'roomRawPayload(%s) exception: %s', id, e.message)
       throw e
     }
   }
@@ -824,7 +824,7 @@ export class PuppetPuppeteer extends Puppet {
   public async roomRawPayloadParser (
     rawPayload: WebRoomRawPayload,
   ): Promise<RoomPayload> {
-    log.verbose('PuppetPuppeteer', 'roomRawPayloadParser(%s)', rawPayload)
+    log.verbose('PuppetWeChat', 'roomRawPayloadParser(%s)', rawPayload)
 
     // const payload = await this.roomPayload(rawPayload.UserName)
 
@@ -889,20 +889,20 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.roomDelMember(roomId, contactId)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'roomDelMember(%s, %d) rejected: %s', roomId, contactId, e.message)
+      log.warn('PuppetWeChat', 'roomDelMember(%s, %d) rejected: %s', roomId, contactId, e.message)
       throw e
     }
   }
 
   public async roomAvatar (roomId: string): Promise<FileBox> {
-    log.verbose('PuppetPuppeteer', 'roomAvatar(%s)', roomId)
+    log.verbose('PuppetWeChat', 'roomAvatar(%s)', roomId)
 
     const payload = await this.roomPayload(roomId)
 
     if (payload.avatar) {
       return FileBox.fromUrl(payload.avatar)
     }
-    log.warn('PuppetPuppeteer', 'roomAvatar() avatar not found, use the chatie default.')
+    log.warn('PuppetWeChat', 'roomAvatar() avatar not found, use the chatie default.')
     return qrCodeForChatie()
   }
 
@@ -913,7 +913,7 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.roomAddMember(roomId, contactId)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'roomAddMember(%s) rejected: %s', contactId, e.message)
+      log.warn('PuppetWeChat', 'roomAddMember(%s) rejected: %s', contactId, e.message)
       throw e
     }
   }
@@ -933,7 +933,7 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.roomModTopic(roomId, topic)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'roomTopic(%s) rejected: %s', topic, e.message)
+      log.warn('PuppetWeChat', 'roomTopic(%s) rejected: %s', topic, e.message)
       throw e
     }
   }
@@ -950,7 +950,7 @@ export class PuppetPuppeteer extends Puppet {
       return roomId
 
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'roomCreate(%s, %s) rejected: %s', contactIdList.join(','), topic, e.message)
+      log.warn('PuppetWeChat', 'roomCreate(%s, %s) rejected: %s', contactIdList.join(','), topic, e.message)
       throw e
     }
   }
@@ -959,7 +959,7 @@ export class PuppetPuppeteer extends Puppet {
   public async roomAnnounce (roomId: string, text: string)  : Promise<void>
 
   public async roomAnnounce (roomId: string, text?: string) : Promise<void | string> {
-    log.warn('PuppetPuppeteer', 'roomAnnounce(%s, %s) not supported', roomId, text || '')
+    log.warn('PuppetWeChat', 'roomAnnounce(%s, %s) not supported', roomId, text || '')
 
     if (text) {
       return
@@ -968,7 +968,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async roomQuit (roomId: string): Promise<void> {
-    log.warn('PuppetPuppeteer', 'roomQuit(%s) not supported by Web API', roomId)
+    log.warn('PuppetWeChat', 'roomQuit(%s) not supported by Web API', roomId)
   }
 
   public async roomQRCode (roomId: string): Promise<string> {
@@ -976,7 +976,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async roomMemberList (roomId: string) : Promise<string[]> {
-    log.verbose('PuppetPuppeteer', 'roommemberList(%s)', roomId)
+    log.verbose('PuppetWeChat', 'roommemberList(%s)', roomId)
     const rawPayload = await this.roomRawPayload(roomId)
 
     const memberIdList = (rawPayload.MemberList || [])
@@ -986,7 +986,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async roomMemberRawPayload (roomId: string, contactId: string): Promise<WebRoomRawMember>  {
-    log.verbose('PuppetPuppeteer', 'roomMemberRawPayload(%s, %s)', roomId, contactId)
+    log.verbose('PuppetWeChat', 'roomMemberRawPayload(%s, %s)', roomId, contactId)
     const rawPayload = await this.roomRawPayload(roomId)
 
     const memberPayloadList = rawPayload.MemberList || []
@@ -1000,7 +1000,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<RoomMemberPayload>  {
-    log.verbose('PuppetPuppeteer', 'roomMemberRawPayloadParser(%s)', rawPayload)
+    log.verbose('PuppetWeChat', 'roomMemberRawPayloadParser(%s)', rawPayload)
 
     const payload: RoomMemberPayload = {
       avatar    : rawPayload.HeadImgUrl,
@@ -1034,7 +1034,7 @@ export class PuppetPuppeteer extends Puppet {
    *
    */
   public async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
-    log.warn('PuppetPuppeteer', 'friendshipRawPayload(%s)', id)
+    log.warn('PuppetWeChat', 'friendshipRawPayload(%s)', id)
 
     const rawPayload = await this.bridge.getMessage(id)
     if (!rawPayload) {
@@ -1044,7 +1044,7 @@ export class PuppetPuppeteer extends Puppet {
   }
 
   public async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
-    log.warn('PuppetPuppeteer', 'friendshipRawPayloadParser(%s)', rawPayload)
+    log.warn('PuppetWeChat', 'friendshipRawPayloadParser(%s)', rawPayload)
 
     const timestamp = Math.floor(Date.now() / 1000) // in seconds
 
@@ -1098,7 +1098,7 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.verifyUserRequest(contactId, hello)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s',
+      log.warn('PuppetWeChat', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s',
         contactId,
         hello,
         e.message,
@@ -1115,7 +1115,7 @@ export class PuppetPuppeteer extends Puppet {
     try {
       await this.bridge.verifyUserOk(payload.contactId, payload.ticket)
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'bridge.verifyUserOk(%s, %s) rejected: %s',
+      log.warn('PuppetWeChat', 'bridge.verifyUserOk(%s, %s) rejected: %s',
         payload.contactId,
         payload.ticket,
         e.message,
@@ -1129,7 +1129,7 @@ export class PuppetPuppeteer extends Puppet {
    * For issue #668
    */
   public async waitStable (): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'waitStable()')
+    log.verbose('PuppetWeChat', 'waitStable()')
 
     let maxNum  = 0
     let curNum = 0
@@ -1156,13 +1156,13 @@ export class PuppetPuppeteer extends Puppet {
         maxNum = curNum
       }
 
-      log.silly('PuppetPuppeteer', 'readyStable() while() curNum=%s, maxNum=%s, unchangedNum=%s',
+      log.silly('PuppetWeChat', 'readyStable() while() curNum=%s, maxNum=%s, unchangedNum=%s',
         curNum, maxNum, unchangedNum,
       )
 
     }
 
-    log.verbose('PuppetPuppeteer', 'readyStable() emit(ready)')
+    log.verbose('PuppetWeChat', 'readyStable() emit(ready)')
     this.emit('ready', { data: 'stable' })
   }
 
@@ -1180,7 +1180,7 @@ export class PuppetPuppeteer extends Puppet {
       }
       return name
     } catch (e) {
-      log.error('PuppetPuppeteer', 'hostname() exception:%s', e)
+      log.error('PuppetWeChat', 'hostname() exception:%s', e)
       this.emit('error', e)
       throw e
     }
@@ -1216,7 +1216,7 @@ export class PuppetPuppeteer extends Puppet {
   private async messageRawPayloadToUrl (
     rawPayload: WebMessageRawPayload,
   ): Promise<null | string> {
-    log.silly('PuppetPuppeteer', 'readyMedia()')
+    log.silly('PuppetWeChat', 'readyMedia()')
 
     // let type = MessageType.Unknown
     let url: undefined | string
@@ -1301,7 +1301,7 @@ export class PuppetPuppeteer extends Puppet {
       }
 
     } catch (e) {
-      log.warn('PuppetPuppeteer', 'ready() exception: %s', e.message)
+      log.warn('PuppetWeChat', 'ready() exception: %s', e.message)
       throw e
     }
 
@@ -1382,7 +1382,7 @@ export class PuppetPuppeteer extends Puppet {
                       + '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
     }
 
-    log.silly('PuppetPuppeteer', 'uploadMedia() headers:%s', JSON.stringify(headers))
+    log.silly('PuppetWeChat', 'uploadMedia() headers:%s', JSON.stringify(headers))
 
     const uploadMediaRequest = {
       AESKey:        '',
@@ -1437,18 +1437,18 @@ export class PuppetPuppeteer extends Puppet {
               } else {
                 let obj = body
                 if (typeof body !== 'object') {
-                  log.silly('PuppetPuppeteer', 'updateMedia() typeof body = %s', typeof body)
+                  log.silly('PuppetWeChat', 'updateMedia() typeof body = %s', typeof body)
                   try {
                     obj = JSON.parse(body)
                   } catch (e) {
-                    log.error('PuppetPuppeteer', 'updateMedia() body = %s', body)
-                    log.error('PuppetPuppeteer', 'updateMedia() exception: %s', e)
+                    log.error('PuppetWeChat', 'updateMedia() body = %s', body)
+                    log.error('PuppetWeChat', 'updateMedia() exception: %s', e)
                     this.emit('error', e)
                   }
                 }
                 if (typeof obj !== 'object' || obj.BaseResponse.Ret !== 0) {
                   const errMsg = obj.BaseResponse || 'api return err'
-                  log.silly('PuppetPuppeteer', 'uploadMedia() checkUpload err:%s \nreq:%s\nret:%s',
+                  log.silly('PuppetWeChat', 'uploadMedia() checkUpload err:%s \nreq:%s\nret:%s',
                     JSON.stringify(errMsg), JSON.stringify(r), body)
                   reject(new Error('chackUpload err:' + JSON.stringify(errMsg)))
                 }
@@ -1463,11 +1463,11 @@ export class PuppetPuppeteer extends Puppet {
           })
         })
       } catch (e) {
-        log.error('PuppetPuppeteer', 'uploadMedia() checkUpload exception: %s', e.message)
+        log.error('PuppetWeChat', 'uploadMedia() checkUpload exception: %s', e.message)
         throw e
       }
       if (!ret.Signature) {
-        log.error('PuppetPuppeteer', 'uploadMedia(): chackUpload failed to get Signature')
+        log.error('PuppetWeChat', 'uploadMedia(): chackUpload failed to get Signature')
         throw new Error('chackUpload failed to get Signature')
       }
       uploadMediaRequest.Signature = ret.Signature
@@ -1478,8 +1478,8 @@ export class PuppetPuppeteer extends Puppet {
       delete (uploadMediaRequest as any).AESKey
     }
 
-    log.verbose('PuppetPuppeteer', 'uploadMedia() webwx_data_ticket: %s', webwxDataTicket)
-    log.verbose('PuppetPuppeteer', 'uploadMedia() pass_ticket: %s', passTicket)
+    log.verbose('PuppetWeChat', 'uploadMedia() webwx_data_ticket: %s', webwxDataTicket)
+    log.verbose('PuppetWeChat', 'uploadMedia() pass_ticket: %s', passTicket)
 
     /**
      * If FILE.SIZE > 1M, file buffer need to split for upload.
@@ -1542,7 +1542,7 @@ export class PuppetPuppeteer extends Puppet {
           }
         })
       } catch (e) {
-        log.error('PuppetPuppeteer', 'uploadMedia() uploadMedia exception: %s', e.message)
+        log.error('PuppetWeChat', 'uploadMedia() uploadMedia exception: %s', e.message)
         throw new Error('uploadMedia err: ' + e.message)
       }
     }
@@ -1551,7 +1551,7 @@ export class PuppetPuppeteer extends Puppet {
       mediaId = await getMediaId(bufferData[i], i)
     }
     if (!mediaId) {
-      log.error('PuppetPuppeteer', 'uploadMedia(): upload fail')
+      log.error('PuppetWeChat', 'uploadMedia(): upload fail')
       throw new Error('PuppetPuppeteer.uploadMedia(): upload fail')
     }
     return Object.assign(mediaData, { MediaId: mediaId })
@@ -1561,7 +1561,7 @@ export class PuppetPuppeteer extends Puppet {
     conversationId : string,
     file           : FileBox,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSendFile(%s, file=%s)',
+    log.verbose('PuppetWeChat', 'messageSendFile(%s, file=%s)',
       conversationId,
       file.toString(),
     )
@@ -1573,14 +1573,14 @@ export class PuppetPuppeteer extends Puppet {
       try {
         mediaData = await this.uploadMedia(file, conversationId)
         rawPayload = Object.assign(rawPayload, mediaData)
-        log.silly('PuppetPuppeteer', 'Upload completed, new rawObj:%s', JSON.stringify(rawPayload))
+        log.silly('PuppetWeChat', 'Upload completed, new rawObj:%s', JSON.stringify(rawPayload))
       } catch (e) {
-        log.error('PuppetPuppeteer', 'sendMedia() exception: %s', e.message)
+        log.error('PuppetWeChat', 'sendMedia() exception: %s', e.message)
         throw e
       }
     } else {
       // To support forward file
-      log.silly('PuppetPuppeteer', 'skip upload file, rawObj:%s', JSON.stringify(rawPayload))
+      log.silly('PuppetWeChat', 'skip upload file, rawObj:%s', JSON.stringify(rawPayload))
       mediaData = {
         FileName   : rawPayload.FileName,
         FileSize   : rawPayload.FileSize,
@@ -1597,7 +1597,7 @@ export class PuppetPuppeteer extends Puppet {
     // console.log('rawObj.MsgType', message.rawObj && message.rawObj.MsgType)
 
     mediaData.MsgType = this.extToType(path.extname(file.name))
-    log.silly('PuppetPuppeteer', 'sendMedia() destination: %s, mediaId: %s, MsgType; %s)',
+    log.silly('PuppetWeChat', 'sendMedia() destination: %s, mediaId: %s, MsgType; %s)',
       conversationId,
       mediaData.MediaId,
       mediaData.MsgType,
@@ -1606,7 +1606,7 @@ export class PuppetPuppeteer extends Puppet {
     try {
       ret = await this.bridge.sendMedia(mediaData)
     } catch (e) {
-      log.error('PuppetPuppeteer', 'sendMedia() exception: %s', e.message)
+      log.error('PuppetWeChat', 'sendMedia() exception: %s', e.message)
       throw e
     }
     if (!ret) {
@@ -1618,17 +1618,17 @@ export class PuppetPuppeteer extends Puppet {
     conversationId : string,
     contactId      : string,
   ): Promise<void> {
-    log.verbose('PuppetPuppeteer', 'messageSend("%s", %s)', conversationId, contactId)
+    log.verbose('PuppetWeChat', 'messageSend("%s", %s)', conversationId, contactId)
     return throwUnsupportedError()
   }
 
   public async messageImage (messageId: string, imageType: ImageType): Promise<FileBox> {
-    log.verbose('PuppetPuppeteer', 'messageImage(%s, %s)', messageId, imageType)
+    log.verbose('PuppetWeChat', 'messageImage(%s, %s)', messageId, imageType)
     return this.messageFile(messageId)
   }
 
   public async messageContact (messageId: string): Promise<string> {
-    log.verbose('PuppetPuppeteer', 'messageContact(%s)', messageId)
+    log.verbose('PuppetWeChat', 'messageContact(%s)', messageId)
     return throwUnsupportedError(messageId)
   }
 
@@ -1655,4 +1655,4 @@ export class PuppetPuppeteer extends Puppet {
 
 }
 
-export default PuppetPuppeteer
+export default PuppetWeChat

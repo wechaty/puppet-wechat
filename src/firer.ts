@@ -27,7 +27,7 @@ import {
   log,
 }               from './config'
 
-import { PuppetPuppeteer }    from './puppet-puppeteer'
+import { PuppetWeChat }    from './puppet-wechat'
 import {
   // WebRecomendInfo,
   WebMessageRawPayload,
@@ -101,7 +101,7 @@ const REGEX_CONFIG = {
 export class Firer {
 
   constructor (
-    public puppet: PuppetPuppeteer,
+    public puppet: PuppetWeChat,
   ) {
     //
   }
@@ -113,7 +113,7 @@ export class Firer {
   //     throw new Error('no RecommendInfo')
   //   }
   //   const recommendInfo: WebRecomendInfo = rawPayload.RecommendInfo
-  //   log.verbose('PuppetPuppeteerFirer', 'fireFriendRequest(%s)', recommendInfo)
+  //   log.verbose('PuppetWeChatFirer', 'fireFriendRequest(%s)', recommendInfo)
 
   //   if (!recommendInfo) {
   //     throw new Error('no recommendInfo')
@@ -142,7 +142,7 @@ export class Firer {
     rawPayload : WebMessageRawPayload,
   ) {
     const content = rawPayload.Content
-    log.silly('PuppetPuppeteerFirer', 'fireFriendConfirm(%s)', content)
+    log.silly('PuppetWeChatFirer', 'fireFriendConfirm(%s)', content)
 
     if (!this.parseFriendConfirm(content)) {
       return
@@ -180,10 +180,10 @@ export class Firer {
     try {
       [inviteeNameList, inviterName] = this.parseRoomJoin(text)
     } catch (e) {
-      log.silly('PuppetPuppeteerFirer', 'checkRoomJoin() "%s" is not a join message', text)
+      log.silly('PuppetWeChatFirer', 'checkRoomJoin() "%s" is not a join message', text)
       return false // not a room join message
     }
-    log.silly('PuppetPuppeteerFirer', 'checkRoomJoin() inviteeList: %s, inviter: %s',
+    log.silly('PuppetWeChatFirer', 'checkRoomJoin() inviteeList: %s, inviter: %s',
       inviteeNameList.join(','),
       inviterName,
     )
@@ -205,7 +205,7 @@ export class Firer {
     let ready = true
 
     while (ttl-- > 0) {
-      log.silly('PuppetPuppeteerFirer', 'fireRoomJoin() retry() ttl %d', ttl)
+      log.silly('PuppetWeChatFirer', 'fireRoomJoin() retry() ttl %d', ttl)
 
       if (!ready) {
         await new Promise(resolve => setTimeout(resolve, timeout))
@@ -228,7 +228,7 @@ export class Firer {
           try {
             await this.puppet.contactPayload(inviteeContactId)
           } catch (e) {
-            log.warn('PuppetPuppeteerFirer', 'fireRoomJoin() contactPayload(%s) exception: %s',
+            log.warn('PuppetWeChatFirer', 'fireRoomJoin() contactPayload(%s) exception: %s',
               inviteeContactId,
               e.message,
             )
@@ -270,7 +270,7 @@ export class Firer {
       }
 
       if (ready) {
-        log.silly('PuppetPuppeteerFirer', 'fireRoomJoin() resolve() inviteeContactIdList: %s, inviterContactId: %s',
+        log.silly('PuppetWeChatFirer', 'fireRoomJoin() resolve() inviteeContactIdList: %s, inviterContactId: %s',
           inviteeContactIdList.join(','),
           inviterContactId,
         )
@@ -302,7 +302,7 @@ export class Firer {
       }
     }
 
-    log.warn('PuppetPuppeteerFier', 'fireRoomJoin() resolve payload fail.')
+    log.warn('PuppetWeChatFier', 'fireRoomJoin() resolve payload fail.')
     return false
   }
 
@@ -312,7 +312,7 @@ export class Firer {
   public async checkRoomLeave (
     rawPayload : WebMessageRawPayload,
   ): Promise<boolean> {
-    log.verbose('PuppetPuppeteerFirer', 'fireRoomLeave(%s)', rawPayload.Content)
+    log.verbose('PuppetWeChatFirer', 'fireRoomLeave(%s)', rawPayload.Content)
 
     const roomId = rawPayload.FromUserName
 
@@ -322,10 +322,10 @@ export class Firer {
     try {
       [leaverName, removerName] = this.parseRoomLeave(rawPayload.Content)
     } catch (e) {
-      log.silly('PuppetPuppeteerFirer', 'fireRoomLeave() %s', e.message)
+      log.silly('PuppetWeChatFirer', 'fireRoomLeave() %s', e.message)
       return false
     }
-    log.silly('PuppetPuppeteerFirer', 'fireRoomLeave() got leaverName: %s', leaverName)
+    log.silly('PuppetWeChatFirer', 'fireRoomLeave() got leaverName: %s', leaverName)
 
     /**
      * FIXME: leaver maybe is a list
@@ -403,7 +403,7 @@ export class Firer {
     }
 
     if (!changerContactId) {
-      log.error('PuppetPuppeteerFirer', 'fireRoomTopic() changer contact not found for %s', changer)
+      log.error('PuppetWeChatFirer', 'fireRoomTopic() changer contact not found for %s', changer)
       return false
     }
 
@@ -419,7 +419,7 @@ export class Firer {
       })
       return true
     } catch (e) {
-      log.error('PuppetPuppeteerFirer', 'fireRoomTopic() co exception: %s', e.stack)
+      log.error('PuppetWeChatFirer', 'fireRoomTopic() co exception: %s', e.stack)
       return false
     }
   }
@@ -454,7 +454,7 @@ export class Firer {
   private parseRoomJoin (
     content: string,
   ): [string[], string] {
-    log.verbose('PuppetPuppeteerFirer', 'parseRoomJoin(%s)', content)
+    log.verbose('PuppetWeChatFirer', 'parseRoomJoin(%s)', content)
 
     const reListInvite = REGEX_CONFIG.roomJoinInvite
     const reListQrcode = REGEX_CONFIG.roomJoinQrcode

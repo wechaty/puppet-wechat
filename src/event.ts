@@ -31,8 +31,8 @@ import {
   Firer,
 }                         from './firer'
 import {
-  PuppetPuppeteer,
-}                         from './puppet-puppeteer'
+  PuppetWeChat,
+}                         from './puppet-wechat'
 import {
   WebMessageRawPayload,
   WebMessageType,
@@ -57,24 +57,24 @@ export const Event = {
 }
 
 function onDing (
-  this: PuppetPuppeteer,
+  this: PuppetWeChat,
   data: any,
 ): void {
-  log.silly('PuppetPuppeteerEvent', 'onDing(%s)', data)
+  log.silly('PuppetWeChatEvent', 'onDing(%s)', data)
   this.emit('heartbeat', { data })
 }
 
 async function onScan (
-  this    : PuppetPuppeteer,
+  this    : PuppetWeChat,
   // Do not use PuppetScanPayload at here, use { code: number, url: string } instead,
   //  because this is related with Browser Hook Code:
   //    wechaty-bro.js
   payloadFromBrowser : { code: number, url: string },
 ): Promise<void> {
-  log.verbose('PuppetPuppeteerEvent', 'onScan({code: %d, url: %s})', payloadFromBrowser.code, payloadFromBrowser.url)
+  log.verbose('PuppetWeChatEvent', 'onScan({code: %d, url: %s})', payloadFromBrowser.code, payloadFromBrowser.url)
 
   // if (this.state.off()) {
-  //   log.verbose('PuppetPuppeteerEvent', 'onScan(%s) state.off()=%s, NOOP',
+  //   log.verbose('PuppetWeChatEvent', 'onScan(%s) state.off()=%s, NOOP',
   //                                 payload, this.state.off())
   //   return
   // }
@@ -90,7 +90,7 @@ async function onScan (
   await this.saveCookie()
 
   if (this.logonoff()) {
-    log.verbose('PuppetPuppeteerEvent', 'onScan() there has user when got a scan event. emit logout and set it to null')
+    log.verbose('PuppetWeChatEvent', 'onScan() there has user when got a scan event. emit logout and set it to null')
     await this.logout()
   }
 
@@ -108,25 +108,25 @@ async function onScan (
 }
 
 function onLog (data: any): void {
-  log.silly('PuppetPuppeteerEvent', 'onLog(%s)', data)
+  log.silly('PuppetWeChatEvent', 'onLog(%s)', data)
 }
 
 async function onLogin (
-  this: PuppetPuppeteer,
+  this: PuppetWeChat,
   note: string,
   ttl = 30,
 ): Promise<void> {
-  log.verbose('PuppetPuppeteerEvent', 'onLogin(%s, %d)', note, ttl)
+  log.verbose('PuppetWeChatEvent', 'onLogin(%s, %d)', note, ttl)
 
   const TTL_WAIT_MILLISECONDS = 1 * 1000
   if (ttl <= 0) {
-    log.verbose('PuppetPuppeteerEvent', 'onLogin(%s) TTL expired')
+    log.verbose('PuppetWeChatEvent', 'onLogin(%s) TTL expired')
     this.emit('error', { data: 'onLogin() TTL expired.' })
     return
   }
 
   // if (this.state.off()) {
-  //   log.verbose('PuppetPuppeteerEvent', 'onLogin(%s, %d) state.off()=%s, NOOP',
+  //   log.verbose('PuppetWeChatEvent', 'onLogin(%s, %d) state.off()=%s, NOOP',
   //                                 note, ttl, this.state.off())
   //   return
   // }
@@ -147,19 +147,19 @@ async function onLogin (
     const userId = await this.bridge.getUserName()
 
     if (!userId) {
-      log.verbose('PuppetPuppeteerEvent', 'onLogin() browser not fully loaded(ttl=%d), retry later', ttl)
+      log.verbose('PuppetWeChatEvent', 'onLogin() browser not fully loaded(ttl=%d), retry later', ttl)
       const html = await this.bridge.innerHTML()
-      log.silly('PuppetPuppeteerEvent', 'onLogin() innerHTML: %s', html.substr(0, 500))
+      log.silly('PuppetWeChatEvent', 'onLogin() innerHTML: %s', html.substr(0, 500))
       setTimeout(onLogin.bind(this, note, ttl - 1), TTL_WAIT_MILLISECONDS)
       return
     }
 
-    log.silly('PuppetPuppeteerEvent', 'bridge.getUserName: %s', userId)
+    log.silly('PuppetWeChatEvent', 'bridge.getUserName: %s', userId)
 
     // const user = this.Contact.load(userId)
     // await user.ready()
 
-    log.silly('PuppetPuppeteerEvent', `onLogin() user ${userId} logined`)
+    log.silly('PuppetWeChatEvent', `onLogin() user ${userId} logined`)
 
     // if (this.state.on() === true) {
     await this.saveCookie()
@@ -168,33 +168,33 @@ async function onLogin (
     // fix issue https://github.com/Chatie/wechaty-puppet-wechat/issues/107
     // we do not wait `ready` before emit `login`
     this.waitStable().catch(e => {
-      log.error('PuppetPuppeteerEvent', 'onLogin() this.waitStable() rejection: %s', e && e.message)
+      log.error('PuppetWeChatEvent', 'onLogin() this.waitStable() rejection: %s', e && e.message)
     })
 
     await this.login(userId)
 
   } catch (e) {
-    log.error('PuppetPuppeteerEvent', 'onLogin() exception: %s', e)
+    log.error('PuppetWeChatEvent', 'onLogin() exception: %s', e)
     throw e
   }
 }
 
 async function onLogout (
-  this: PuppetPuppeteer,
+  this: PuppetWeChat,
   data: any,
 ): Promise<void> {
-  log.verbose('PuppetPuppeteerEvent', 'onLogout(%s)', data)
+  log.verbose('PuppetWeChatEvent', 'onLogout(%s)', data)
 
   if (this.logonoff()) {
     await this.logout()
   } else {
     // not logged-in???
-    log.error('PuppetPuppeteerEvent', 'onLogout() without self-user')
+    log.error('PuppetWeChatEvent', 'onLogout() without self-user')
   }
 }
 
 async function onMessage (
-  this       : PuppetPuppeteer,
+  this       : PuppetWeChat,
   rawPayload : WebMessageRawPayload,
 ): Promise<void> {
   const firer = new Firer(this)
@@ -219,7 +219,7 @@ async function onMessage (
         const topicRestul = await firer.checkRoomTopic(rawPayload)
 
         if (!joinResult && !leaveResult && !topicRestul) {
-          log.silly('PuppetPuppeteerEvent', `checkRoomSystem message: <${rawPayload.Content}> not found`)
+          log.silly('PuppetWeChatEvent', `checkRoomSystem message: <${rawPayload.Content}> not found`)
         }
       } else {
         await firer.checkFriendConfirm(rawPayload)
@@ -230,14 +230,14 @@ async function onMessage (
   this.emit('message', { messageId: rawPayload.MsgId })
 }
 
-async function onUnload (this: PuppetPuppeteer): Promise<void> {
-  log.silly('PuppetPuppeteerEvent', 'onUnload()')
+async function onUnload (this: PuppetWeChat): Promise<void> {
+  log.silly('PuppetWeChatEvent', 'onUnload()')
   /*
   try {
     await this.quit()
     await this.init()
   } catch (e) {
-    log.error('PuppetPuppeteerEvent', 'onUnload() exception: %s', e)
+    log.error('PuppetWeChatEvent', 'onUnload() exception: %s', e)
     this.emit('error', e)
     throw e
   }
