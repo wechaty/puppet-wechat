@@ -1,18 +1,18 @@
-# WECHATY-PUPPET-PUPPETEER
+# WECHATY-PUPPET-WECHAT
 
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/chatie/wechaty)
-[![NPM Version](https://badge.fury.io/js/wechaty-puppet-puppeteer.svg)](https://badge.fury.io/js/wechaty-puppet-puppeteer)
-[![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-puppeteer/next.svg)](https://www.npmjs.com/package/wechaty-puppet-puppeteer?activeTab=versions)
+[![NPM Version](https://badge.fury.io/js/wechaty-puppet-wechat.svg)](https://badge.fury.io/js/wechaty-puppet-wechat)
+[![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-wechat/next.svg)](https://www.npmjs.com/package/wechaty-puppet-wechat?activeTab=versions)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-[![NPM](https://github.com/wechaty/wechaty-puppet-puppeteer/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-puppeteer/actions?query=workflow%3ANPM)
+[![NPM](https://github.com/wechaty/wechaty-puppet-wechat/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-wechat/actions?query=workflow%3ANPM)
 
-[![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-puppeteer/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-puppeteer)
+[![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-wechat/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-wechat)
 
 > Picture Credit: [https://www.forsbergplustwo.com](https://www.forsbergplustwo.com/blogs/news/pdf-generation-with-chrome-headless-in-ruby-using-puppeteer-on-heroku)
 
 Wechaty Puppet for Puppeteer
 
-- This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-puppeteer/issues/1>
+- This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-wechat/issues/1>
 - Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/Chatie/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
 
 ## KNOWN LIMITATIONS
@@ -32,13 +32,13 @@ Cause `storage.googleapis.com` is blocked in mainland china, you'd better config
 ### 1. Linux & Mac
 
 ```shell
-PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-puppeteer
+PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-wechat
 ```
 
 ### 2. Windows
 
 ```shell
-SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-puppeteer
+SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-wechat
 ```
 
 Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomment-351945645>
@@ -50,7 +50,7 @@ An example of adding executablePath to puppeteer.launch():
 ```js
 const bot = new Wechaty({
   name: 'mybot',
-  puppet: 'wechaty-puppet-puppeteer',
+  puppet: 'wechaty-puppet-wechat',
   // ...
   puppetOptions: {
     endpoint: '<executablePath>'
@@ -60,7 +60,7 @@ const bot = new Wechaty({
 // or
 const bot = new Wechaty({
   name: 'mybot',
-  puppet: 'wechaty-puppet-puppeteer',
+  puppet: 'wechaty-puppet-wechat',
   // ...
   puppetOptions: {
     launchOptions: {
@@ -85,6 +85,10 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 ## HISTORY
 
 ### master
+
+### v0.26 (Mar 4, 2021)
+
+Rename NPM package name from `wechaty-puppet-puppeteer` to `wechaty-puppet-wechat`
 
 ### v0.24 (Feb 20, 2021)
 

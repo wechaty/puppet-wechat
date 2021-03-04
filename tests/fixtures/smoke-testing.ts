@@ -11,7 +11,7 @@ import {
   PuppetPuppeteer,
   VERSION,
   log,
-}                   from 'wechaty-puppet-puppeteer'
+}                   from 'wechaty-puppet-wechat'
 
 log.level('verbose')
 

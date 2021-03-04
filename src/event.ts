@@ -165,7 +165,7 @@ async function onLogin (
     await this.saveCookie()
     // }
 
-    // fix issue https://github.com/Chatie/wechaty-puppet-puppeteer/issues/107
+    // fix issue https://github.com/Chatie/wechaty-puppet-wechat/issues/107
     // we do not wait `ready` before emit `login`
     this.waitStable().catch(e => {
       log.error('PuppetPuppeteerEvent', 'onLogin() this.waitStable() rejection: %s', e && e.message)

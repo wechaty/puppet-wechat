@@ -1,7 +1,7 @@
 {
-  "name": "wechaty-puppet-puppeteer",
-  "version": "0.24.6",
-  "description": "Puppet Puppeteer for Wechaty",
+  "name": "wechaty-puppet-wechat",
+  "version": "0.26.0",
+  "description": "Puppet WeChat for Wechaty",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "engines": {
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wechaty/wechaty-puppet-puppeteer.git"
+    "url": "git+https://github.com/wechaty/wechaty-puppet-wechat.git"
   },
   "keywords": [
     "chatie",
@@ -38,7 +38,7 @@
   "author": "Huan LI <zixia@zixia.net>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/wechaty/wechaty-puppet-puppeteer/issues"
+    "url": "https://github.com/wechaty/wechaty-puppet-wechat/issues"
   },
   "devDependencies": {
     "@chatie/eslint-config": "^0.12.3",
@@ -64,7 +64,7 @@
   "peerDependencies": {
     "wechaty-puppet": ">=0.34"
   },
-  "homepage": "https://github.com/wechaty/wechaty-puppet-puppeteer#readme",
+  "homepage": "https://github.com/wechaty/wechaty-puppet-wechat#readme",
   "dependencies": {
     "bl": "^4.1.0",
     "brolog": "^1.12.4",
