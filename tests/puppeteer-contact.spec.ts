@@ -30,7 +30,7 @@ import {
   log,
 }              from '../src/config'
 
-import PuppetPuppeteer  from '../src/puppet-puppeteer'
+import PuppetWeChat  from '../src/puppet-wechat'
 
 test('Contact smoke testing', async t => {
 
@@ -53,7 +53,7 @@ test('Contact smoke testing', async t => {
     })
   }
 
-  const puppet = new PuppetPuppeteer()
+  const puppet = new PuppetWeChat()
   sandbox.stub(puppet as any, 'contactRawPayload').callsFake(mockContactPayload as any)
 
   const contactPayload = await puppet.contactPayload(UserName)

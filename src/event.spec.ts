@@ -24,11 +24,11 @@ import test  from 'blue-tape'
 
 import {
   // Event,
-  PuppetPuppeteer,
-}                   from './puppet-puppeteer'
+  PuppetWeChat,
+}                   from './puppet-wechat'
 
 test('Puppet Puppeteer Event smoke testing', async (t) => {
-  const puppet = new PuppetPuppeteer()
+  const puppet = new PuppetWeChat()
 
   try {
     await puppet.start()

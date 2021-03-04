@@ -19,14 +19,14 @@
 
 // tslint:disable:no-console
 
-import { PuppetPuppeteer } from '../src/'
+import { PuppetWeChat } from '../src/'
 import { EventLogoutPayload, EventLoginPayload, EventScanPayload, EventErrorPayload, EventMessagePayload } from 'wechaty-puppet'
 /**
  *
  * 1. Declare your Bot!
  *
  */
-const puppet = new PuppetPuppeteer()
+const puppet = new PuppetWeChat()
 
 /**
  *
