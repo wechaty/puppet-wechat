@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-wechat",
-  "version": "0.26.2",
+  "version": "0.26.3",
   "description": "Puppet WeChat for Wechaty",
   "main": "dist/src/mod.js",
   "typings": "dist/src/mod.d.ts",
