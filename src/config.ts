@@ -41,7 +41,7 @@ export async function retry<T> (
 }
 
 export function envHead (): boolean {
-  const KEY = 'WECHATY_PUPPET_WECHAT_HEAD'
+  const KEY = 'WECHATY_PUPPET_WECHAT_PUPPETEER_HEAD'
   return KEY in process.env
     ? !!process.env[KEY]
     : false
@@ -49,7 +49,7 @@ export function envHead (): boolean {
 }
 
 export function envStealthless (): boolean {
-  const KEY = 'WECHATY_PUPPET_WECHAT_STEALTHLESS'
+  const KEY = 'WECHATY_PUPPET_WECHAT_PUPPETEER_STEALTHLESS'
   return !!process.env[KEY]
 
 }
