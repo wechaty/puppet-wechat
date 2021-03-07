@@ -1,19 +1,19 @@
 # WECHATY-PUPPET-WECHAT
 
-[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/chatie/wechaty)
+[![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/wechaty/wechaty)
 [![NPM Version](https://badge.fury.io/js/wechaty-puppet-wechat.svg)](https://badge.fury.io/js/wechaty-puppet-wechat)
 [![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-wechat/next.svg)](https://www.npmjs.com/package/wechaty-puppet-wechat?activeTab=versions)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 [![NPM](https://github.com/wechaty/wechaty-puppet-wechat/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-wechat/actions?query=workflow%3ANPM)
 
-[![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-wechat/images/puppeteer-logo.png)](https://github.com/chatie/wechaty-puppet-wechat)
+[![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-wechat/images/puppeteer-logo.png)](https://github.com/wechaty/wechaty-puppet-wechat)
 
 > Picture Credit: [https://www.forsbergplustwo.com](https://www.forsbergplustwo.com/blogs/news/pdf-generation-with-chrome-headless-in-ruby-using-puppeteer-on-heroku)
 
 Wechaty Puppet for WeChat
 
-- This repository is a sub module of Wechaty. See: <https://github.com/Chatie/wechaty-puppet-wechat/issues/1>
-- Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/Chatie/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
+- This repository is a sub module of Wechaty. See: <https://github.com/wechaty/wechaty-puppet-wechat/issues/1>
+- Source code before moved to here can be found at Wechaty repository: [Wechaty/src/puppet-puppeteer#a2c56e6](https://github.com/wechaty/wechaty/tree/a2c56e62642f9004243e3ad8e9c9d0b0dd1a4761/src/puppet-puppeteer)
 
 ## KNOWN LIMITATIONS
 
@@ -23,7 +23,7 @@ Wechaty Puppet for WeChat
 
 If you want to break the above limitations, please consider to use a Wechaty Puppet other than using Web API, like [wechaty-puppet-padchat](https://github.com/lijiarui/wechaty-puppet-padchat).
 
-Learn more about the Puppet at [Wechaty wiki: Puppet](https://github.com/Chatie/wechaty/wiki/Puppet)
+Learn more about the Puppet at [Wechaty wiki: Puppet](https://github.com/wechaty/wechaty/wiki/Puppet)
 
 ## Note for Developers in China
 
@@ -118,7 +118,7 @@ You need to be able to run chrome in your Linux environment. If you are using Ub
 sudo apt-get install libxss1
 ```
 
-See: <https://github.com/Chatie/wechaty/issues/1152>
+See: <https://github.com/wechaty/wechaty/issues/1152>
 
 ## AUTHOR
 
