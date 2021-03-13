@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 [![NPM](https://github.com/wechaty/wechaty-puppet-wechat/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-wechat/actions?query=workflow%3ANPM)
 
-[![Wechaty Puppet Puppeteer](https://wechaty.github.io/wechaty-puppet-wechat/images/puppeteer-logo.png)](https://github.com/wechaty/wechaty-puppet-wechat)
+[![Wechaty Puppet Puppeteer](docs/images/wechaty-puppet-wechat.png)](https://github.com/wechaty/wechaty-puppet-wechat)
 
 > Picture Credit: [https://www.forsbergplustwo.com](https://www.forsbergplustwo.com/blogs/news/pdf-generation-with-chrome-headless-in-ruby-using-puppeteer-on-heroku)
 
