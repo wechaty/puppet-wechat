@@ -225,6 +225,34 @@ export class Bridge extends EventEmitter {
     // might be called before initPage() return.
     const page = this.page =  await browser.newPage()
 
+    page.on('error',  e => this.emit('error', e))
+    page.on('dialog', this.onDialog.bind(this))
+
+    const cookieList = (
+      await this.options.memory.get(MEMORY_SLOT)
+    ) as Protocol.Network.Cookie[]
+
+    const url = this.entryUrl(cookieList)
+    log.verbose('PuppetWeChatBridge', 'initPage() before page.goto(url)')
+
+    // Does this related to(?) the CI Error: exception: Navigation Timeout Exceeded: 30000ms exceeded
+    await page.goto(url)
+    log.verbose('PuppetWeChatBridge', 'initPage() after page.goto(url)')
+
+    await this.uosPatch(page)
+
+    if (cookieList && cookieList.length) {
+      await page.setCookie(...cookieList)
+      log.silly('PuppetWeChatBridge', 'initPage() page.setCookie() %s cookies set back', cookieList.length)
+    }
+
+    page.on('load', () => this.emit('load', page))
+    await page.reload() // reload page to make effect of the new cookie.
+
+    return page
+  }
+
+  private async uosPatch (page: Page) {
     /**
      * Can we support UOS with puppeteer? #127
      *  https://github.com/wechaty/wechaty-puppet-wechat/issues/127
@@ -240,30 +268,6 @@ export class Bridge extends EventEmitter {
       referer : 'https://wx.qq.com/?&lang=zh_CN&target=t',
     }
     await page.setExtraHTTPHeaders(extraHeaders)
-
-    page.on('error',  e => this.emit('error', e))
-
-    page.on('dialog', this.onDialog.bind(this))
-
-    const cookieList = (await this.options.memory.get(MEMORY_SLOT)) as Protocol.Network.Cookie[]
-    const url        = this.entryUrl(cookieList)
-
-    log.verbose('PuppetWeChatBridge', 'initPage() before page.goto(url)')
-
-    // Does this related to(?) the CI Error: exception: Navigation Timeout Exceeded: 30000ms exceeded
-    await page.goto(url)
-
-    log.verbose('PuppetWeChatBridge', 'initPage() after page.goto(url)')
-
-    if (cookieList && cookieList.length) {
-      await page.setCookie(...cookieList)
-      log.silly('PuppetWeChatBridge', 'initPage() page.setCookie() %s cookies set back', cookieList.length)
-    }
-
-    page.on('load', () => this.emit('load', page))
-    await page.reload() // reload page to make effect of the new cookie.
-
-    return page
   }
 
   public async readyAngular (page: Page): Promise<void> {
