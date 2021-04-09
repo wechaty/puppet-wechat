@@ -131,12 +131,16 @@ export class Bridge extends EventEmitter {
     if (this.options.endpoint) {
       launchOptions.executablePath = this.options.endpoint
     }
+
+    const extensionOptionsArgs = [
+      ...this.getWeChromeExtensionOptionsArgs(),
+    ]
+
     const options = {
       ...launchOptions,
       args: [
         '--audio-output-channels=0',
         '--disable-default-apps',
-        '--disable-extensions',
         '--disable-translate',
         '--disable-gpu',
         '--disable-setuid-sandbox',
@@ -145,6 +149,7 @@ export class Bridge extends EventEmitter {
         '--mute-audio',
         '--no-sandbox',
         ...launchOptionsArgs,
+        ...extensionOptionsArgs,
       ],
       headless,
     }
@@ -239,7 +244,8 @@ export class Bridge extends EventEmitter {
     await page.goto(url)
     log.verbose('PuppetWeChatBridge', 'initPage() after page.goto(url)')
 
-    await this.uosPatch(page)
+    // await this.uosPatch(page)
+    void this.uosPatch
 
     if (cookieList && cookieList.length) {
       await page.setCookie(...cookieList)
@@ -268,6 +274,30 @@ export class Bridge extends EventEmitter {
       referer : 'https://wx.qq.com/?&lang=zh_CN&target=t',
     }
     await page.setExtraHTTPHeaders(extraHeaders)
+  }
+
+  private getWeChromeExtensionOptionsArgs (): string[] {
+    /**
+     * Issue #127: Can we support UOS with puppeteer?
+     *  https://github.com/wechaty/wechaty-puppet-wechat/issues/127
+     *  https://github.com/adamyi/wechrome - Chrome extension to unblock web wechat
+     *  https://stackoverflow.com/a/51434261/1123955
+     */
+    const weChromeExt = path.join(
+      __dirname,
+      '..',
+      'wechrome'
+    )
+    if (!fs.existsSync(weChromeExt)) {
+      throw new Error('WeChrome extension not found.')
+    }
+
+    const extensionOptionsArgs = [
+      `--load-extension=${weChromeExt}`,
+      `--disable-extensions-except=${weChromeExt}`,
+    ]
+
+    return extensionOptionsArgs
   }
 
   public async readyAngular (page: Page): Promise<void> {
