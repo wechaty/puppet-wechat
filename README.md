@@ -86,6 +86,13 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ### master
 
+### v0.28 (Apr 13, 2021)
+
+[重磅：绕过登录限制，wechaty免费版web协议重放荣光](https://wechaty.js.org/2021/04/13/wechaty-uos-web/)
+
+1. Support UOS with puppeteer [#127](https://github.com/wechaty/wechaty-puppet-wechat/issues/127)
+1. 添加uos请求头支持 [#129](https://github.com/wechaty/wechaty-puppet-wechat/pull/129)
+
 ### v0.26 (Mar 4, 2021)
 
 Rename NPM package name from `wechaty-puppet-puppeteer` to `wechaty-puppet-wechat`
