@@ -1076,7 +1076,7 @@ export class Bridge extends EventEmitter {
     }
     log.silly('PuppetWeChatBridge', 'cookieDomain() got %s', url)
 
-    return url
+    return url + '?target=t'
   }
 
   public async reload (): Promise<void> {
