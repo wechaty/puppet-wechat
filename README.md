@@ -73,6 +73,8 @@ const bot = new Wechaty({
 
 We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) to make puppeteer more like a normal browser, if you want to disabled it, just set the `WECHATY_PUPPET_PUPPETEER_STEALTHLESS` environment variable to `1`. eg. `WECHATY_PUPPET_PUPPETEER_STEALTHLESS=1 ts-node your-bot.ts`
 
+[In rare cases](https://github.com/wechaty/matrix-appservice-wechaty/issues/78#issuecomment-882208894), we could meet some problem and see `Error: Could not find expected browser` when we start PuppetWeChatBridge and try to run `initBrowser()`. A easy way to solve this problem is set `WECHATY_PUPPET_PUPPETEER_ENDPOINT` environment variable to `<your executablePath>`. eg. `WECHATY_PUPPET_PUPPETEER_ENDPOINT=/usr/bin/chromium-browser ts-node your-bot.ts`
+
 ## puppetOptions
 
 | Option        |  value  | default value | description                                                                                                                 |
