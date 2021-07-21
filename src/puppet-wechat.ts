@@ -128,6 +128,7 @@ export class PuppetWeChat extends Puppet {
     this.fileId = 0
     this.bridge = new Bridge({
       endpoint      : options.endpoint || process.env.WECHATY_PUPPET_PUPPETEER_ENDPOINT,
+      extspam       : options.token || process.env.WECHATY_PUPPET_WECHAT_TOKEN,
       head          : typeof options.head === 'boolean' ? options.head : envHead(),
       launchOptions : options.launchOptions as LaunchOptions,
       memory        : this.memory,

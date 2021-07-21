@@ -79,6 +79,7 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 | Option        |  value  | default value | description                                                                                                                 |
 | ------------- | :-----: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------- |
+| token         | string  |       -       | your own extspam value, see [#127](https://github.com/wechaty/wechaty-puppet-wechat/issues/127)                             |
 | endpoint      | string  |       -       | puppeteerlaunchoptions.executablePath                                                                                       |
 | head          | boolean |     false     | puppeteerlaunchoptions.headless                                                                                             |
 | launchOptions | object  |       -       | same to [puppeteerlaunchoptions](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions) |
