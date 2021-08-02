@@ -278,6 +278,16 @@ export class Bridge extends EventEmitter {
     await page.setRequestInterception(true)
     page.on('request', async req => {
       const url = new URL(req.url())
+      if (url.pathname === '/' && url.search.indexOf('target=t') === -1) {
+        if (url.search === '' || url.search === '?') {
+          url.search = '?'
+        } else {
+          url.search += '&'
+        }
+        url.search += 'target=t'
+        await req.continue({ url })
+        return
+      }
       if (url.pathname === '/cgi-bin/mmwebwx-bin/webwxnewloginpage') {
         const override = {
           headers: {
