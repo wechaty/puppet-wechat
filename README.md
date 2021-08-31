@@ -17,7 +17,7 @@ Wechaty Puppet for WeChat
 
 ## KNOWN LIMITATIONS
 
-1. WeChat Account that registered after 2017 mignt not be able to login Web Wechat, so it can not use PuppetWeChat with Wechaty. Please make sure your WeChat Account can be able to login by visiting <https://wx.qq.com>
+1. Solved by UOS. ~~WeChat Account that registered after 2017 mignt not be able to login Web Wechat, so it can not use PuppetWeChat with Wechaty. Please make sure your WeChat Account can be able to login by visiting <https://wx.qq.com>~~
 1. Web API can not create room and invite members to room since 2018.
 1. Can not Receive/Send message from Work Wechat.
 
