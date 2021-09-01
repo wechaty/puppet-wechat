@@ -16,22 +16,19 @@
  *   limitations under the License.
  *
  */
-
-// tslint:disable:no-var-requires
-// tslint:disable:arrow-parens
-
-// const retryPromise  = require('retry-promise').default
-// import cuid from 'cuid'
+import {
+  PayloadType,
+}                from 'wechaty-puppet'
 
 import {
   log,
-}               from './config'
+}               from './config.js'
 
-import { PuppetWeChat }    from './puppet-wechat'
-import {
+import type { PuppetWeChat }    from './puppet-wechat.js'
+import type {
   // WebRecomendInfo,
   WebMessageRawPayload,
-}                             from './web-schemas'
+}                             from './web-schemas.js'
 
 // import {
 //   // FriendRequestPayload,
@@ -192,7 +189,7 @@ export class Firer {
      * Convert the display name to Contact ID
      */
     let   inviterContactId: undefined | string
-    const inviteeContactIdList: string[]       = []
+    const inviteeContactIdList: string[] = []
 
     if (/^You|你$/i.test(inviterName)) { //  === 'You' || inviter === '你' || inviter === 'you'
       inviterContactId = this.puppet.selfId()
@@ -217,7 +214,7 @@ export class Firer {
        * set inviteeContactIdList
        */
       for (let i = 0; i < inviteeNameList.length; i++) {
-        const inviteeName = inviteeNameList[i]
+        const inviteeName = inviteeNameList[i]!
 
         const inviteeContactId = inviteeContactIdList[i]
         if (inviteeContactId) {
@@ -230,7 +227,7 @@ export class Firer {
           } catch (e) {
             log.warn('PuppetWeChatFirer', 'fireRoomJoin() contactPayload(%s) exception: %s',
               inviteeContactId,
-              e.message,
+              (e as Error).message,
             )
             ready = false
           }
@@ -247,12 +244,16 @@ export class Firer {
 
           const contactId = memberIdList[0]
           // XXX: Take out the first one if we have matched many contact.
-          inviteeContactIdList[i] = contactId
+          inviteeContactIdList[i] = contactId!
 
-          try {
-            await this.puppet.contactPayload(contactId)
-          } catch (e) {
+          if (!contactId) {
             ready = false
+          } else {
+            try {
+              await this.puppet.contactPayload(contactId)
+            } catch (e) {
+              ready = false
+            }
           }
 
         }
@@ -278,9 +279,11 @@ export class Firer {
          * Resolve All Payload again to make sure the data is ready.
          */
         await Promise.all(
-          inviteeContactIdList.map(
-            id => this.puppet.contactPayload(id),
-          ),
+          inviteeContactIdList
+            .filter(id => !!id)
+            .map(
+              id => this.puppet.contactPayload(id!),
+            ),
         )
 
         if (!inviterContactId) {
@@ -322,7 +325,7 @@ export class Firer {
     try {
       [leaverName, removerName] = this.parseRoomLeave(rawPayload.Content)
     } catch (e) {
-      log.silly('PuppetWeChatFirer', 'fireRoomLeave() %s', e.message)
+      log.silly('PuppetWeChatFirer', 'fireRoomLeave() %s', (e as Error).message)
       return false
     }
     log.silly('PuppetWeChatFirer', 'fireRoomLeave() got leaverName: %s', leaverName)
@@ -371,7 +374,11 @@ export class Firer {
     })
 
     setTimeout(async () => {
-      await this.puppet.roomPayloadDirty(roomId)
+      await this.puppet.dirtyPayload(PayloadType.Room, roomId)
+      // this.puppet.emit('dirty', {
+      //   payloadType: PayloadType.Room,
+      //   payloadId: roomId,
+      // })
       await this.puppet.roomPayload(roomId)
     }, 10 * 1000) // reload the room data, especially for memberList
 
@@ -419,7 +426,7 @@ export class Firer {
       })
       return true
     } catch (e) {
-      log.error('PuppetWeChatFirer', 'fireRoomTopic() co exception: %s', e.stack)
+      log.error('PuppetWeChatFirer', 'fireRoomTopic() co exception: %s', (e as Error).stack)
       return false
     }
   }
@@ -473,9 +480,9 @@ export class Firer {
     const [inviter, inviteeStr] = foundInvite ? [foundInvite[1], foundInvite[2]] : [foundQrcode[2], foundQrcode[1]]
 
     // FIXME: should also compatible english split
-    const inviteeList = inviteeStr.split(/、/)
+    const inviteeList = inviteeStr?.split(/、/) || []
 
-    return [inviteeList, inviter] // put invitee at first place
+    return [inviteeList, inviter!] // put invitee at first place
   }
 
   private parseRoomLeave (
@@ -508,7 +515,7 @@ export class Firer {
       throw new Error('no match')
     }
 
-    return [leaverName, removerName]
+    return [leaverName!, removerName!]
   }
 
   private parseRoomTopic (
@@ -522,7 +529,7 @@ export class Firer {
       throw new Error('checkRoomTopic() not found')
     }
     const [, changer, topic] = found
-    return [topic, changer]
+    return [topic!, changer!]
   }
 
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 
 /**
  *   Wechaty - https://github.com/chatie/wechaty
@@ -18,23 +18,21 @@
  *   limitations under the License.
  *
  */
-// tslint:disable:arrow-parens
-// tslint:disable:no-shadowed-variable
-
-import { test, sinon } from 'tstest'
+import {
+  test,
+  sinon,
+}           from 'tstest'
 // import {
 //   cloneClass,
 // }               from 'clone-class'
 
 import {
   log,
-}              from '../src/config'
+}              from '../src/config.js'
 
-import PuppetWeChat  from '../src/puppet-wechat'
+import PuppetWeChat  from '../src/puppet-wechat.js'
 
 test('Contact smoke testing', async t => {
-
-  /* tslint:disable:variable-name */
   const UserName = '@0bb3e4dd746fdbd4a80546aef66f4085'
   const NickName = 'NickNameTest'
   const RemarkName = 'AliasTest'
@@ -58,15 +56,14 @@ test('Contact smoke testing', async t => {
 
   const contactPayload = await puppet.contactPayload(UserName)
 
-  // tslint:disable-next-line:variable-name
   // const MyContact = cloneClass(Contact)
   // MyContact.puppet = puppet as any  // FIXME: any
 
   // const c = new MyContact(UserName)
-  t.is(contactPayload.id, UserName, 'id/UserName right')
+  t.equal(contactPayload.id, UserName, 'id/UserName right')
 
-  t.is(contactPayload.name,   NickName, 'NickName set')
-  t.is(contactPayload.alias,  RemarkName, 'should get the right alias from Contact')
+  t.equal(contactPayload.name,   NickName, 'NickName set')
+  t.equal(contactPayload.alias,  RemarkName, 'should get the right alias from Contact')
 
   sandbox.restore()
 

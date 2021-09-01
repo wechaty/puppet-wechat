@@ -1,10 +1,10 @@
-import {
+import type {
   WebMessageRawPayload,
-}                         from '../web-schemas'
+}                         from '../web-schemas.js'
 
 import {
   messageExtname,
-}                         from './message-extname'
+}                         from './message-extname.js'
 
 export function messageFilename (
   rawPayload: WebMessageRawPayload,

@@ -1,21 +1,22 @@
-import {
-  WebMessageRawPayload,
-}                         from '../web-schemas'
-
-import {
+import type {
   MessagePayload,
   MessageType,
 }                 from 'wechaty-puppet'
+
+import type {
+  WebMessageRawPayload,
+}                         from '../web-schemas.js'
+
 import {
   isRoomId,
-}                 from './is-type'
+}                 from './is-type.js'
 
 import {
   messageFilename,
-}                 from './message-filename'
+}                 from './message-filename.js'
 import {
   webMessageType,
-}                 from './web-message-type'
+}                 from './web-message-type.js'
 
 export function messageRawPayloadParser (
   rawPayload: WebMessageRawPayload,

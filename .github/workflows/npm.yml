@@ -7,16 +7,23 @@ jobs:
     name: Build
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node: [14]
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        node:
+          - 14
+          - 16
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: package.json
 
       - name: Install Dependencies
         run: npm install
@@ -30,15 +37,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package.json
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Generate Version
-        run: ./scripts/generate-version.sh
+      - name: Generate Package JSON
+        run: ./scripts/generate-package-json.sh
 
       - name: Pack Testing
         run: ./scripts/npm-pack-testing.sh
@@ -46,22 +55,24 @@ jobs:
           WECHATY_PUPPET_HOSTIE_TOKEN: ${{ secrets.WECHATY_PUPPET_HOSTIE_TOKEN }}
 
   publish:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/v'))
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v'))
     name: Publish
     needs: [build, pack]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
+          cache: 'npm'
+          cache-dependency-path: package.json
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Generate Version
-        run: ./scripts/generate-version.sh
+      - name: Generate Package JSON
+        run: ./scripts/generate-package-json.sh
 
       - name: Set Publish Config
         run: ./scripts/package-publish-config-tag.sh
@@ -72,7 +83,7 @@ jobs:
       - name: Check Branch
         id: check-branch
         run: |
-          if [[ ${{ github.ref }} =~ ^refs/heads/(master|v[0-9]+\.[0-9]+.*)$ ]]; then
+          if [[ ${{ github.ref }} =~ ^refs/heads/(main|v[0-9]+\.[0-9]+.*)$ ]]; then
               echo ::set-output name=match::true
           fi  # See: https://stackoverflow.com/a/58869470/1123955
       - name: Is A Publish Branch
