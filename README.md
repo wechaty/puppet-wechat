@@ -87,7 +87,9 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### master
+### master v0.29
+
+1. ESM support.
 
 ### v0.28 (Apr 13, 2021)
 
@@ -132,14 +134,15 @@ See: <https://github.com/wechaty/wechaty/issues/1152>
 
 ## AUTHOR
 
-[Huan LI](http://linkedin.com/in/zixia) \<zixia@zixia.net\>
+[Huan LI](http://linkedin.com/in/zixia) Tencent TVP of Chatbot \<zixia@zixia.net\>
 
+<!-- markdownlint-disable MD033 -->
 <a href="https://stackexchange.com/users/265499">
   <img src="https://stackexchange.com/users/flair/265499.png" width="208" height="58" alt="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for zixia on Stack Exchange, a network of free, community-driven Q&amp;A sites">
 </a>
 
 ## COPYRIGHT & LICENSE
 
-- Code & Docs © 2016-2019 Huan LI \<zixia@zixia.net\>
+- Code & Docs © 2016-now Huan LI \<zixia@zixia.net\>
 - Code released under the Apache-2.0 License
 - Docs released under Creative Commons

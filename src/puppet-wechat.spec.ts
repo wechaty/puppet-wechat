@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty - https://github.com/chatie/wechaty
  *
@@ -17,12 +17,10 @@
  *   limitations under the License.
  *
  */
-// tslint:disable:no-shadowed-variable
-// tslint:disable:no-var-requires
-// tslint:disable:only-arrow-functions
-// tslint:disable:arrow-parens
-
-import { test, sinon } from 'tstest'// const sinonTest   = require('sinon-test')(sinon, {
+import {
+  test,
+  sinon,
+}               from 'tstest'// const sinonTest   = require('sinon-test')(sinon, {
 //   useFakeTimers: {  // https://github.com/sinonjs/lolex
 //     advanceTimeDelta  : 10,
 //     shouldAdvanceTime : true,
@@ -32,21 +30,21 @@ import { test, sinon } from 'tstest'// const sinonTest   = require('sinon-test')
 // import { log }    from './config'
 // log.level('silly')
 
-import { Bridge }           from './bridge'
-import { Event }            from './event'
-import { PuppetWeChat }  from './puppet-wechat'
+import { Bridge }           from './bridge.js'
+import { Event }            from './event.js'
+import { PuppetWeChat }  from './puppet-wechat.js'
 
 class PuppetTest extends PuppetWeChat {
 
-  public contactRawPayload (id: string) {
+  override contactRawPayload (id: string) {
     return super.contactRawPayload(id)
   }
 
-  public roomRawPayload (id: string) {
+  override roomRawPayload (id: string) {
     return super.roomRawPayload(id)
   }
 
-  public messageRawPayload (id: string) {
+  override messageRawPayload (id: string) {
     return super.messageRawPayload(id)
   }
 
@@ -88,14 +86,14 @@ test('login/logout events', async t => {
 
     await puppet.start()
     t.pass('should be inited')
-    t.is(puppet.logonoff(), false, 'should be not logined')
+    t.equal(puppet.logonoff(), false, 'should be not logined')
 
     const future = new Promise(resolve => puppet.once('login', resolve))
       .catch(e => t.fail(e))
     puppet.bridge.emit('login', 'TestPuppetWeChat')
     await future
 
-    t.is(puppet.logonoff(), true, 'should be logined')
+    t.equal(puppet.logonoff(), true, 'should be logined')
 
     t.ok((puppet.bridge.getUserName as any).called, 'bridge.getUserName should be called')
 
@@ -115,18 +113,18 @@ test('login/logout events', async t => {
      *
      * 3, 4, 5 is PuppetWeChat.waitStable() for `unchangedNum` to reach 3 times.
      */
-    t.is((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
+    t.equal((Bridge.prototype.contactList as any).callCount, 6, 'should call stubContacList 6 times')
 
     t.ok(readySpy.called, 'should emit ready event, after login')
 
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
     puppet.bridge.emit('logout')
-    t.is(await logoutPromise, 'logoutFired', 'should fire logout event')
-    t.is(puppet.logonoff(), false, 'should be logouted')
+    t.equal(await logoutPromise, 'logoutFired', 'should fire logout event')
+    t.equal(puppet.logonoff(), false, 'should be logouted')
 
     await puppet.stop()
   } catch (e) {
-    t.fail(e)
+    t.fail(e as any)
   } finally {
     sandbox.restore()
   }

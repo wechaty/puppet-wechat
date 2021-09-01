@@ -16,11 +16,6 @@
  *   limitations under the License.
  *
  */
-
-// tslint:disable:member-ordering
-// tslint:disable:arrow-parens
-// tslint:disable:object-literal-key-quotes
-
 import path    from 'path'
 import nodeUrl from 'url'
 
@@ -28,7 +23,7 @@ import BufferList from 'bl'
 import md5        from 'md5'
 import mime       from 'mime'
 import request    from 'request'
-import {
+import type {
   LaunchOptions,
 }                 from 'puppeteer'
 
@@ -68,16 +63,16 @@ import {
   UrlLinkPayload,
   ImageType,
   EventScanPayload,
+  log,
 }                           from 'wechaty-puppet'
 
 import {
   envStealthless,
   envHead,
-  log,
   MEMORY_SLOT,
   qrCodeForChatie,
   VERSION,
-}                           from './config'
+}                           from './config.js'
 
 import {
   messageFilename,
@@ -85,15 +80,15 @@ import {
   plainText,
   unescapeHtml,
   isRoomId,
-}                           from './pure-function-helpers/mod'
+}                           from './pure-function-helpers/mod.js'
 
 import {
   Bridge,
   Cookie,
-}                           from './bridge'
+}                           from './bridge.js'
 import {
   Event,
-}                           from './event'
+}                           from './event.js'
 
 import {
   WebAppMsgType,
@@ -105,13 +100,19 @@ import {
   WebRecomendInfo,
   WebRoomRawMember,
   WebRoomRawPayload,
-}                           from './web-schemas'
+}                           from './web-schemas.js'
 
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
+type PuppetWeChatOptions = PuppetOptions & {
+  head?          : boolean
+  launchOptions? : LaunchOptions
+  stealthless?   : boolean
+}
+
 export class PuppetWeChat extends Puppet {
 
-  public static readonly VERSION = VERSION
+  public static override readonly VERSION = VERSION
 
   public bridge: Bridge
 
@@ -121,16 +122,16 @@ export class PuppetWeChat extends Puppet {
   private fileId: number
 
   constructor (
-    public options: PuppetOptions = {},
+    public override options: PuppetWeChatOptions = {},
   ) {
     super(options)
 
     this.fileId = 0
     this.bridge = new Bridge({
-      endpoint      : options.endpoint || process.env.WECHATY_PUPPET_PUPPETEER_ENDPOINT,
-      extspam       : options.token || process.env.WECHATY_PUPPET_WECHAT_TOKEN,
-      head          : typeof options.head === 'boolean' ? options.head : envHead(),
-      launchOptions : options.launchOptions as LaunchOptions,
+      endpoint      : options.endpoint || process.env['WECHATY_PUPPET_PUPPETEER_ENDPOINT'],
+      extspam       : options.token || process.env['WECHATY_PUPPET_WECHAT_TOKEN'],
+      head          : typeof options.head === 'boolean' ? options['head'] : envHead(),
+      launchOptions : options.launchOptions,
       memory        : this.memory,
       stealthless   : typeof options.stealthless === 'boolean' ? options.stealthless : envStealthless(),
     })
@@ -141,7 +142,7 @@ export class PuppetWeChat extends Puppet {
     this.initWatchdogForScan()
   }
 
-  public async start (): Promise<void> {
+  public override async start (): Promise<void> {
     log.verbose('PuppetWeChat', `start() with ${this.memory.name}`)
 
     if (this.state.on()) {
@@ -153,6 +154,8 @@ export class PuppetWeChat extends Puppet {
     this.state.on('pending')
 
     try {
+      await super.start()
+
       /**
        * Overwrite the memory in bridge
        * because it could be changed between constructor() and start()
@@ -196,19 +199,20 @@ export class PuppetWeChat extends Puppet {
       return
 
     } catch (e) {
-      log.error('PuppetWeChat', 'start() exception: %s', e)
+      log.error('PuppetWeChat', 'start() exception: %s', e as Error)
 
       // this.state.off(true)
-      this.emit('error', e)
+      this.emit('error', {
+        data: (e as Error).message,
+      })
       await this.stop()
 
       throw e
     }
   }
 
-  public async stop (): Promise<void> {
+  public override async stop (): Promise<void> {
     log.verbose('PuppetWeChat', 'stop()')
-
     if (this.state.off()) {
       log.warn('PuppetWeChat', 'stop() is called on a OFF puppet. await ready(off) and return.')
       await this.state.ready('off')
@@ -218,6 +222,8 @@ export class PuppetWeChat extends Puppet {
 
     log.verbose('PuppetWeChat', 'stop() make watchdog sleep before do stop')
 
+    await super.stop()
+
     /**
      * Clean listeners for `watchdog`
      */
@@ -225,14 +231,14 @@ export class PuppetWeChat extends Puppet {
     this.scanWatchdog.sleep()
     // this.watchdog.removeAllListeners()
     this.scanWatchdog.removeAllListeners()
-    this.removeAllListeners('watchdog')
+    this.removeAllListeners('watchdog' as any)
 
     try {
       await this.bridge.stop()
       // register the removeListeners micro task at then end of the task queue
       setImmediate(() => this.bridge.removeAllListeners())
     } catch (e) {
-      log.error('PuppetWeChat', 'this.bridge.quit() exception: %s', e.message)
+      log.error('PuppetWeChat', 'this.bridge.quit() exception: %s', (e as Error).message)
       throw e
     } finally {
       this.state.off(true)
@@ -284,15 +290,17 @@ export class PuppetWeChat extends Puppet {
       try {
         await this.bridge.reload()
       } catch (e) {
-        log.error('PuppetWeChat', 'initScanWatchdog() on(reset) exception: %s', e)
+        log.error('PuppetWeChat', 'initScanWatchdog() on(reset) exception: %s', e as Error)
         try {
-          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) try to recover by bridge.{quit,init}()', e)
+          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) try to recover by bridge.{quit,init}()', e as Error)
           await this.bridge.stop()
           await this.bridge.start()
           log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover successful')
         } catch (e) {
-          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover FAIL: %s', e)
-          this.emit('error', e)
+          log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover FAIL: %s', e as Error)
+          this.emit('error', {
+            data: (e as Error).message,
+          })
         }
       }
     })
@@ -303,7 +311,7 @@ export class PuppetWeChat extends Puppet {
 
     if (this.state.off()) {
       const e = new Error('initBridge() found targetState != live, no init anymore')
-      log.warn('PuppetWeChat', e.message)
+      log.warn('PuppetWeChat', (e as Error).message)
       throw e
     }
 
@@ -311,7 +319,7 @@ export class PuppetWeChat extends Puppet {
     // this.bridge.on('ding'     , Event.onDing.bind(this))
     this.bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
 
-    this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && e.message) || String(e) }))
+    this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && (e as Error).message) || String(e) }))
     this.bridge.on('log',       Event.onLog.bind(this))
     this.bridge.on('login',     Event.onLogin.bind(this))
     this.bridge.on('logout',    Event.onLogout.bind(this))
@@ -322,11 +330,13 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.start()
     } catch (e) {
-      log.error('PuppetWeChat', 'initBridge() exception: %s', e.message)
+      log.error('PuppetWeChat', 'initBridge() exception: %s', (e as Error).message)
       await this.bridge.stop().catch(e => {
-        log.error('PuppetWeChat', 'initBridge() this.bridge.stop() rejection: %s', e)
+        log.error('PuppetWeChat', 'initBridge() this.bridge.stop() rejection: %s', e as Error)
       })
-      this.emit('error', e)
+      this.emit('error', {
+        data: (e as Error).message,
+      })
 
       throw e
     }
@@ -340,12 +350,12 @@ export class PuppetWeChat extends Puppet {
       const obj = JSON.parse(json)
       return obj.BaseRequest
     } catch (e) {
-      log.error('PuppetWeChat', 'send() exception: %s', e.message)
+      log.error('PuppetWeChat', 'send() exception: %s', (e as Error).message)
       throw e
     }
   }
 
-  public unref (): void {
+  public override unref (): void {
     log.verbose('PuppetWeChat', 'unref ()')
     super.unref()
 
@@ -469,7 +479,7 @@ export class PuppetWeChat extends Puppet {
    * TODO: Test this function if it could work...
    */
   // public async forward(baseData: MsgRawObj, patchData: MsgRawObj): Promise<boolean> {
-  public async messageForward (
+  public override async messageForward (
     conversationId  : string,
     messageId : string,
   ): Promise<void> {
@@ -537,7 +547,7 @@ export class PuppetWeChat extends Puppet {
         throw new Error('forward failed')
       }
     } catch (e) {
-      log.error('PuppetWeChat', 'forward() exception: %s', e.message)
+      log.error('PuppetWeChat', 'forward() exception: %s', (e as Error).message)
       throw e
     }
   }
@@ -551,19 +561,19 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.send(conversationId, text)
     } catch (e) {
-      log.error('PuppetWeChat', 'messageSendText() exception: %s', e.message)
+      log.error('PuppetWeChat', 'messageSendText() exception: %s', (e as Error).message)
       throw e
     }
   }
 
-  public async login (userId: string): Promise<void> {
+  public override async login (userId: string): Promise<void> {
     return super.login(userId)
   }
 
   /**
    * logout from browser, then server will emit `logout` event
    */
-  public async logout (): Promise<void> {
+  public override async logout (): Promise<void> {
     log.verbose('PuppetWeChat', 'logout()')
 
     const user = this.selfId()
@@ -575,7 +585,7 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.logout()
     } catch (e) {
-      log.error('PuppetWeChat', 'logout() exception: %s', e.message)
+      log.error('PuppetWeChat', 'logout() exception: %s', (e as Error).message)
       throw e
     } finally {
       this.id = undefined
@@ -612,7 +622,7 @@ export class PuppetWeChat extends Puppet {
       const rawPayload = await this.bridge.getContact(id) as WebContactRawPayload
       return rawPayload
     } catch (e) {
-      log.error('PuppetWeChat', 'contactRawPayload(%s) exception: %s', id, e.message)
+      log.error('PuppetWeChat', 'contactRawPayload(%s) exception: %s', id, (e as Error).message)
       throw e
     }
 
@@ -652,6 +662,7 @@ export class PuppetWeChat extends Puppet {
       gender:     rawPayload.Sex,
       id:         rawPayload.UserName,
       name:       plainText(rawPayload.NickName || ''),
+      phone: [],
       province:   rawPayload.Province,
       signature:  rawPayload.Signature,
       star:       !!rawPayload.StarFriend,
@@ -663,7 +674,7 @@ export class PuppetWeChat extends Puppet {
         */
       type:      (!!rawPayload.UserName && !rawPayload.UserName.startsWith('@@') && !!(rawPayload.VerifyFlag & 8))
         ? ContactType.Official
-        : ContactType.Personal,
+        : ContactType.Individual,
       weixin:     rawPayload.Alias,  // Wechat ID
     }
   }
@@ -711,7 +722,7 @@ export class PuppetWeChat extends Puppet {
       )
 
     } catch (err) {
-      log.warn('PuppeteerContact', 'avatar() exception: %s', err.stack)
+      log.warn('PuppeteerContact', 'avatar() exception: %s', (err as Error).stack)
       throw err
     }
   }
@@ -745,7 +756,7 @@ export class PuppetWeChat extends Puppet {
         throw new Error('bridge.contactAlias fail')
       }
     } catch (e) {
-      log.warn('PuppetWeChat', 'contactRemark(%s, %s) rejected: %s', contactId, alias, e.message)
+      log.warn('PuppetWeChat', 'contactRemark(%s, %s) rejected: %s', contactId, alias, (e as Error).message)
       throw e
     }
   }
@@ -817,7 +828,7 @@ export class PuppetWeChat extends Puppet {
       throw new Error('no payload')
 
     } catch (e) {
-      log.error('PuppetWeChat', 'roomRawPayload(%s) exception: %s', id, e.message)
+      log.error('PuppetWeChat', 'roomRawPayload(%s) exception: %s', id, (e as Error).message)
       throw e
     }
   }
@@ -890,7 +901,7 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.roomDelMember(roomId, contactId)
     } catch (e) {
-      log.warn('PuppetWeChat', 'roomDelMember(%s, %d) rejected: %s', roomId, contactId, e.message)
+      log.warn('PuppetWeChat', 'roomDelMember(%s, %d) rejected: %s', roomId, contactId, (e as Error).message)
       throw e
     }
   }
@@ -914,7 +925,7 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.roomAddMember(roomId, contactId)
     } catch (e) {
-      log.warn('PuppetWeChat', 'roomAddMember(%s) rejected: %s', contactId, e.message)
+      log.warn('PuppetWeChat', 'roomAddMember(%s) rejected: %s', contactId, (e as Error).message)
       throw e
     }
   }
@@ -934,7 +945,7 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.roomModTopic(roomId, topic)
     } catch (e) {
-      log.warn('PuppetWeChat', 'roomTopic(%s) rejected: %s', topic, e.message)
+      log.warn('PuppetWeChat', 'roomTopic(%s) rejected: %s', topic, (e as Error).message)
       throw e
     }
   }
@@ -951,7 +962,7 @@ export class PuppetWeChat extends Puppet {
       return roomId
 
     } catch (e) {
-      log.warn('PuppetWeChat', 'roomCreate(%s, %s) rejected: %s', contactIdList.join(','), topic, e.message)
+      log.warn('PuppetWeChat', 'roomCreate(%s, %s) rejected: %s', contactIdList.join(','), topic, (e as Error).message)
       throw e
     }
   }
@@ -994,7 +1005,7 @@ export class PuppetWeChat extends Puppet {
 
     const memberPayloadResult = memberPayloadList.filter(payload => payload.UserName === contactId)
     if (memberPayloadResult.length > 0) {
-      return memberPayloadResult[0]
+      return memberPayloadResult[0]!
     } else {
       throw new Error('not found')
     }
@@ -1102,7 +1113,7 @@ export class PuppetWeChat extends Puppet {
       log.warn('PuppetWeChat', 'friendshipAdd() bridge.verifyUserRequest(%s, %s) rejected: %s',
         contactId,
         hello,
-        e.message,
+        (e as Error).message,
       )
       throw e
     }
@@ -1119,7 +1130,7 @@ export class PuppetWeChat extends Puppet {
       log.warn('PuppetWeChat', 'bridge.verifyUserOk(%s, %s) rejected: %s',
         payload.contactId,
         payload.ticket,
-        e.message,
+        (e as Error).message,
       )
       throw e
     }
@@ -1181,8 +1192,10 @@ export class PuppetWeChat extends Puppet {
       }
       return name
     } catch (e) {
-      log.error('PuppetWeChat', 'hostname() exception:%s', e)
-      this.emit('error', e)
+      log.error('PuppetWeChat', 'hostname() exception:%s', e as Error)
+      this.emit('error', {
+        data: (e as Error).message,
+      })
       throw e
     }
   }
@@ -1266,7 +1279,7 @@ export class PuppetWeChat extends Puppet {
 
             default: {
               const e = new Error('ready() unsupported typeApp(): ' + rawPayload.AppMsgType)
-              log.warn('PuppeteerMessage', e.message)
+              log.warn('PuppeteerMessage', (e as Error).message)
               throw e
             }
           }
@@ -1302,7 +1315,7 @@ export class PuppetWeChat extends Puppet {
       }
 
     } catch (e) {
-      log.warn('PuppetWeChat', 'ready() exception: %s', e.message)
+      log.warn('PuppetWeChat', 'ready() exception: %s', (e as Error).message)
       throw e
     }
 
@@ -1341,10 +1354,11 @@ export class PuppetWeChat extends Puppet {
     }
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
-      file.pipe(new BufferList((err: Error, data: Buffer) => {
+      const bl = new BufferList((err: Error, data: Buffer) => {
         if (err) reject(err)
         else resolve(data)
-      }))
+      })
+      file.pipe(bl)
     })
 
     // Sending video files is not allowed to exceed 20MB
@@ -1443,8 +1457,10 @@ export class PuppetWeChat extends Puppet {
                     obj = JSON.parse(body)
                   } catch (e) {
                     log.error('PuppetWeChat', 'updateMedia() body = %s', body)
-                    log.error('PuppetWeChat', 'updateMedia() exception: %s', e)
-                    this.emit('error', e)
+                    log.error('PuppetWeChat', 'updateMedia() exception: %s', e as Error)
+                    this.emit('error', {
+                      data: (e as Error).message,
+                    })
                   }
                 }
                 if (typeof obj !== 'object' || obj.BaseResponse.Ret !== 0) {
@@ -1464,7 +1480,7 @@ export class PuppetWeChat extends Puppet {
           })
         })
       } catch (e) {
-        log.error('PuppetWeChat', 'uploadMedia() checkUpload exception: %s', e.message)
+        log.error('PuppetWeChat', 'uploadMedia() checkUpload exception: %s', (e as Error).message)
         throw e
       }
       if (!ret.Signature) {
@@ -1543,13 +1559,13 @@ export class PuppetWeChat extends Puppet {
           }
         })
       } catch (e) {
-        log.error('PuppetWeChat', 'uploadMedia() uploadMedia exception: %s', e.message)
-        throw new Error('uploadMedia err: ' + e.message)
+        log.error('PuppetWeChat', 'uploadMedia() uploadMedia exception: %s', (e as Error).message)
+        throw new Error('uploadMedia err: ' + (e as any).message)
       }
     }
     let mediaId = ''
     for (let i = 0; i < bufferData.length; i++) {
-      mediaId = await getMediaId(bufferData[i], i)
+      mediaId = await getMediaId(bufferData[i]!, i)
     }
     if (!mediaId) {
       log.error('PuppetWeChat', 'uploadMedia(): upload fail')
@@ -1576,7 +1592,7 @@ export class PuppetWeChat extends Puppet {
         rawPayload = Object.assign(rawPayload, mediaData)
         log.silly('PuppetWeChat', 'Upload completed, new rawObj:%s', JSON.stringify(rawPayload))
       } catch (e) {
-        log.error('PuppetWeChat', 'sendMedia() exception: %s', e.message)
+        log.error('PuppetWeChat', 'sendMedia() exception: %s', (e as Error).message)
         throw e
       }
     } else {
@@ -1607,7 +1623,7 @@ export class PuppetWeChat extends Puppet {
     try {
       ret = await this.bridge.sendMedia(mediaData)
     } catch (e) {
-      log.error('PuppetWeChat', 'sendMedia() exception: %s', e.message)
+      log.error('PuppetWeChat', 'sendMedia() exception: %s', (e as Error).message)
       throw e
     }
     if (!ret) {
@@ -1652,6 +1668,25 @@ export class PuppetWeChat extends Puppet {
 
   public async tagContactList (contactId?: string) : Promise<string[]> {
     return throwUnsupportedError(contactId)
+  }
+
+  override async contactCorporationRemark (contactId: string, corporationRemark: string | null) {
+    return throwUnsupportedError(contactId, corporationRemark)
+  }
+
+  override async contactDescription (contactId: string, description: string | null) {
+    return throwUnsupportedError(contactId, description)
+  }
+
+  override async contactPhone (contactId: string, phoneList: string[]): Promise<void> {
+    return throwUnsupportedError(contactId, phoneList)
+  }
+
+  override conversationReadMark (
+    conversationId: string,
+    hasRead = true,
+  ) : Promise<void> {
+    return throwUnsupportedError(conversationId, hasRead)
   }
 
 }

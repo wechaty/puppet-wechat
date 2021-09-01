@@ -2,7 +2,7 @@ import {
   WebAppMsgType,
   WebMessageRawPayload,
   WebMessageType,
-}                         from '../web-schemas'
+}                         from '../web-schemas.js'
 
 import {
   MessageType,

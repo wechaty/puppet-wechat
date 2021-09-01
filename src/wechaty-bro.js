@@ -702,12 +702,13 @@
               throw new Error('chatroomFactory.create() got empty r.ChatRoomName')
             }
             resolve(r.ChatRoomName)
+
           } else {
-            throw new Error('chatroomFactory.create() error with Ret: '
+            reject(new Error('chatroomFactory.create() error with Ret: '
                               + r && r.BaseResponse.Ret
                               + 'with ErrMsg: '
                               + r && r.BaseResponse.ErrMsg
-            )
+            ))
           }
         })
         .catch(function (e) {

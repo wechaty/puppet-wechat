@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty - https://github.com/chatie/wechaty
  *
@@ -17,16 +17,11 @@
  *   limitations under the License.
  *
  */
-// tslint:disable:arrow-parens
-// tslint:disable:no-shadowed-variable
-
-import test  from 'blue-tape'
+import { test } from 'tstest'
 
 // import sinon from 'sinon'
 
-import {
-  launch,
-}                 from 'puppeteer'
+import puppeteer  from 'puppeteer'
 // import { spy }    from 'sinon'
 
 import {
@@ -38,7 +33,7 @@ import {
 // }                 from './config'
 // log.silly('BridgeTesting', 'import typings for Brolog')
 
-import Bridge     from './bridge'
+import Bridge     from './bridge.js'
 
 const PUPPETEER_LAUNCH_OPTIONS = {
   args: [
@@ -108,7 +103,6 @@ test('testBlockedMessage()', async t => {
     '当前登录环境异常。为了你的帐号安全，暂时不能登录web微信。',
     '你可以通过手机客户端或者windows微信登录。',
   ].join('')
-   // tslint:disable:max-line-length
   const BLOCKED_XML_EN = `
     <error>
      <ret>1203</ret>
@@ -120,7 +114,7 @@ test('testBlockedMessage()', async t => {
     ' To use WeChat on a computer, use Windows WeChat or Mac WeChat at http://wechat.com',
   ].join('')
 
-  t.test('not blocked', async t => {
+  void t.test('not blocked', async t => {
     const memory = new MemoryCard()
     const bridge = new Bridge({ memory })
 
@@ -128,7 +122,7 @@ test('testBlockedMessage()', async t => {
     t.equal(msg, false, 'should return false when no block message')
   })
 
-  t.test('html', async t => {
+  void t.test('html', async t => {
     const memory = new MemoryCard()
     const bridge = new Bridge({ memory })
 
@@ -136,7 +130,7 @@ test('testBlockedMessage()', async t => {
     t.equal(msg, BLOCKED_TEXT_ZH, 'should get zh blocked message')
   })
 
-  t.test('zh', async t => {
+  void t.test('zh', async t => {
     const memory = new MemoryCard()
     const bridge = new Bridge({ memory })
 
@@ -165,8 +159,8 @@ test('clickSwitchAccount()', async t => {
   const memory = new MemoryCard()
   const bridge = new Bridge({ memory })
 
-  t.test('switch account needed', async t => {
-    const browser = await launch(PUPPETEER_LAUNCH_OPTIONS)
+  void t.test('switch account needed', async t => {
+    const browser = await puppeteer.launch(PUPPETEER_LAUNCH_OPTIONS)
     const page    = await browser.newPage()
 
     await page.setContent(SWITCH_ACCOUNT_HTML)
@@ -178,8 +172,8 @@ test('clickSwitchAccount()', async t => {
     t.equal(clicked, true, 'should click the switch account button')
   })
 
-  t.test('switch account not needed', async t => {
-    const browser = await launch(PUPPETEER_LAUNCH_OPTIONS)
+  void t.test('switch account not needed', async t => {
+    const browser = await puppeteer.launch(PUPPETEER_LAUNCH_OPTIONS)
     const page    = await browser.newPage()
 
     await page.setContent('<h1>ok</h1>')
@@ -209,15 +203,15 @@ test('WechatyBro.ding()', async t => {
       return WechatyBro.ding()
     }) as string
 
-    t.is(retDing, 'dong', 'should got dong after execute WechatyBro.ding()')
+    t.equal(retDing, 'dong', 'should got dong after execute WechatyBro.ding()')
 
     const retCode = await bridge.proxyWechaty('loginState')
-    t.is(typeof retCode, 'boolean', 'should got a boolean after call proxyWechaty(loginState)')
+    t.equal(typeof retCode, 'boolean', 'should got a boolean after call proxyWechaty(loginState)')
 
     await bridge.stop()
     t.pass('b.quit()')
   } catch (err) {
-    t.fail('exception: ' + err.message)
+    t.fail('exception: ' + (err as Error).message)
   } finally {
     await memory.destroy()
   }

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 
 /**
  *   Wechaty - https://github.com/chatie/wechaty
@@ -18,14 +18,12 @@
  *   limitations under the License.
  *
  */
-import test  from 'blue-tape'
-// tslint:disable:no-shadowed-variable
-// import sinon from 'sinon'
+import { test } from 'tstest'
 
 import {
   // Event,
   PuppetWeChat,
-}                   from './puppet-wechat'
+}                   from './puppet-wechat.js'
 
 test('Puppet Puppeteer Event smoke testing', async (t) => {
   const puppet = new PuppetWeChat()
@@ -36,6 +34,6 @@ test('Puppet Puppeteer Event smoke testing', async (t) => {
     await puppet.stop()
     t.pass('should be quited')
   } catch (e) {
-    t.fail('exception: ' + e.message)
+    t.fail('exception: ' + (e as Error).message)
   }
 })

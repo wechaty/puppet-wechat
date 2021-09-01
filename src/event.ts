@@ -16,33 +16,32 @@
  *   limitations under the License.
  *
  */
-import {
+import type {
   WatchdogFood,
 }                 from 'watchdog'
 
 import {
   log,
-}                 from './config'
+}                 from './config.js'
 // import {
 //   PuppetScanEvent,
 // }                 from 'wechaty-puppet'
 
 import {
   Firer,
-}                         from './firer'
-import {
+}                         from './firer.js'
+import type {
   PuppetWeChat,
-}                         from './puppet-wechat'
+}                         from './puppet-wechat.js'
 import {
   WebMessageRawPayload,
   WebMessageType,
-}                         from './web-schemas'
+}                         from './web-schemas.js'
 
 import {
   normalizeScanStatus,
-}                         from './pure-function-helpers/normalize-scan-status'
+}                         from './pure-function-helpers/normalize-scan-status.js'
 
-/* tslint:disable:variable-name */
 export const Event = {
   onDing,
 
@@ -168,13 +167,13 @@ async function onLogin (
     // fix issue https://github.com/Chatie/wechaty-puppet-wechat/issues/107
     // we do not wait `ready` before emit `login`
     this.waitStable().catch(e => {
-      log.error('PuppetWeChatEvent', 'onLogin() this.waitStable() rejection: %s', e && e.message)
+      log.error('PuppetWeChatEvent', 'onLogin() this.waitStable() rejection: %s', e && (e as Error).message)
     })
 
     await this.login(userId)
 
   } catch (e) {
-    log.error('PuppetWeChatEvent', 'onLogin() exception: %s', e)
+    log.error('PuppetWeChatEvent', 'onLogin() exception: %s', e as Error)
     throw e
   }
 }
@@ -237,8 +236,8 @@ async function onUnload (this: PuppetWeChat): Promise<void> {
     await this.quit()
     await this.init()
   } catch (e) {
-    log.error('PuppetWeChatEvent', 'onUnload() exception: %s', e)
-    this.emit('error', e)
+    log.error('PuppetWeChatEvent', 'onUnload() exception: %s', e as Error)
+    this.emit('error', e as Error)
     throw e
   }
   */
