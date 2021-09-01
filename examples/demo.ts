@@ -16,18 +16,15 @@
  *   limitations under the License.
  *
  */
-
-// tslint:disable:no-console
-
-import { PuppetWeChat } from '../src/mod'
-
-import {
+import type {
   EventLogoutPayload,
   EventLoginPayload,
   EventScanPayload,
   EventErrorPayload,
   EventMessagePayload,
 }                       from 'wechaty-puppet'
+
+import { PuppetWeChat } from '../src/mod.js'
 
 /**
  *
@@ -55,7 +52,7 @@ puppet
  */
 puppet.start()
   .catch(async e => {
-    console.error('Bot start() fail:', e)
+    console.error('Bot start() fail:', e as Error)
     await puppet.stop()
     process.exit(-1)
   })
@@ -100,7 +97,7 @@ function onError (payload: EventErrorPayload) {
   console.error('Bot error:', payload.data)
   /*
   if (bot.logonoff()) {
-    bot.say('Wechaty error: ' + e.message).catch(console.error)
+    bot.say('Wechaty error: ' + (e as Error).message).catch(console.error)
   }
   */
 }

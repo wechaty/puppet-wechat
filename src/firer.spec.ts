@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty - https://github.com/chatie/wechaty
  *
@@ -22,12 +22,10 @@
  * Process the Message to find which event to FIRE
  */
 
-// tslint:disable:no-shadowed-variable
-import test  from 'blue-tape'
-// import sinon from 'sinon'
+import { test } from 'tstest'
 
-import { Firer }            from './firer'
-import { PuppetWeChat }  from './puppet-wechat'
+import { Firer }              from './firer.js'
+import type { PuppetWeChat }  from './puppet-wechat.js'
 
 const SELF_ID = 'self-id'
 const mockPuppetWeChat = {
@@ -126,8 +124,8 @@ test('parseRoomJoin()', async (t) => {
   contentList.forEach(([content, inviter, inviteeList]) => {
     result = (firer as any).parseRoomJoin(content)
     t.ok(result, 'should check room join message right for ' + content)
-    t.deepEqual(result[0], inviteeList, 'should get inviteeList right')
-    t.is(result[1], inviter, 'should get inviter right')
+    t.same(result[0], inviteeList, 'should get inviteeList right')
+    t.equal(result[1], inviter, 'should get inviter right')
   })
 
   t.throws(() => {
@@ -163,13 +161,13 @@ test('parseRoomLeave()', async (t) => {
   contentLeaverList.forEach(([content, leaver]) => {
     const resultLeaver = (firer as any).parseRoomLeave(content)[0]
     t.ok(resultLeaver, 'should get leaver for leave message: ' + content)
-    t.is(resultLeaver, leaver, 'should get leaver name right')
+    t.equal(resultLeaver, leaver, 'should get leaver name right')
   })
 
   contentRemoverList.forEach(([content, remover]) => {
     const resultRemover = (firer as any).parseRoomLeave(content)[1]
     t.ok(resultRemover, 'should get remover for leave message: ' + content)
-    t.is(resultRemover, remover, 'should get leaver name right')
+    t.equal(resultRemover, remover, 'should get leaver name right')
   })
 
   t.throws(() => {
@@ -197,8 +195,8 @@ test('parseRoomTopic()', async (t) => {
   contentList.forEach(([content, changer, topic]) => {
     result = (firer as any).parseRoomTopic(content)
     t.ok(result, 'should check topic right for content: ' + content)
-    t.is(topic,   result[0], 'should get right topic')
-    t.is(changer, result[1], 'should get right changer')
+    t.equal(topic,   result[0], 'should get right topic')
+    t.equal(changer, result[1], 'should get right changer')
   })
 
   t.throws(() => {

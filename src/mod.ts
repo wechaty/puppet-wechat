@@ -16,12 +16,12 @@
  *   limitations under the License.
  *
  */
-import { PuppetWeChat }  from './puppet-wechat'
+import { PuppetWeChat }  from './puppet-wechat.js'
 
 export {
   VERSION,
   log,
-}              from './config'
+}              from './config.js'
 
 export {
   PuppetWeChat,

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --no-warnings --loader ts-node/esm
 
 /**
  *   Wechaty - https://github.com/chatie/wechaty
@@ -27,7 +27,7 @@ import {
   ScanStatus,
 }               from 'wechaty-puppet'
 
-import { normalizeScanStatus } from './normalize-scan-status'
+import { normalizeScanStatus } from './normalize-scan-status.js'
 
 test('normalizeScanStatus()', async t => {
   const SCAN_STATUS_LIST = [
@@ -38,7 +38,7 @@ test('normalizeScanStatus()', async t => {
   ]
 
   for (const [puppeteerStatus, EXPECT_PUPPET_STATUS] of SCAN_STATUS_LIST) {
-    const puppetStatus = normalizeScanStatus(puppeteerStatus)
-    t.is(puppetStatus, EXPECT_PUPPET_STATUS, `should convert status code from puppeer(${puppeteerStatus}) to puppet(${EXPECT_PUPPET_STATUS})`)
+    const puppetStatus = normalizeScanStatus(puppeteerStatus!)
+    t.equal(puppetStatus, EXPECT_PUPPET_STATUS, `should convert status code from puppeer(${puppeteerStatus}) to puppet(${EXPECT_PUPPET_STATUS})`)
   }
 })
