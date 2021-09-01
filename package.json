@@ -23,7 +23,7 @@
     "copy:esm": "shx cp -R commonjs/ dist/esm/ && shx cp src/*.js dist/esm/src/",
     "copy:cjs": "shx cp -R commonjs/ dist/cjs/ && shx cp src/*.js dist/cjs/src/",
     "lint": "npm run lint:es && npm run lint:ts && npm run lint:md",
-    "lint:es": "eslint '{bin,examples,scripts,src,tests}/**/*.{js,ts}' --ignore-pattern='tests/fixtures/**'",
+    "lint:es": "eslint --ignore-pattern fixtures/ \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint:md": "markdownlint README.md",
     "lint:ts": "tsc --isolatedModules --noEmit",
     "start": "node examples/demo.ts",
