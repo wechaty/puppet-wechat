@@ -64,6 +64,7 @@ import {
   ImageType,
   EventScanPayload,
   log,
+  MessagePayloadRoom,
 }                           from 'wechaty-puppet'
 
 import {
@@ -101,6 +102,7 @@ import {
   WebRoomRawMember,
   WebRoomRawPayload,
 }                           from './web-schemas.js'
+import { parseMentionIdList } from './pure-function-helpers/parse-mention-id-list.js'
 
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
 
@@ -382,6 +384,14 @@ export class PuppetWeChat extends Puppet {
     log.verbose('PuppetWeChat', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
 
     const payload = messageRawPayloadParser(rawPayload)
+
+    /**
+     * Huan(202109): generate mention id list
+     *  https://github.com/wechaty/wechaty-puppet-wechat/issues/141
+     */
+    if (payload.roomId && payload.text) {
+      (payload as MessagePayloadRoom).mentionIdList = await parseMentionIdList(this, payload.roomId, payload.text)
+    }
 
     return payload
   }
