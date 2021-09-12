@@ -5,6 +5,7 @@
 [![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-wechat/next.svg)](https://www.npmjs.com/package/wechaty-puppet-wechat?activeTab=versions)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 [![NPM](https://github.com/wechaty/wechaty-puppet-wechat/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-wechat/actions?query=workflow%3ANPM)
+[![ES Modules](https://img.shields.io/badge/ES-Modules-brightgreen)](https://github.com/Chatie/tsconfig/issues/16)
 
 [![Wechaty Puppet Puppeteer](docs/images/wechaty-puppet-wechat.png)](https://github.com/wechaty/wechaty-puppet-wechat)
 
