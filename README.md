@@ -123,13 +123,18 @@ Release a version before upgrade.
 
 ## FAQ
 
-### 1. chrome-linux/chrome: error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory
+### 1. chrome-linux/chrome: error while loading shared libraries: libXXX.so.x: cannot open shared object file: No such file or directory
 
 You need to be able to run chrome in your Linux environment. If you are using Ubuntu Linux:
 
-```sh
-sudo apt-get install libxss1
-```
+- `error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory`
+    - `apt install libnss3`
+- `error while loading shared libraries: libgbm.so.1: cannot open shared object file: No such file or directory`
+    -  `apt install libgbm-dev`
+- `error while loading shared libraries: libxshmfence.so.1: cannot open shared object file: No such file or directory`
+    - `apt install libxshmfence-dev`
+- `error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory
+    - `apt install libxss1`
 
 See: <https://github.com/wechaty/wechaty/issues/1152>
 
