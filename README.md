@@ -88,7 +88,7 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### master v0.29
+### master v0.30
 
 1. ESM support.
 
