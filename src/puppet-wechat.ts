@@ -142,7 +142,7 @@ export class PuppetWeChat extends Puppet {
     this.initWatchdogForScan()
   }
 
-  public override async start (): Promise<void> {
+  override async start (): Promise<void> {
     log.verbose('PuppetWeChat', `start() with ${this.memory.name}`)
 
     if (this.state.on()) {
@@ -211,7 +211,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public override async stop (): Promise<void> {
+  override async stop (): Promise<void> {
     log.verbose('PuppetWeChat', 'stop()')
     if (this.state.off()) {
       log.warn('PuppetWeChat', 'stop() is called on a OFF puppet. await ready(off) and return.')
@@ -355,7 +355,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public override unref (): void {
+  override unref (): void {
     log.verbose('PuppetWeChat', 'unref ()')
     super.unref()
 
@@ -479,7 +479,7 @@ export class PuppetWeChat extends Puppet {
    * TODO: Test this function if it could work...
    */
   // public async forward(baseData: MsgRawObj, patchData: MsgRawObj): Promise<boolean> {
-  public override async messageForward (
+  override async messageForward (
     conversationId  : string,
     messageId : string,
   ): Promise<void> {
@@ -566,14 +566,14 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public override async login (userId: string): Promise<void> {
+  override async login (userId: string): Promise<void> {
     return super.login(userId)
   }
 
   /**
    * logout from browser, then server will emit `logout` event
    */
-  public override async logout (): Promise<void> {
+  override async logout (): Promise<void> {
     log.verbose('PuppetWeChat', 'logout()')
 
     const user = this.selfId()

@@ -17,3 +17,5 @@ declare module 'puppeteer-extra' {
   export function use(plugin:any): any;
   export function launch(opts?:LaunchOptions): Promise<Browser>;
 }
+
+declare module 'why-is-node-running'

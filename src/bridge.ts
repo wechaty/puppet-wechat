@@ -190,11 +190,11 @@ export class Bridge extends EventEmitter {
 
     try {
       const emitExist = await page.evaluate(() => {
-        return typeof window.wechatyPuppetBridgeEmit === 'function'
+        return typeof window['wechatyPuppetBridgeEmit'] === 'function'
       })
       if (!emitExist) {
         /**
-         * expose window.wechatyPuppetBridgeEmit at here.
+         * expose window['wechatyPuppetBridgeEmit'] at here.
          * enable wechaty-bro.js to emit message to bridge
          */
         await page.exposeFunction('wechatyPuppetBridgeEmit', this.emit.bind(this))

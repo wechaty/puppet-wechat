@@ -23,6 +23,10 @@ import type {
   EventErrorPayload,
   EventMessagePayload,
 }                       from 'wechaty-puppet'
+import {
+  FileBox,
+  MessageType,
+}                       from 'wechaty-puppet'
 
 import { PuppetWeChat } from '../src/mod.js'
 
@@ -111,6 +115,20 @@ function onError (payload: EventErrorPayload) {
 async function onMessage (payload: EventMessagePayload) {
   const messagePayload = await puppet.messagePayload(payload.messageId)
   console.info(JSON.stringify(messagePayload))
+
+  if (messagePayload.type === MessageType.Text
+    && /^ding$/i.test(messagePayload.text || '')
+  ) {
+    const conversationId = messagePayload.roomId || messagePayload.fromId
+
+    if (!conversationId) {
+      throw new Error('no conversation id')
+    }
+    await puppet.messageSendText(conversationId, 'dong')
+
+    const fileBox = FileBox.fromUrl('https://wechaty.github.io/wechaty/images/bot-qr-code.png')
+    await puppet.messageSendFile(conversationId, fileBox)
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-#!/usr/bin/env node --no-warnings --loader ts-node/esm
+#!/usr/bin/env -S node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty - https://github.com/chatie/wechaty
  *
@@ -29,6 +29,7 @@ import {
 
 // import { log }    from './config'
 // log.level('silly')
+import whyIsNodeRunning     from 'why-is-node-running'
 
 import { Bridge }           from './bridge.js'
 import { Event }            from './event.js'
@@ -133,15 +134,18 @@ test('login/logout events', async t => {
 /**
  * FIXME: increase test times from 1 to 3 Huan(202006)
  */
-test('restart() 1 times', async t => {
+test('PuppetWechat perfect restart', async t => {
   const puppet = new PuppetWeChat()
 
   let n = 1
 
   while (n--) {
     await puppet.start()
+    // await new Promise(resolve => setTimeout(resolve, 1000))
     await puppet.stop()
+    t.pass(`perfect restart #${n}`)
   }
 
-  t.pass('restarted many times')
+  void whyIsNodeRunning
+  // setInterval(whyIsNodeRunning, 5000)
 })

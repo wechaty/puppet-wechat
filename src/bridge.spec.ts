@@ -1,4 +1,4 @@
-#!/usr/bin/env node --no-warnings --loader ts-node/esm
+#!/usr/bin/env -S node --no-warnings --loader ts-node/esm
 /**
  *   Wechaty - https://github.com/chatie/wechaty
  *
@@ -44,17 +44,22 @@ const PUPPETEER_LAUNCH_OPTIONS = {
   headless: true,
 }
 
-test('PuppetWeChatBridge', async (t) => {
+test('PuppetWeChatBridge restart', async (t) => {
   const memory = new MemoryCard()
   await memory.load()
 
-  const bridge = new Bridge({ memory })
-  try {
-    await bridge.start()
-    await bridge.stop()
-    t.pass('Bridge instnace')
-  } catch (e) {
-    t.fail('Bridge instance: ' + e)
+  let bridge
+
+  let ttl = 3
+  while (ttl-- > 0) {
+    try {
+      bridge = new Bridge({ memory })
+      await bridge.start()
+      await bridge.stop()
+      t.pass('Bridge instnace restart ttl #' + ttl)
+    } catch (e) {
+      t.fail('Bridge instance: ' + e)
+    }
   }
 })
 
