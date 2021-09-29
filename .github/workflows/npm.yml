@@ -9,10 +9,10 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
+          # - windows-latest
+          # - macos-latest
         node:
-          - 14
+          # - 14
           - 16
 
     runs-on: ${{ matrix.os }}
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: package.json
 
       - name: Install Dependencies
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: package.json
 
       - name: Install Dependencies
@@ -65,7 +65,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: package.json
 
       - name: Install Dependencies

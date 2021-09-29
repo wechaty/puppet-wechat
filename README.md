@@ -5,6 +5,7 @@
 [![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-wechat/next.svg)](https://www.npmjs.com/package/wechaty-puppet-wechat?activeTab=versions)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 [![NPM](https://github.com/wechaty/wechaty-puppet-wechat/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty-puppet-wechat/actions?query=workflow%3ANPM)
+[![ES Modules](https://img.shields.io/badge/ES-Modules-brightgreen)](https://github.com/Chatie/tsconfig/issues/16)
 
 [![Wechaty Puppet Puppeteer](docs/images/wechaty-puppet-wechat.png)](https://github.com/wechaty/wechaty-puppet-wechat)
 
@@ -87,7 +88,7 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### master v0.29
+### master v0.30
 
 1. ESM support.
 
@@ -122,13 +123,18 @@ Release a version before upgrade.
 
 ## FAQ
 
-### 1. chrome-linux/chrome: error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory
+### 1. chrome-linux/chrome: error while loading shared libraries: libXXX.so.x: cannot open shared object file: No such file or directory
 
 You need to be able to run chrome in your Linux environment. If you are using Ubuntu Linux:
 
-```sh
-sudo apt-get install libxss1
-```
+- _error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory_
+  - `apt install libnss3`
+- _error while loading shared libraries: libgbm.so.1: cannot open shared object file: No such file or directory_
+  - `apt install libgbm-dev`
+- _error while loading shared libraries: libxshmfence.so.1: cannot open shared object file: No such file or directory_
+  - `apt install libxshmfence-dev`
+- _error while loading shared libraries: libX11.so.6: cannot open shared object file: No such file or directory_
+  - `apt install libxss1`
 
 See: <https://github.com/wechaty/wechaty/issues/1152>
 
