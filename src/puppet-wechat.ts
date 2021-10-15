@@ -1341,7 +1341,7 @@ export class PuppetWeChat extends Puppet {
     const ext      = path.extname(filename) //  message.ext()
 
     // const contentType = Misc.mime(ext)
-    const contentType = mime.getType(ext)
+    const contentType = mime.getType(ext) || file.mimeType || undefined
     // const contentType = message.mimeType()
     if (!contentType) {
       throw new Error('no MIME Type found on mediaMessage: ' + file.name)
