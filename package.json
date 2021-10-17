@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-wechat",
-  "version": "0.31.3",
+  "version": "0.31.4",
   "description": "Puppet WeChat for Wechaty",
   "type": "module",
   "exports": {
