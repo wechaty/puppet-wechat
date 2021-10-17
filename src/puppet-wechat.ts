@@ -144,87 +144,43 @@ export class PuppetWeChat extends Puppet {
     this.initWatchdogForScan()
   }
 
-  override async start (): Promise<void> {
-    log.verbose('PuppetWeChat', `start() with ${this.memory.name}`)
+  override async onStart (): Promise<void> {
+    log.verbose('PuppetWeChat', `onStart() with ${this.memory.name}`)
 
-    if (this.state.on()) {
-      log.warn('PuppetWeChat', 'start() is called on a ON puppet. await ready(on) and return.')
-      await this.state.ready('on')
-      return
+    /**
+     * Overwrite the memory in bridge
+     * because it could be changed between constructor() and start()
+     */
+    this.bridge.options.memory = this.memory
+
+    // this.initWatchdog()
+    // this.initWatchdogForScan()
+
+    this.bridge = await this.initBridge()
+    log.verbose('PuppetWeChat', 'onStart() initBridge() done')
+
+    /**
+     * Feed the dog and start watch
+     */
+    const food: WatchdogFood = {
+      data: 'inited',
+      timeout: 2 * 60 * 1000, // 2 mins for first login
     }
+    this.emit('heartbeat', food)
 
-    this.state.on('pending')
-
-    try {
-      await super.start()
-
-      /**
-       * Overwrite the memory in bridge
-       * because it could be changed between constructor() and start()
-       */
-      this.bridge.options.memory = this.memory
-
-      // this.initWatchdog()
-      // this.initWatchdogForScan()
-
-      this.bridge = await this.initBridge()
-      log.verbose('PuppetWeChat', 'initBridge() done')
-
-      /**
-       *  state must set to `live`
-       *  before feed Watchdog
-       */
-      this.state.on(true)
-
-      /**
-       * Feed the dog and start watch
-       */
-      const food: WatchdogFood = {
-        data: 'inited',
-        timeout: 2 * 60 * 1000, // 2 mins for first login
-      }
-      this.emit('heartbeat', food)
-
-      /**
-       * Save cookie for every 5 minutes
-       */
-      const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
-      this.on('heartbeat', data => throttleQueue.next(data))
-      throttleQueue.subscribe(async (data: any) => {
-        log.verbose('PuppetWeChat', 'start() throttleQueue.subscribe() new item: %s', data)
-        await this.saveCookie()
-      })
-
-      log.verbose('PuppetWeChat', 'start() done')
-
-      // this.emit('start')
-      return
-
-    } catch (e) {
-      log.error('PuppetWeChat', 'start() exception: %s', e as Error)
-
-      // this.state.off(true)
-      this.emit('error', {
-        data: (e as Error).message,
-      })
-      await this.stop()
-
-      throw e
-    }
+    /**
+     * Save cookie for every 5 minutes
+     */
+    const throttleQueue = new ThrottleQueue(5 * 60 * 1000)
+    this.on('heartbeat', data => throttleQueue.next(data))
+    throttleQueue.subscribe(async (data: any) => {
+      log.verbose('PuppetWeChat', 'onStart() throttleQueue.subscribe() new item: %s', data)
+      await this.saveCookie()
+    })
   }
 
-  override async stop (): Promise<void> {
-    log.verbose('PuppetWeChat', 'stop()')
-    if (this.state.off()) {
-      log.warn('PuppetWeChat', 'stop() is called on a OFF puppet. await ready(off) and return.')
-      await this.state.ready('off')
-      return
-    }
-    this.state.off('pending')
-
-    log.verbose('PuppetWeChat', 'stop() make watchdog sleep before do stop')
-
-    await super.stop()
+  override async onStop (): Promise<void> {
+    log.verbose('PuppetWeChat', 'onSsop()')
 
     /**
      * Clean listeners for `watchdog`
@@ -235,18 +191,9 @@ export class PuppetWeChat extends Puppet {
     this.scanWatchdog.removeAllListeners()
     this.removeAllListeners('watchdog' as any)
 
-    try {
-      await this.bridge.stop()
-      // register the removeListeners micro task at then end of the task queue
-      setImmediate(() => this.bridge.removeAllListeners())
-    } catch (e) {
-      log.error('PuppetWeChat', 'this.bridge.quit() exception: %s', (e as Error).message)
-      throw e
-    } finally {
-      this.state.off(true)
-      // this.emit('stop')
-    }
-
+    await this.bridge.stop()
+    // register the removeListeners micro task at then end of the task queue
+    setImmediate(() => this.bridge.removeAllListeners())
   }
 
   /**
@@ -265,10 +212,12 @@ export class PuppetWeChat extends Puppet {
     // clean the dog because this could be re-inited
     // dog.removeAllListeners()
 
-    puppet.on('scan', info => dog.feed({
-      data: info,
-      type: 'scan',
-    }))
+    puppet.on('scan', info => {
+      dog.feed({
+        data: info,
+        type: 'scan',
+      })
+    })
     puppet.on('login',  (/* user */) => {
       // dog.feed({
       //   data: user,
@@ -280,10 +229,12 @@ export class PuppetWeChat extends Puppet {
     })
 
     // active monitor again for `scan` event
-    puppet.on('logout', user => dog.feed({
-      data: user,
-      type: 'logout',
-    }))
+    puppet.on('logout', user => {
+      dog.feed({
+        data: user,
+        type: 'logout',
+      })
+    })
 
     dog.on('reset', async (food, timePast) => {
       log.warn('PuppetWeChat', 'initScanWatchdog() on(reset) lastFood: %s, timePast: %s',
@@ -321,7 +272,9 @@ export class PuppetWeChat extends Puppet {
     // this.bridge.on('ding'     , Event.onDing.bind(this))
     this.bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
 
-    this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && (e as Error).message) || String(e) }))
+    this.bridge.on('error',     (e: Error) => this.emit('error', {
+      data: (e as Error).message,
+    }))
     this.bridge.on('log',       Event.onLog.bind(this))
     this.bridge.on('login',     Event.onLogin.bind(this))
     this.bridge.on('logout',    Event.onLogout.bind(this))
@@ -357,28 +310,17 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  override unref (): void {
-    log.verbose('PuppetWeChat', 'unref ()')
-    super.unref()
-
-    if (this.scanWatchdog) {
-      this.scanWatchdog.unref()
-    }
-
-    // TODO: unref() the puppeteer
-  }
-
   /**
    *
    * Message
    *
    */
-  public async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
+  override async messageRawPayload (id: string): Promise <WebMessageRawPayload> {
     const rawPayload = await this.bridge.getMessage(id)
     return rawPayload
   }
 
-  public async messageRawPayloadParser (
+  override async messageRawPayloadParser (
     rawPayload: WebMessageRawPayload,
   ): Promise<MessagePayload> {
     log.verbose('PuppetWeChat', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
@@ -396,21 +338,21 @@ export class PuppetWeChat extends Puppet {
     return payload
   }
 
-  public async messageRecall (messageId: string): Promise<boolean> {
+  override async messageRecall (messageId: string): Promise<boolean> {
     return throwUnsupportedError(messageId)
   }
 
-  public async messageFile (messageId: string): Promise<FileBox> {
+  override async messageFile (messageId: string): Promise<FileBox> {
     const rawPayload = await this.messageRawPayload(messageId)
     const fileBox    = await this.messageRawPayloadToFile(rawPayload)
     return fileBox
   }
 
-  public async messageUrl (messageId: string)  : Promise<UrlLinkPayload> {
+  override async messageUrl (messageId: string)  : Promise<UrlLinkPayload> {
     return throwUnsupportedError(messageId)
   }
 
-  public async messageMiniProgram (messageId: string): Promise<MiniProgramPayload> {
+  override async messageMiniProgram (messageId: string): Promise<MiniProgramPayload> {
     log.verbose('PuppetWeChat', 'messageMiniProgram(%s)', messageId)
     return throwUnsupportedError(messageId)
   }
@@ -470,14 +412,14 @@ export class PuppetWeChat extends Puppet {
     return fileBox
   }
 
-  public async messageSendUrl (
+  override async messageSendUrl (
     conversationId : string,
     urlLinkPayload : UrlLinkPayload,
   ) : Promise<void> {
     throwUnsupportedError(conversationId, urlLinkPayload)
   }
 
-  public async messageSendMiniProgram (conversationId: string, miniProgramPayload: MiniProgramPayload): Promise<void> {
+  override async messageSendMiniProgram (conversationId: string, miniProgramPayload: MiniProgramPayload): Promise<void> {
     log.verbose('PuppetWeChat', 'messageSendMiniProgram("%s", %s)',
       conversationId,
       JSON.stringify(miniProgramPayload),
@@ -562,7 +504,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async messageSendText (
+  override async messageSendText (
     conversationId : string,
     text           : string,
   ): Promise<void> {
@@ -576,18 +518,13 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  override async login (userId: string): Promise<void> {
-    return super.login(userId)
-  }
-
   /**
    * logout from browser, then server will emit `logout` event
    */
-  override async logout (): Promise<void> {
-    log.verbose('PuppetWeChat', 'logout()')
+  override async logout (reason?: string): Promise<void> {
+    log.verbose('PuppetWeChat', 'logout(%s)', reason)
 
-    const user = this.selfId()
-    if (!user) {
+    if (!this.logonoff()) {
       log.warn('PuppetWeChat', 'logout() without self()')
       return
     }
@@ -598,8 +535,7 @@ export class PuppetWeChat extends Puppet {
       log.error('PuppetWeChat', 'logout() exception: %s', (e as Error).message)
       throw e
     } finally {
-      this.id = undefined
-      this.emit('logout', { contactId: user, data: 'logout()' })
+      await super.logout(reason)
     }
   }
 
@@ -609,15 +545,15 @@ export class PuppetWeChat extends Puppet {
    *
    *
    */
-  public async contactSelfQRCode (): Promise<string> {
+  override async contactSelfQRCode (): Promise<string> {
     return throwUnsupportedError()
   }
 
-  public async contactSelfName (name: string): Promise<void> {
+  override async contactSelfName (name: string): Promise<void> {
     return throwUnsupportedError(name)
   }
 
-  public async contactSelfSignature (signature: string): Promise<void> {
+  override async contactSelfSignature (signature: string): Promise<void> {
     return throwUnsupportedError(signature)
   }
 
@@ -626,7 +562,7 @@ export class PuppetWeChat extends Puppet {
    * Contact
    *
    */
-  public async contactRawPayload (id: string): Promise<WebContactRawPayload> {
+  override async contactRawPayload (id: string): Promise<WebContactRawPayload> {
     log.silly('PuppetWeChat', 'contactRawPayload(%s) @ %s', id, this)
     try {
       const rawPayload = await this.bridge.getContact(id) as WebContactRawPayload
@@ -638,7 +574,7 @@ export class PuppetWeChat extends Puppet {
 
   }
 
-  public async contactRawPayloadParser (
+  override async contactRawPayloadParser (
     rawPayload: WebContactRawPayload,
   ): Promise<ContactPayload> {
     log.silly('PuppetWeChat', 'contactParseRawPayload(Object.keys(payload).length=%d)',
@@ -689,15 +625,15 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public ding (data?: string): void {
+  override ding (data?: string): void {
     log.verbose('PuppetWeChat', 'ding(%s)', data || '')
     this.bridge.ding(data)
   }
 
-  public async contactAvatar (contactId: string)                : Promise<FileBox>
-  public async contactAvatar (contactId: string, file: FileBox) : Promise<void>
+  override async contactAvatar (contactId: string)                : Promise<FileBox>
+  override async contactAvatar (contactId: string, file: FileBox) : Promise<void>
 
-  public async contactAvatar (contactId: string, file?: FileBox): Promise<void | FileBox> {
+  override async contactAvatar (contactId: string, file?: FileBox): Promise<void | FileBox> {
     log.verbose('PuppetWeChat', 'contactAvatar(%s)', contactId)
 
     if (file) {
@@ -737,19 +673,10 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async contactQrcode (contactId: string): Promise<string> {
-    if (contactId !== this.selfId()) {
-      throw new Error('can not set avatar for others')
-    }
+  override contactAlias (contactId: string)                      : Promise<string>
+  override contactAlias (contactId: string, alias: string | null): Promise<void>
 
-    throw new Error('not supported')
-    // return await this.bridge.WXqr
-  }
-
-  public contactAlias (contactId: string)                      : Promise<string>
-  public contactAlias (contactId: string, alias: string | null): Promise<void>
-
-  public async contactAlias (
+  override async contactAlias (
     contactId : string,
     alias?    : string | null,
   ): Promise<string | void> {
@@ -771,7 +698,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async contactList (): Promise<string[]> {
+  override async contactList (): Promise<string[]> {
     const idList = await this.bridge.contactList()
     return idList
   }
@@ -781,7 +708,7 @@ export class PuppetWeChat extends Puppet {
    * Room
    *
    */
-  public async roomRawPayload (id: string): Promise<WebRoomRawPayload> {
+  override async roomRawPayload (id: string): Promise<WebRoomRawPayload> {
     log.verbose('PuppetWeChat', 'roomRawPayload(%s)', id)
 
     try {
@@ -843,7 +770,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomRawPayloadParser (
+  override async roomRawPayloadParser (
     rawPayload: WebRoomRawPayload,
   ): Promise<RoomPayload> {
     log.verbose('PuppetWeChat', 'roomRawPayloadParser(%s)', rawPayload)
@@ -897,14 +824,14 @@ export class PuppetWeChat extends Puppet {
     return roomPayload
   }
 
-  public async roomList (): Promise<string[]> {
+  override async roomList (): Promise<string[]> {
     log.verbose('PuppetPupppeteer', 'roomList()')
 
     const idList = await this.bridge.roomList()
     return idList
   }
 
-  public async roomDel (
+  override async roomDel (
     roomId    : string,
     contactId : string,
   ): Promise<void> {
@@ -916,7 +843,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomAvatar (roomId: string): Promise<FileBox> {
+  override async roomAvatar (roomId: string): Promise<FileBox> {
     log.verbose('PuppetWeChat', 'roomAvatar(%s)', roomId)
 
     const payload = await this.roomPayload(roomId)
@@ -928,7 +855,7 @@ export class PuppetWeChat extends Puppet {
     return qrCodeForChatie()
   }
 
-  public async roomAdd (
+  override async roomAdd (
     roomId    : string,
     contactId : string,
   ): Promise<void> {
@@ -940,10 +867,10 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomTopic (roomId: string)                : Promise<string>
-  public async roomTopic (roomId: string, topic: string) : Promise<void>
+  override async roomTopic (roomId: string)                : Promise<string>
+  override async roomTopic (roomId: string, topic: string) : Promise<void>
 
-  public async roomTopic (
+  override async roomTopic (
     roomId : string,
     topic? : string,
   ): Promise<void | string> {
@@ -960,7 +887,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomCreate (
+  override async roomCreate (
     contactIdList : string[],
     topic         : string,
   ): Promise<string> {
@@ -977,10 +904,10 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomAnnounce (roomId: string)                : Promise<string>
-  public async roomAnnounce (roomId: string, text: string)  : Promise<void>
+  override async roomAnnounce (roomId: string)                : Promise<string>
+  override async roomAnnounce (roomId: string, text: string)  : Promise<void>
 
-  public async roomAnnounce (roomId: string, text?: string) : Promise<void | string> {
+  override async roomAnnounce (roomId: string, text?: string) : Promise<void | string> {
     log.warn('PuppetWeChat', 'roomAnnounce(%s, %s) not supported', roomId, text || '')
 
     if (text) {
@@ -989,15 +916,15 @@ export class PuppetWeChat extends Puppet {
     return ''
   }
 
-  public async roomQuit (roomId: string): Promise<void> {
+  override async roomQuit (roomId: string): Promise<void> {
     log.warn('PuppetWeChat', 'roomQuit(%s) not supported by Web API', roomId)
   }
 
-  public async roomQRCode (roomId: string): Promise<string> {
+  override async roomQRCode (roomId: string): Promise<string> {
     return throwUnsupportedError(roomId)
   }
 
-  public async roomMemberList (roomId: string) : Promise<string[]> {
+  override async roomMemberList (roomId: string) : Promise<string[]> {
     log.verbose('PuppetWeChat', 'roommemberList(%s)', roomId)
     const rawPayload = await this.roomRawPayload(roomId)
 
@@ -1007,7 +934,7 @@ export class PuppetWeChat extends Puppet {
     return memberIdList
   }
 
-  public async roomMemberRawPayload (roomId: string, contactId: string): Promise<WebRoomRawMember>  {
+  override async roomMemberRawPayload (roomId: string, contactId: string): Promise<WebRoomRawMember>  {
     log.verbose('PuppetWeChat', 'roomMemberRawPayload(%s, %s)', roomId, contactId)
     const rawPayload = await this.roomRawPayload(roomId)
 
@@ -1021,7 +948,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<RoomMemberPayload>  {
+  override async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<RoomMemberPayload>  {
     log.verbose('PuppetWeChat', 'roomMemberRawPayloadParser(%s)', rawPayload)
 
     const payload: RoomMemberPayload = {
@@ -1038,15 +965,15 @@ export class PuppetWeChat extends Puppet {
    * Room Invitation
    *
    */
-  public async roomInvitationAccept (roomInvitationId: string): Promise<void> {
+  override async roomInvitationAccept (roomInvitationId: string): Promise<void> {
     return throwUnsupportedError(roomInvitationId)
   }
 
-  public async roomInvitationRawPayload (roomInvitationId: string): Promise<any> {
+  override async roomInvitationRawPayload (roomInvitationId: string): Promise<any> {
     return throwUnsupportedError(roomInvitationId)
   }
 
-  public async roomInvitationRawPayloadParser (rawPayload: any): Promise<RoomInvitationPayload> {
+  override async roomInvitationRawPayloadParser (rawPayload: any): Promise<RoomInvitationPayload> {
     return throwUnsupportedError(rawPayload)
   }
 
@@ -1055,7 +982,7 @@ export class PuppetWeChat extends Puppet {
    * Friendship
    *
    */
-  public async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
+  override async friendshipRawPayload (id: string): Promise<WebMessageRawPayload> {
     log.warn('PuppetWeChat', 'friendshipRawPayload(%s)', id)
 
     const rawPayload = await this.bridge.getMessage(id)
@@ -1065,7 +992,7 @@ export class PuppetWeChat extends Puppet {
     return rawPayload
   }
 
-  public async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
+  override async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<FriendshipPayload> {
     log.warn('PuppetWeChat', 'friendshipRawPayloadParser(%s)', rawPayload)
 
     const timestamp = Math.floor(Date.now() / 1000) // in seconds
@@ -1105,15 +1032,15 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async friendshipSearchPhone (phone: string): Promise<null | string> {
+  override async friendshipSearchPhone (phone: string): Promise<null | string> {
     throw throwUnsupportedError(phone)
   }
 
-  public async friendshipSearchWeixin (weixin: string): Promise<null | string> {
+  override async friendshipSearchWeixin (weixin: string): Promise<null | string> {
     throw throwUnsupportedError(weixin)
   }
 
-  public async friendshipAdd (
+  override async friendshipAdd (
     contactId : string,
     hello     : string,
   ): Promise<void> {
@@ -1129,7 +1056,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async friendshipAccept (
+  override async friendshipAccept (
     friendshipId : string,
   ): Promise<void> {
     const payload = await this.friendshipPayload(friendshipId) as any as FriendshipPayloadReceive
@@ -1150,7 +1077,7 @@ export class PuppetWeChat extends Puppet {
    * @private
    * For issue #668
    */
-  public async waitStable (): Promise<void> {
+  async waitStable (): Promise<void> {
     log.verbose('PuppetWeChat', 'waitStable()')
 
     let maxNum  = 0
@@ -1214,7 +1141,7 @@ export class PuppetWeChat extends Puppet {
     return this.bridge.cookies()
   }
 
-  public async saveCookie (): Promise<void> {
+  async saveCookie (): Promise<void> {
     const cookieList = await this.bridge.cookies()
     await this.memory.set(MEMORY_SLOT, cookieList)
     await this.memory.save()
@@ -1584,7 +1511,7 @@ export class PuppetWeChat extends Puppet {
     return Object.assign(mediaData, { MediaId: mediaId })
   }
 
-  public async messageSendFile (
+  override async messageSendFile (
     conversationId : string,
     file           : FileBox,
   ): Promise<void> {
@@ -1641,7 +1568,7 @@ export class PuppetWeChat extends Puppet {
     }
   }
 
-  public async messageSendContact (
+  override async messageSendContact (
     conversationId : string,
     contactId      : string,
   ): Promise<void> {
@@ -1649,12 +1576,12 @@ export class PuppetWeChat extends Puppet {
     return throwUnsupportedError()
   }
 
-  public async messageImage (messageId: string, imageType: ImageType): Promise<FileBox> {
+  override async messageImage (messageId: string, imageType: ImageType): Promise<FileBox> {
     log.verbose('PuppetWeChat', 'messageImage(%s, %s)', messageId, imageType)
     return this.messageFile(messageId)
   }
 
-  public async messageContact (messageId: string): Promise<string> {
+  override async messageContact (messageId: string): Promise<string> {
     log.verbose('PuppetWeChat', 'messageContact(%s)', messageId)
     return throwUnsupportedError(messageId)
   }
@@ -1664,19 +1591,19 @@ export class PuppetWeChat extends Puppet {
    * Tag
    *
    */
-  public async tagContactAdd (tagId: string, contactId: string): Promise<void> {
+  override async tagContactAdd (tagId: string, contactId: string): Promise<void> {
     return throwUnsupportedError(tagId, contactId)
   }
 
-  public async tagContactRemove (tagId: string, contactId: string): Promise<void> {
+  override async tagContactRemove (tagId: string, contactId: string): Promise<void> {
     return throwUnsupportedError(tagId, contactId)
   }
 
-  public async tagContactDelete (tagId: string) : Promise<void> {
+  override async tagContactDelete (tagId: string) : Promise<void> {
     return throwUnsupportedError(tagId)
   }
 
-  public async tagContactList (contactId?: string) : Promise<string[]> {
+  override async tagContactList (contactId?: string) : Promise<string[]> {
     return throwUnsupportedError(contactId)
   }
 

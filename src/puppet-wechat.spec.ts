@@ -118,7 +118,12 @@ test('login/logout events', async t => {
 
     t.ok(readySpy.called, 'should emit ready event, after login')
 
-    const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve('logoutFired')))
+    const logoutPromise = new Promise((resolve) => {
+      puppet.once('logout', () => {
+        // resolve after all tasks in event loop quene are done
+        setImmediate(() => resolve('logoutFired'))
+      })
+    })
     puppet.bridge.emit('logout')
     t.equal(await logoutPromise, 'logoutFired', 'should fire logout event')
     t.equal(puppet.logonoff(), false, 'should be logouted')

@@ -35,7 +35,7 @@ import type {
 
 class PuppetWeChatTest extends PuppetWeChat {
 
-  public override id?: string = undefined
+  // public override id?: string = undefined
 
 }
 

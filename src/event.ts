@@ -120,7 +120,9 @@ async function onLogin (
   const TTL_WAIT_MILLISECONDS = 1 * 1000
   if (ttl <= 0) {
     log.verbose('PuppetWeChatEvent', 'onLogin(%s) TTL expired')
-    this.emit('error', { data: 'onLogin() TTL expired.' })
+    this.emit('error', {
+      data: 'onLogin() TTL expired.',
+    })
     return
   }
 
