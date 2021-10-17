@@ -70,7 +70,7 @@
     "why-is-node-running": "^2.2.0"
   },
   "peerDependencies": {
-    "wechaty-puppet": "^0.51.2"
+    "wechaty-puppet": "^0.51.3"
   },
   "homepage": "https://github.com/wechaty/wechaty-puppet-wechat#readme",
   "dependencies": {

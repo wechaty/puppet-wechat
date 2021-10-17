@@ -62,7 +62,7 @@ class PuppetTest extends PuppetWeChat {
 //   t.ok(puppet.state.pending(), 'should be pending state after set')
 // })
 
-test('login/logout events', async t => {
+test.only('login/logout events', async t => {
   const sandbox = sinon.createSandbox()
 
   try {
@@ -118,14 +118,10 @@ test('login/logout events', async t => {
 
     t.ok(readySpy.called, 'should emit ready event, after login')
 
-    const logoutPromise = new Promise((resolve) => {
-      puppet.once('logout', () => {
-        // resolve after all tasks in event loop quene are done
-        setImmediate(() => resolve('logoutFired'))
-      })
-    })
+    const LOGOUT_FIRED = 'logoutFired'
+    const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve(LOGOUT_FIRED)))
     puppet.bridge.emit('logout')
-    t.equal(await logoutPromise, 'logoutFired', 'should fire logout event')
+    t.equal(await logoutPromise, LOGOUT_FIRED, 'should fire logout event')
     t.equal(puppet.logonoff(), false, 'should be logouted')
 
     await puppet.stop()
