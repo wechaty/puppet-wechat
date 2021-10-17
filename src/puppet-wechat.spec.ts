@@ -134,18 +134,20 @@ test('login/logout events', async t => {
 /**
  * FIXME: increase test times from 1 to 3 Huan(202006)
  */
-test('PuppetWechat perfect restart', async t => {
+test.only('PuppetWechat perfect restart', async t => {
   const puppet = new PuppetWeChat()
 
-  let n = 1
+  let n = 2
 
   while (n--) {
+    const future = new Promise(resolve => puppet.once('scan', resolve))
     await puppet.start()
+    await future
     // await new Promise(resolve => setTimeout(resolve, 1000))
     await puppet.stop()
-    t.pass(`perfect restart #${n}`)
+    t.pass(`perfect restart ttl #${n}`)
   }
 
   void whyIsNodeRunning
-  // setInterval(whyIsNodeRunning, 5000)
+  setTimeout(whyIsNodeRunning, 1000)
 })

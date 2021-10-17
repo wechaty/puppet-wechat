@@ -112,31 +112,36 @@ type PuppetWeChatOptions = PuppetOptions & {
   stealthless?   : boolean
 }
 
+let fileId = 0
+
 export class PuppetWeChat extends Puppet {
 
-  public static override readonly VERSION = VERSION
+  static override readonly VERSION = VERSION
 
-  public bridge: Bridge
+  #bridge?: Bridge
+  get bridge (): Bridge {
+    return this.#bridge!
+  }
 
-  public scanPayload? : EventScanPayload
-  public scanWatchdog : Watchdog<ScanFoodType>
+  scanPayload? : EventScanPayload
+  scanWatchdog : Watchdog<ScanFoodType>
 
-  private fileId: number
+  endpoint?     : string
+  extspam?      : string
+  head          : boolean
+  stealthless   : boolean
+  launchOptions : LaunchOptions
 
   constructor (
-    public override options: PuppetWeChatOptions = {},
+    options: PuppetWeChatOptions = {},
   ) {
     super(options)
 
-    this.fileId = 0
-    this.bridge = new Bridge({
-      endpoint      : options.endpoint || process.env['WECHATY_PUPPET_PUPPETEER_ENDPOINT'],
-      extspam       : options.token || process.env['WECHATY_PUPPET_WECHAT_TOKEN'],
-      head          : typeof options.head === 'boolean' ? options['head'] : envHead(),
-      launchOptions : options.launchOptions,
-      memory        : this.memory,
-      stealthless   : typeof options.stealthless === 'boolean' ? options.stealthless : envStealthless(),
-    })
+    this.endpoint      = options.endpoint || process.env['WECHATY_PUPPET_PUPPETEER_ENDPOINT']
+    this.extspam       = options.token || process.env['WECHATY_PUPPET_WECHAT_TOKEN']
+    this.head          = typeof options.head === 'boolean' ? options['head'] : envHead()
+    this.stealthless   = typeof options.stealthless === 'boolean' ? options.stealthless : envStealthless()
+    this.launchOptions = options.launchOptions || {}
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
     this.scanWatchdog   = new Watchdog<ScanFoodType>(SCAN_TIMEOUT, 'Scan')
@@ -158,17 +163,10 @@ export class PuppetWeChat extends Puppet {
     try {
       await super.start()
 
-      /**
-       * Overwrite the memory in bridge
-       * because it could be changed between constructor() and start()
-       */
-      this.bridge.options.memory = this.memory
+      this.#bridge = await this.createBridge()
 
       // this.initWatchdog()
       // this.initWatchdogForScan()
-
-      this.bridge = await this.initBridge()
-      log.verbose('PuppetWeChat', 'initBridge() done')
 
       /**
        *  state must set to `live`
@@ -238,9 +236,11 @@ export class PuppetWeChat extends Puppet {
     try {
       await this.bridge.stop()
       // register the removeListeners micro task at then end of the task queue
-      setImmediate(() => this.bridge.removeAllListeners())
+      this.bridge.removeAllListeners()
+      this.#bridge = undefined
+
     } catch (e) {
-      log.error('PuppetWeChat', 'this.bridge.quit() exception: %s', (e as Error).message)
+      log.error('PuppetWeChat', 'this.bridge.stop() exception: %s', (e as Error).message)
       throw e
     } finally {
       this.state.off(true)
@@ -308,42 +308,37 @@ export class PuppetWeChat extends Puppet {
     })
   }
 
-  private async initBridge (): Promise<Bridge> {
-    log.verbose('PuppetWeChat', 'initBridge()')
+  private async createBridge (): Promise<Bridge> {
+    log.verbose('PuppetWeChat', 'createBridge()')
+
+    const bridge = new Bridge({
+      endpoint      : this.endpoint,
+      extspam       : this.extspam,
+      head          : this.head,
+      launchOptions : this.launchOptions,
+      memory        : this.memory,
+      stealthless   : this.stealthless,
+    })
 
     if (this.state.off()) {
-      const e = new Error('initBridge() found targetState != live, no init anymore')
+      const e = new Error('createBridge() found targetState != live, no init anymore')
       log.warn('PuppetWeChat', (e as Error).message)
       throw e
     }
 
-    this.bridge.on('dong',      (data: string) => this.emit('dong', { data }))
-    // this.bridge.on('ding'     , Event.onDing.bind(this))
-    this.bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
+    bridge.on('dong',      (data: string) => this.emit('dong', { data }))
+    // bridge.on('ding'     , Event.onDing.bind(this))
+    bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
 
-    this.bridge.on('error',     (e: Error) => this.emit('error', { data: (e && (e as Error).message) || String(e) }))
-    this.bridge.on('log',       Event.onLog.bind(this))
-    this.bridge.on('login',     Event.onLogin.bind(this))
-    this.bridge.on('logout',    Event.onLogout.bind(this))
-    this.bridge.on('message',   Event.onMessage.bind(this))
-    this.bridge.on('scan',      Event.onScan.bind(this))
-    this.bridge.on('unload',    Event.onUnload.bind(this))
+    bridge.on('error',     (e: Error) => this.emit('error', { data: (e && (e as Error).message) || String(e) }))
+    bridge.on('log',       Event.onLog.bind(this))
+    bridge.on('login',     Event.onLogin.bind(this))
+    bridge.on('logout',    Event.onLogout.bind(this))
+    bridge.on('message',   Event.onMessage.bind(this))
+    bridge.on('scan',      Event.onScan.bind(this))
+    bridge.on('unload',    Event.onUnload.bind(this))
 
-    try {
-      await this.bridge.start()
-    } catch (e) {
-      log.error('PuppetWeChat', 'initBridge() exception: %s', (e as Error).message)
-      await this.bridge.stop().catch(e => {
-        log.error('PuppetWeChat', 'initBridge() this.bridge.stop() rejection: %s', e as Error)
-      })
-      this.emit('error', {
-        data: (e as Error).message,
-      })
-
-      throw e
-    }
-
-    return this.bridge
+    return bridge
   }
 
   private async getBaseRequest (): Promise<any> {
@@ -1396,8 +1391,7 @@ export class PuppetWeChat extends Puppet {
     const webwxDataTicket = first && first.value
     const size            = buffer.length
     const fromUserName    = this.selfId()
-    const id              = 'WU_FILE_' + this.fileId
-    this.fileId++
+    const id              = 'WU_FILE_' + fileId++
 
     const hostname = await this.bridge.hostname()
     const headers = {
