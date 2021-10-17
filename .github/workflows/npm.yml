@@ -11,8 +11,7 @@ jobs:
           - ubuntu-latest
           # - windows-latest
           # - macos-latest
-        node:
-          # - 14
+        node-version:
           - 16
 
     runs-on: ${{ matrix.os }}
