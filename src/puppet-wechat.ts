@@ -467,7 +467,7 @@ export class PuppetWeChat extends Puppet {
                         + 'more than 25MB of files can not be downloaded and can not be forwarded.')
     }
 
-    newMsg.FromUserName         = this.id || ''
+    newMsg.FromUserName         = this.currentUserId
     newMsg.isTranspond          = true
     newMsg.MsgIdBeforeTranspond = rawPayload.MsgIdBeforeTranspond || rawPayload.MsgId
     newMsg.MMSourceMsgId        = rawPayload.MsgId
@@ -592,7 +592,7 @@ export class PuppetWeChat extends Puppet {
       // }
     }
 
-    // this.id = rawPayload.UserName
+    // this._currentUserId = rawPayload.UserName
     // MMActualSender??? MMPeerUserName??? `getUserContact(message.MMActualSender,message.MMPeerUserName).HeadImgUrl`
 
     // uin:        rawPayload.Uin,    // stable id: 4763975 || getCookie("wxuin")
@@ -742,7 +742,7 @@ export class PuppetWeChat extends Puppet {
 
           if (prevLength === currLength) {
             log.silly('PuppetWeChat', 'roomPayload() puppet.getContact(%s) done at ttl:%d with length:%d',
-              this.id,
+              this.currentUserId,
               ttl,
               currLength,
             )
