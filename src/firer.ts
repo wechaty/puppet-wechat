@@ -16,9 +16,7 @@
  *   limitations under the License.
  *
  */
-import {
-  PayloadType,
-}                from 'wechaty-puppet'
+import * as PUPPET  from 'wechaty-puppet'
 
 import {
   log,
@@ -373,13 +371,14 @@ export class Firer {
       timestamp,
     })
 
-    setTimeout(async () => {
-      await this.puppet.dirtyPayload(PayloadType.Room, roomId)
+    setTimeout(() => {
+      this.puppet.dirtyPayload(PUPPET.type.Payload.Room, roomId)
+        .then(() => this.puppet.roomPayload(roomId))
+        .catch(console.error)
       // this.puppet.emit('dirty', {
       //   payloadType: PayloadType.Room,
       //   payloadId: roomId,
       // })
-      await this.puppet.roomPayload(roomId)
     }, 10 * 1000) // reload the room data, especially for memberList
 
     return true
@@ -438,9 +437,8 @@ export class Firer {
     content: string,
   ): boolean {
     const reList = REGEX_CONFIG.friendConfirm
-    let found = false
 
-    reList.some(re => !!(found = re.test(content)))
+    const found = reList.some(re => re.test(content))
     if (found) {
       return true
     } else {
@@ -466,10 +464,24 @@ export class Firer {
     const reListInvite = REGEX_CONFIG.roomJoinInvite
     const reListQrcode = REGEX_CONFIG.roomJoinQrcode
 
-    let foundInvite: null | string[] = []
-    reListInvite.some(re => !!(foundInvite = content.match(re)))
+    let foundInvite: null | string[] = null
+    for (const re of reListInvite) {
+      foundInvite = content.match(re)
+      if (foundInvite) {
+        break
+      }
+    }
+    // reListInvite.some(re => !!(foundInvite = content.match(re)))
+
     let foundQrcode: null | string[] = []
-    reListQrcode.some(re => !!(foundQrcode = content.match(re)))
+    for (const re of reListQrcode) {
+      foundQrcode = content.match(re)
+      if (foundQrcode) {
+        break
+      }
+    }
+    // reListQrcode.some(re => !!(foundQrcode = content.match(re)))
+
     if ((!foundInvite || !foundInvite.length) && (!foundQrcode || !foundQrcode.length)) {
       throw new Error('parseRoomJoin() not found matched re of ' + content)
     }
@@ -477,7 +489,7 @@ export class Firer {
      * 管理员 invited 庆次、小桔妹 to the group chat
      * "管理员"通过扫描你分享的二维码加入群聊
      */
-    const [inviter, inviteeStr] = foundInvite ? [foundInvite[1], foundInvite[2]] : [foundQrcode[2], foundQrcode[1]]
+    const [inviter, inviteeStr] = foundInvite ? [foundInvite[1], foundInvite[2]] : [foundQrcode![2], foundQrcode![1]]
 
     // FIXME: should also compatible english split
     const inviteeList = inviteeStr?.split(/、/) || []
@@ -488,19 +500,21 @@ export class Firer {
   private parseRoomLeave (
     content: string,
   ): [string, string] {
-    let matchIKickOther: null | string[] = []
-    REGEX_CONFIG.roomLeaveIKickOther.some(
-      regex => !!(
-        matchIKickOther = content.match(regex)
-      ),
-    )
+    let matchIKickOther: null | string[] = null
+    for (const re of REGEX_CONFIG.roomLeaveIKickOther) {
+      matchIKickOther = content.match(re)
+      if (matchIKickOther) {
+        break
+      }
+    }
 
-    let matchOtherKickMe: null | string[] = []
-    REGEX_CONFIG.roomLeaveOtherKickMe.some(
-      re => !!(
-        matchOtherKickMe = content.match(re)
-      ),
-    )
+    let matchOtherKickMe: null | string[] = null
+    for (const re of REGEX_CONFIG.roomLeaveOtherKickMe) {
+      matchOtherKickMe = content.match(re)
+      if (matchOtherKickMe) {
+        break
+      }
+    }
 
     let leaverName  : undefined | string
     let removerName : undefined | string
@@ -523,8 +537,13 @@ export class Firer {
   ): [string, string] {
     const reList = REGEX_CONFIG.roomTopic
 
-    let found: null | string[] = []
-    reList.some(re => !!(found = content.match(re)))
+    let found: null | string[] = null
+    for (const re of reList) {
+      found = content.match(re)
+      if (found) {
+        break
+      }
+    }
     if (!found || !found.length) {
       throw new Error('checkRoomTopic() not found')
     }

@@ -25,7 +25,7 @@ import {
 
 import {
   ScanStatus,
-}               from 'wechaty-puppet'
+}               from 'wechaty-puppet/types'
 
 import { normalizeScanStatus } from './normalize-scan-status.js'
 

@@ -25,9 +25,11 @@ import stealthPlugin    from 'puppeteer-extra-plugin-stealth'
 import { StateSwitch }  from 'state-switch'
 import { parseString }  from 'xml2js'
 
+import { wrapAsyncError } from 'wechaty-puppet/helpers'
+
 import type {
   MemoryCard,
-}                       from 'wechaty-puppet'
+}                       from 'memory-card'
 import {
   log,
 }                       from 'wechaty-puppet'
@@ -73,6 +75,8 @@ export class Bridge extends EventEmitter {
   private page    : undefined | puppeteer.Page
   private state   : StateSwitch
 
+  private wrapAsync = wrapAsyncError(e => this.emit('error', e))
+
   constructor (
     public options: BridgeOptions,
   ) {
@@ -85,22 +89,22 @@ export class Bridge extends EventEmitter {
   public async start (): Promise<void> {
     log.verbose('PuppetWeChatBridge', 'start()')
 
-    this.state.on('pending')
+    this.state.active('pending')
     try {
       this.browser = await this.initBrowser()
       log.verbose('PuppetWeChatBridge', 'start() initBrowser() done')
 
-      this.on('load', this.onLoad.bind(this))
+      this.on('load', this.wrapAsync(this.onLoad.bind(this)))
 
       const ready = new Promise(resolve => this.once('ready', resolve))
       this.page = await this.initPage(this.browser)
       await ready
 
-      this.state.on(true)
+      this.state.active(true)
       log.verbose('PuppetWeChatBridge', 'start() initPage() done')
     } catch (e) {
       log.error('PuppetWeChatBridge', 'start() exception: %s', e as Error)
-      this.state.off(true)
+      this.state.inactive(true)
 
       try {
         if (this.page) {
@@ -183,7 +187,7 @@ export class Bridge extends EventEmitter {
   public async onLoad (page: puppeteer.Page): Promise<void> {
     log.verbose('PuppetWeChatBridge', 'onLoad() page.url=%s', page.url())
 
-    if (this.state.off()) {
+    if (this.state.inactive()) {
       log.verbose('PuppetWeChatBridge', 'onLoad() OFF state detected. NOP')
       return // reject(new Error('onLoad() OFF state detected'))
     }
@@ -227,11 +231,11 @@ export class Bridge extends EventEmitter {
     await this.uosPatch(page)
 
     page.on('error',  e => this.emit('error', e as Error))
-    page.on('dialog', this.onDialog.bind(this))
+    page.on('dialog', this.wrapAsync(this.onDialog.bind(this)))
 
     const cookieList = (
       await this.options.memory.get(MEMORY_SLOT)
-    ) as puppeteer.Protocol.Network.Cookie[]
+    ) || [] as puppeteer.Protocol.Network.Cookie[]
 
     const url = this.entryUrl(cookieList)
     log.verbose('PuppetWeChatBridge', 'initPage() before page.goto(url)')
@@ -243,7 +247,7 @@ export class Bridge extends EventEmitter {
     // await this.uosPatch(page)
     void this.uosPatch
 
-    if (cookieList && cookieList.length) {
+    if (cookieList.length) {
       await page.setCookie(...cookieList)
       log.silly('PuppetWeChatBridge', 'initPage() page.setCookie() %s cookies set back', cookieList.length)
     }
@@ -270,7 +274,7 @@ export class Bridge extends EventEmitter {
     }
     // add RequestInterception
     await page.setRequestInterception(true)
-    page.on('request', async req => {
+    page.on('request', req => {
       const url = new URL(req.url())
       if (url.pathname === '/' && url.search.indexOf('target=t') === -1) {
         if (url.search === '' || url.search === '?') {
@@ -279,20 +283,20 @@ export class Bridge extends EventEmitter {
           url.search += '&'
         }
         url.search += 'target=t'
-        await req.continue({ url: url.toString() })
-        return
-      }
-      if (url.pathname === '/cgi-bin/mmwebwx-bin/webwxnewloginpage') {
+        this.wrapAsync(req.continue({ url: url.toString() }))
+
+      } else if (url.pathname === '/cgi-bin/mmwebwx-bin/webwxnewloginpage') {
         const override = {
           headers: {
             ...req.headers(),
             ...uosHeaders,
           },
         }
-        await req.continue(override)
-        return
+        this.wrapAsync(req.continue(override))
+
+      } else {
+        this.wrapAsync(req.continue())
       }
-      await req.continue()
     })
   }
 
@@ -332,14 +336,14 @@ export class Bridge extends EventEmitter {
       const sourceCode = fs.readFileSync(WECHATY_BRO_JS_FILE)
         .toString()
 
-      let retObj = await page.evaluate(sourceCode) as InjectResult
+      let retObj = await page.evaluate(sourceCode) as undefined | InjectResult
 
       if (retObj && /^(2|3)/.test(retObj.code.toString())) {
         // HTTP Code 2XX & 3XX
         log.silly('PuppetWeChatBridge', 'inject() eval(Wechaty) return code[%d] message[%s]',
           retObj.code, retObj.message)
       } else {  // HTTP Code 4XX & 5XX
-        throw new Error('execute injectio error: ' + retObj.code + ', ' + retObj.message)
+        throw new Error('execute injectio error: ' + retObj?.code + ', ' + retObj?.message)
       }
 
       retObj = await this.proxyWechaty('init')
@@ -348,7 +352,7 @@ export class Bridge extends EventEmitter {
         log.silly('PuppetWeChatBridge', 'inject() Wechaty.init() return code[%d] message[%s]',
           retObj.code, retObj.message)
       } else {  // HTTP Code 4XX & 5XX
-        throw new Error('execute proxyWechaty(init) error: ' + retObj.code + ', ' + retObj.message)
+        throw new Error('execute proxyWechaty(init) error: ' + retObj?.code + ', ' + retObj?.message)
       }
 
       const SUCCESS_CIPHER = 'ding() OK!'
@@ -386,7 +390,7 @@ export class Bridge extends EventEmitter {
       throw new Error('no browser')
     }
 
-    this.state.off('pending')
+    this.state.inactive('pending')
 
     try {
       await this.page.close()
@@ -402,7 +406,7 @@ export class Bridge extends EventEmitter {
       log.warn('PuppetWeChatBridge', 'stop() browser.close() exception: %s', e as Error)
     }
 
-    this.state.off(true)
+    this.state.inactive(true)
   }
 
   public async getUserName (): Promise<string> {
@@ -496,7 +500,7 @@ export class Bridge extends EventEmitter {
   }
 
   public async roomCreate (contactIdList: string[], topic?: string): Promise<string> {
-    if (!contactIdList || !Array.isArray(contactIdList)) {
+    if (!Array.isArray(contactIdList)) {
       throw new Error('no valid contactIdList')
     }
 
@@ -855,14 +859,14 @@ export class Bridge extends EventEmitter {
         message : string,
       }
     }
-    let obj: BlockedMessage
+    let obj: undefined | BlockedMessage
 
     try {
       // see unit test for detail
       const tryXmlText = this.preHtmlToXml(text)
       // obj = JSON.parse(toJson(tryXmlText))
       obj = await new Promise((resolve, reject) => {
-        parseString(tryXmlText, { explicitArray: false }, (err, result) => {
+        parseString(tryXmlText, { explicitArray: false }, (err: any, result) => {
           if (err) {
             return reject(err)
           }

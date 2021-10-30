@@ -1,4 +1,4 @@
-import { ScanStatus } from 'wechaty-puppet'
+import { ScanStatus } from 'wechaty-puppet/types'
 
 export function normalizeScanStatus (
   status: number,

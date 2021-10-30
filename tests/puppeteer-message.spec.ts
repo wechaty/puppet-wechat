@@ -27,10 +27,7 @@ import {
   log,
 }                 from '../src/config.js'
 
-import {
-  MessagePayload,
-  MessageType,
-}                 from 'wechaty-puppet'
+import * as PUPPET from 'wechaty-puppet'
 
 import {
   PuppetWeChat,
@@ -81,13 +78,13 @@ test('constructor()', async t => {
   }
   const sandbox = sinon.createSandbox()
   const mockMessagePayload = async (/* _: string */) => {
-    const payload: MessagePayload = {
+    const payload: PUPPET.payload.Message = {
       fromId        : EXPECTED.from,
       id            : EXPECTED.id,
       mentionIdList : [],
       timestamp     : Date.now(),
       toId          : 'toId',
-      type          : MessageType.Text,
+      type          : PUPPET.type.Message.Text,
     }
     return payload
   }

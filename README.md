@@ -88,9 +88,11 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### master v0.30
+### master v1.0 (Oct 30, 2021)
 
-1. ESM support.
+Release 1.0 of Wechaty Puppet for WeChat
+
+1. v0.30 (Sep, 2021): ESM support.
 
 ### v0.28 (Apr 13, 2021)
 

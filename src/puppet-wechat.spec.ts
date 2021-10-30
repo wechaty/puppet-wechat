@@ -56,9 +56,9 @@ class PuppetTest extends PuppetWeChat {
 //   const wechaty = new WechatyTest({ puppet })
 //   wechaty.initPuppetAccessory(puppet)
 
-//   t.ok(puppet.state.off(), 'should be OFF state after instanciate')
-//   puppet.state.on('pending')
-//   t.ok(puppet.state.on(), 'should be ON state after set')
+//   t.ok(puppet.state.inactive(), 'should be OFF state after instanciate')
+//   puppet.state.active('pending')
+//   t.ok(puppet.state.active(), 'should be ON state after set')
 //   t.ok(puppet.state.pending(), 'should be pending state after set')
 // })
 

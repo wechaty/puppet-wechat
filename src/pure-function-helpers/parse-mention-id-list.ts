@@ -74,7 +74,7 @@ async function parseMentionIdList (
 
   const contactIdListNested = await Promise.all(
     mentionNameList.map(
-      name => puppet.roomMemberSearch(roomId, name)
+      name => puppet.roomMemberSearch(roomId, name),
     ),
   )
 

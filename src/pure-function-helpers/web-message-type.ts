@@ -4,44 +4,42 @@ import {
   WebMessageType,
 }                         from '../web-schemas.js'
 
-import {
-  MessageType,
-}                 from 'wechaty-puppet'
+import * as PUPPET from 'wechaty-puppet'
 
 export function webMessageType (
   rawPayload: WebMessageRawPayload,
-): MessageType {
+): PUPPET.type.Message {
 
   switch (rawPayload.MsgType) {
     case WebMessageType.TEXT:
       switch (rawPayload.SubMsgType) {
         case WebMessageType.LOCATION:
-          return MessageType.Attachment
+          return PUPPET.type.Message.Attachment
 
         default:
-          return MessageType.Text
+          return PUPPET.type.Message.Text
       }
 
     case WebMessageType.EMOTICON:
     case WebMessageType.IMAGE:
-      return MessageType.Image
+      return PUPPET.type.Message.Image
 
     case WebMessageType.VOICE:
-      return MessageType.Audio
+      return PUPPET.type.Message.Audio
 
     case WebMessageType.MICROVIDEO:
     case WebMessageType.VIDEO:
-      return MessageType.Video
+      return PUPPET.type.Message.Video
 
     case WebMessageType.APP:
       switch (rawPayload.AppMsgType) {
         case WebAppMsgType.ATTACH:
         case WebAppMsgType.URL:
         case WebAppMsgType.READER_TYPE:
-          return MessageType.Attachment
+          return PUPPET.type.Message.Attachment
 
         default:
-          return MessageType.Text
+          return PUPPET.type.Message.Text
       }
 
     /**
@@ -51,10 +49,10 @@ export function webMessageType (
      * FIXME: should we use better message type at here???
      */
     case WebMessageType.SYS:
-      return MessageType.Text
+      return PUPPET.type.Message.Text
     // add recall type
     case WebMessageType.RECALLED:
-      return MessageType.Recalled
+      return PUPPET.type.Message.Recalled
     // VERIFYMSG           = 37,
     // POSSIBLEFRIEND_MSG  = 40,
     // SHARECARD           = 42,
@@ -66,6 +64,6 @@ export function webMessageType (
     // SYSNOTICE           = 9999,
     // RECALLED            = 10002,
     default:
-      return MessageType.Text
+      return PUPPET.type.Message.Text
   }
 }

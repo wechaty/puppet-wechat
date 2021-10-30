@@ -1,7 +1,4 @@
-import type {
-  MessagePayload,
-  MessageType,
-}                 from 'wechaty-puppet'
+import type * as PUPPET from 'wechaty-puppet'
 
 import type {
   WebMessageRawPayload,
@@ -20,7 +17,7 @@ import {
 
 export function messageRawPayloadParser (
   rawPayload: WebMessageRawPayload,
-): MessagePayload {
+): PUPPET.payload.Message {
   const id                           = rawPayload.MsgId
   const fromId                       = rawPayload.MMActualSender               // MMPeerUserName
   const text: string                 = rawPayload.MMActualContent              // Content has @id prefix added by wx
@@ -52,7 +49,7 @@ export function messageRawPayloadParser (
     }
   }
 
-  const type: MessageType = webMessageType(rawPayload)
+  const type: PUPPET.type.Message = webMessageType(rawPayload)
 
   const payloadBase = {
     filename: msgFileName,
@@ -64,7 +61,7 @@ export function messageRawPayloadParser (
     type,
   }
 
-  let payload: MessagePayload
+  let payload: PUPPET.payload.Message
 
   if (toId) {
     payload = {

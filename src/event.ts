@@ -72,9 +72,9 @@ async function onScan (
 ): Promise<void> {
   log.verbose('PuppetWeChatEvent', 'onScan({code: %d, url: %s})', payloadFromBrowser.code, payloadFromBrowser.url)
 
-  // if (this.state.off()) {
-  //   log.verbose('PuppetWeChatEvent', 'onScan(%s) state.off()=%s, NOOP',
-  //                                 payload, this.state.off())
+  // if (this.state.inactive()) {
+  //   log.verbose('PuppetWeChatEvent', 'onScan(%s) state.inactive()=%s, NOOP',
+  //                                 payload, this.state.inactive())
   //   return
   // }
 
@@ -126,9 +126,9 @@ async function onLogin (
     return
   }
 
-  // if (this.state.off()) {
-  //   log.verbose('PuppetWeChatEvent', 'onLogin(%s, %d) state.off()=%s, NOOP',
-  //                                 note, ttl, this.state.off())
+  // if (this.state.inactive()) {
+  //   log.verbose('PuppetWeChatEvent', 'onLogin(%s, %d) state.inactive()=%s, NOOP',
+  //                                 note, ttl, this.state.inactive())
   //   return
   // }
 
@@ -151,7 +151,7 @@ async function onLogin (
       log.verbose('PuppetWeChatEvent', 'onLogin() browser not fully loaded(ttl=%d), retry later', ttl)
       const html = await this.bridge.innerHTML()
       log.silly('PuppetWeChatEvent', 'onLogin() innerHTML: %s', html.substr(0, 500))
-      setTimeout(onLogin.bind(this, note, ttl - 1), TTL_WAIT_MILLISECONDS)
+      setTimeout(this.wrapAsync(onLogin.bind(this, note, ttl - 1)), TTL_WAIT_MILLISECONDS)
       return
     }
 
@@ -162,7 +162,7 @@ async function onLogin (
 
     log.silly('PuppetWeChatEvent', `onLogin() user ${userId} logined`)
 
-    // if (this.state.on() === true) {
+    // if (this.state.active() === true) {
     await this.saveCookie()
     // }
 

@@ -179,10 +179,10 @@ test('other demos', async t => {
 
     // not the same with the document of ConsoleMessage???
 
-    page.on('dialog', async dialog => {
+    page.on('dialog', dialog => {
       console.info(dialog)
       console.info('dialog:', dialog.type, dialog.message())
-      await dialog.accept('ok')
+      dialog.accept('ok').catch(console.error)
     })
 
     page.on('error', (e, ...args) => {
@@ -201,13 +201,13 @@ test('other demos', async t => {
 
     await page.setRequestInterception(true)
 
-    page.on('request', async interceptedRequest => {
+    page.on('request', interceptedRequest => {
       if (interceptedRequest.url().endsWith('.png')
         || interceptedRequest.url().endsWith('.jpg')
       ) {
-        await interceptedRequest.abort()
+        interceptedRequest.abort().catch(console.error)
       } else {
-        await interceptedRequest.continue()
+        interceptedRequest.continue().catch(console.error)
       }
     })
 

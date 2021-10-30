@@ -1,9 +1,11 @@
 /// <reference path="./typings.d.ts" />
 
 import {
-  FileBox,
   log,
 }                  from 'wechaty-puppet'
+import {
+  FileBox,
+}                 from 'file-box'
 import qrImage      from 'qr-image'
 
 import { packageJson } from './package-json.js'
