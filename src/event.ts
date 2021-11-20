@@ -88,7 +88,7 @@ async function onScan (
    */
   await this.saveCookie()
 
-  if (this.logonoff()) {
+  if (this.isLoggedIn) {
     log.verbose('PuppetWeChatEvent', 'onScan() there has user when got a scan event. emit logout and set it to null')
     await this.logout()
   }
@@ -132,8 +132,8 @@ async function onLogin (
   //   return
   // }
 
-  if (this.logonoff()) {
-    throw new Error('onLogin() user had already logined: ' + this.selfId())
+  if (this.isLoggedIn) {
+    throw new Error('onLogin() user had already logined: ' + this.currentUserId)
     // await this.logout()
   }
 
@@ -186,7 +186,7 @@ async function onLogout (
 ): Promise<void> {
   log.verbose('PuppetWeChatEvent', 'onLogout(%s)', data)
 
-  if (this.logonoff()) {
+  if (this.isLoggedIn) {
     await this.logout()
   } else {
     // not logged-in???

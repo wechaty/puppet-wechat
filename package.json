@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-wechat",
-  "version": "1.0.1",
+  "version": "1.7.0",
   "description": "Puppet WeChat for Wechaty",
   "type": "module",
   "exports": {
@@ -11,12 +11,14 @@
   },
   "typings": "./dist/esm/src/mod.d.ts",
   "engines": {
-    "wechaty": ">=1.0.4"
+    "node": ">=16",
+    "npm": ">=7"
   },
   "scripts": {
+    "build": "tsc && tsc -p tsconfig.cjs.json",
     "clean": "shx rm -fr dist/*",
-    "dist": "npm-run-all clean build dist:copy",
-    "build": "tsc && tsc -p tsconfig.cjs.json && shx echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "dist": "npm-run-all clean build dist:commonjs dist:copy",
+    "dist:commonjs": "jq -n \"{ type: \\\"commonjs\\\" }\" > dist/cjs/package.json",
     "dist:copy": "npm-run-all copy:esm copy:cjs",
     "copy:js": "shx cp src/*.js dist/src/",
     "copy:esm": "shx cp -R commonjs/ dist/esm/ && shx cp src/*.js dist/esm/src/",
@@ -26,13 +28,13 @@
     "lint:md": "markdownlint README.md",
     "lint:ts": "tsc --isolatedModules --noEmit",
     "start": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node examples/ding-dong-bot.ts",
-    "test": "npm run lint && npm run test:unit",
+    "test": "npm-run-all lint test:unit",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
     "test:unit": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" TAP_TIMEOUT=60 tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wechaty/wechaty-puppet-wechat.git"
+    "url": "git+https://github.com/wechaty/puppet-wechat.git"
   },
   "keywords": [
     "chatie",
@@ -47,13 +49,13 @@
   "author": "Huan LI <zixia@zixia.net>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/wechaty/wechaty-puppet-wechat/issues"
+    "url": "https://github.com/wechaty/puppet-wechat/issues"
   },
   "devDependencies": {
     "@chatie/eslint-config": "^1.0.4",
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
-    "@chatie/tsconfig": "^1.0.2",
+    "@chatie/tsconfig": "^4.5.1",
     "@types/bl": "^5",
     "@types/md5": "^2.3.1",
     "@types/mime": "^2.0.3",
@@ -64,22 +66,22 @@
     "why-is-node-running": "^2.2.0"
   },
   "peerDependencies": {
-    "wechaty-puppet": "^1.0.1"
+    "wechaty-puppet": "^1.7.22"
   },
-  "homepage": "https://github.com/wechaty/wechaty-puppet-wechat#readme",
+  "homepage": "https://github.com/wechaty/puppet-wechat#readme",
   "dependencies": {
     "bl": "^5",
     "cockatiel": "^2.0.2",
     "md5": "^2.3.0",
-    "mime": "^2.5.2",
-    "puppeteer": "^10.4.0",
+    "mime": "^3.0.0",
+    "puppeteer": "^11.0.0",
     "puppeteer-extra": "^3.2.3",
     "puppeteer-extra-plugin-stealth": "^2.9.0",
     "qr-image": "^3.2.0",
     "request": "^2.88.2",
     "rx-queue": "^0.12.6",
     "rxjs": "^7.4.0",
-    "state-switch": "^1.0.16",
+    "state-switch": "^1.6.1",
     "watchdog": "^0.8.17",
     "xml2js": "^0.4.23"
   },

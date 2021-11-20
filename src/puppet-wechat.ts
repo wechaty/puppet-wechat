@@ -29,16 +29,18 @@ import type {
 
 import {
   ThrottleQueue,
-}                   from 'rx-queue'
+}                           from 'rx-queue'
 import {
   Watchdog,
   WatchdogFood,
-}                   from 'watchdog'
+}                           from 'watchdog'
 
-import * as PUPPET from 'wechaty-puppet'
-import { log } from 'wechaty-puppet'
-import { FileBox } from 'file-box'
-import type { FileBoxInterface } from 'file-box'
+import * as PUPPET          from 'wechaty-puppet'
+import { log }              from 'wechaty-puppet'
+import {
+  FileBox,
+  type FileBoxInterface,
+}                           from 'file-box'
 
 import {
   envStealthless,
@@ -496,7 +498,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
   override async logout (reason?: string): Promise<void> {
     log.verbose('PuppetWeChat', 'logout(%s)', reason)
 
-    if (!this.logonoff()) {
+    if (!this.isLoggedIn) {
       log.warn('PuppetWeChat', 'logout() without self()')
       return
     }
@@ -602,10 +604,10 @@ export class PuppetWeChat extends PUPPET.Puppet {
     this.bridge.ding(data)
   }
 
-  override async contactAvatar (contactId: string)                : Promise<FileBoxInterface>
-  override async contactAvatar (contactId: string, file: FileBoxInterface) : Promise<void>
+  override async contactAvatar (contactId: string)                          : Promise<FileBoxInterface>
+  override async contactAvatar (contactId: string, file: FileBoxInterface)  : Promise<void>
 
-  override async contactAvatar (contactId: string, file?: FileBoxInterface): Promise<void | FileBox> {
+  override async contactAvatar (contactId: string, file?: FileBoxInterface) : Promise<void | FileBoxInterface> {
     log.verbose('PuppetWeChat', 'contactAvatar(%s)', contactId)
 
     if (file) {
@@ -1233,7 +1235,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     const ext      = path.extname(filename) //  message.ext()
 
     // const contentType = Misc.mime(ext)
-    const contentType = mime.getType(ext) || file.mimeType || undefined
+    const contentType = mime.getType(ext) || file.mediaType || undefined
     // const contentType = message.mimeType()
     if (!contentType) {
       throw new Error('no MIME Type found on mediaMessage: ' + file.name)
@@ -1288,7 +1290,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     const first           = cookie.find(c => c.name === 'webwx_data_ticket')
     const webwxDataTicket = first && first.value
     const size            = buffer.length
-    const fromUserName    = this.selfId()
+    const fromUserName    = this.currentUserId
     const id              = 'WU_FILE_' + this.fileId
     this.fileId++
 

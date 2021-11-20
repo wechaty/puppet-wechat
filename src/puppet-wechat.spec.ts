@@ -87,14 +87,14 @@ test.only('login/logout events', async t => {
 
     await puppet.start()
     t.pass('should be inited')
-    t.equal(puppet.logonoff(), false, 'should be not logined')
+    t.equal(puppet.isLoggedIn, false, 'should be not logined')
 
     const future = new Promise(resolve => puppet.once('login', resolve))
       .catch(e => t.fail(e))
     puppet.bridge.emit('login', 'TestPuppetWeChat')
     await future
 
-    t.equal(puppet.logonoff(), true, 'should be logined')
+    t.equal(puppet.isLoggedIn, true, 'should be logined')
 
     t.ok((puppet.bridge.getUserName as any).called, 'bridge.getUserName should be called')
 
@@ -122,7 +122,7 @@ test.only('login/logout events', async t => {
     const logoutPromise = new Promise((resolve) => puppet.once('logout', () => resolve(LOGOUT_FIRED)))
     puppet.bridge.emit('logout')
     t.equal(await logoutPromise, LOGOUT_FIRED, 'should fire logout event')
-    t.equal(puppet.logonoff(), false, 'should be logouted')
+    t.equal(puppet.isLoggedIn, false, 'should be logouted')
 
     await puppet.stop()
   } catch (e) {

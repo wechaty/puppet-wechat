@@ -16,8 +16,6 @@
  *   limitations under the License.
  *
  */
-import * as PUPPET  from 'wechaty-puppet'
-
 import {
   log,
 }               from './config.js'
@@ -190,7 +188,7 @@ export class Firer {
     const inviteeContactIdList: string[] = []
 
     if (/^You|你$/i.test(inviterName)) { //  === 'You' || inviter === '你' || inviter === 'you'
-      inviterContactId = this.puppet.selfId()
+      inviterContactId = this.puppet.currentUserId
     }
 
     const sleep   = 1000
@@ -338,9 +336,9 @@ export class Firer {
     let removerContactId : undefined | string
 
     if (/^(You|你)$/i.test(leaverName)) {
-      leaverContactId = this.puppet.selfId()
+      leaverContactId = this.puppet.currentUserId
     } else if (/^(You|你)$/i.test(removerName)) {
-      removerContactId = this.puppet.selfId()
+      removerContactId = this.puppet.currentUserId
     }
 
     if (!leaverContactId) {
@@ -372,7 +370,7 @@ export class Firer {
     })
 
     setTimeout(() => {
-      this.puppet.dirtyPayload(PUPPET.type.Payload.Room, roomId)
+      this.puppet.roomPayloadDirty(roomId)
         .then(() => this.puppet.roomPayload(roomId))
         .catch(console.error)
       // this.puppet.emit('dirty', {
@@ -403,7 +401,7 @@ export class Firer {
 
     let changerContactId: undefined | string
     if (/^(You|你)$/.test(changer)) {
-      changerContactId = this.puppet.selfId()
+      changerContactId = this.puppet.currentUserId
     } else {
       changerContactId = (await this.puppet.roomMemberSearch(roomId, changer))[0]
     }

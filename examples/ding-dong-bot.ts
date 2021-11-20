@@ -93,7 +93,7 @@ function onLogout (payload: PUPPET.payload.EventLogout) {
 function onError (payload: PUPPET.payload.EventError) {
   console.error('Bot error:', payload.data)
   /*
-  if (bot.logonoff()) {
+  if (bot.isLoggedIn) {
     bot.say('Wechaty error: ' + (e as Error).message).catch(console.error)
   }
   */
