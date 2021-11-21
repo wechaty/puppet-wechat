@@ -27,9 +27,9 @@ import { test } from 'tstest'
 import { Firer }              from './firer.js'
 import type { PuppetWeChat }  from './puppet-wechat.js'
 
-const SELF_ID = 'self-id'
+const CURRENT_USER_ID = 'current-user-id'
 const mockPuppetWeChat = {
-  selfId: () => SELF_ID,
+  currentUserId: SELF_ID,
 } as any as PuppetWeChat
 
 test('parseFriendConfirm()', async (t) => {
