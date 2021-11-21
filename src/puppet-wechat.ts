@@ -92,7 +92,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   public bridge: Bridge
 
-  public scanPayload? : PUPPET.payload.EventScan
+  public scanPayload? : PUPPET.payloads.EventScan
   public scanWatchdog : Watchdog<ScanFoodType>
 
   private fileId: number
@@ -296,7 +296,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   override async messageRawPayloadParser (
     rawPayload: WebMessageRawPayload,
-  ): Promise<PUPPET.payload.Message> {
+  ): Promise<PUPPET.payloads.Message> {
     log.verbose('PuppetWeChat', 'messageRawPayloadParser(%s) @ %s', rawPayload, this)
 
     const payload = messageRawPayloadParser(rawPayload)
@@ -306,7 +306,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
      *  https://github.com/wechaty/wechaty-puppet-wechat/issues/141
      */
     if (payload.roomId && payload.text) {
-      (payload as PUPPET.payload.MessageRoom).mentionIdList = await parseMentionIdList(this, payload.roomId, payload.text)
+      (payload as PUPPET.payloads.MessageRoom).mentionIdList = await parseMentionIdList(this, payload.roomId, payload.text)
     }
 
     return payload
@@ -322,11 +322,11 @@ export class PuppetWeChat extends PUPPET.Puppet {
     return fileBox
   }
 
-  override async messageUrl (messageId: string)  : Promise<PUPPET.payload.UrlLink> {
+  override async messageUrl (messageId: string)  : Promise<PUPPET.payloads.UrlLink> {
     return PUPPET.throwUnsupportedError(messageId)
   }
 
-  override async messageMiniProgram (messageId: string): Promise<PUPPET.payload.MiniProgram> {
+  override async messageMiniProgram (messageId: string): Promise<PUPPET.payloads.MiniProgram> {
     log.verbose('PuppetWeChat', 'messageMiniProgram(%s)', messageId)
     return PUPPET.throwUnsupportedError(messageId)
   }
@@ -337,7 +337,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     let url = await this.messageRawPayloadToUrl(rawPayload)
 
     if (!url) {
-      throw new Error('no url for type ' + PUPPET.type.Message[rawPayload.MsgType])
+      throw new Error('no url for type ' + PUPPET.types.Message[rawPayload.MsgType])
     }
 
     // use http instead of https, because https will only success on the very first request!
@@ -388,12 +388,12 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   override async messageSendUrl (
     conversationId : string,
-    urlLinkPayload : PUPPET.payload.UrlLink,
+    urlLinkPayload : PUPPET.payloads.UrlLink,
   ) : Promise<void> {
     PUPPET.throwUnsupportedError(conversationId, urlLinkPayload)
   }
 
-  override async messageSendMiniProgram (conversationId: string, miniProgramPayload: PUPPET.payload.MiniProgram): Promise<void> {
+  override async messageSendMiniProgram (conversationId: string, miniProgramPayload: PUPPET.payloads.MiniProgram): Promise<void> {
     log.verbose('PuppetWeChat', 'messageSendMiniProgram("%s", %s)',
       conversationId,
       JSON.stringify(miniProgramPayload),
@@ -550,7 +550,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   override async contactRawPayloadParser (
     rawPayload: WebContactRawPayload,
-  ): Promise<PUPPET.payload.Contact> {
+  ): Promise<PUPPET.payloads.Contact> {
     log.silly('PuppetWeChat', 'contactParseRawPayload(Object.keys(payload).length=%d)',
       Object.keys(rawPayload).length,
     )
@@ -593,8 +593,8 @@ export class PuppetWeChat extends PUPPET.Puppet {
         * @ignore
         */
       type:      (!!rawPayload.UserName && !rawPayload.UserName.startsWith('@@') && !!(rawPayload.VerifyFlag & 8))
-        ? PUPPET.type.Contact.Official
-        : PUPPET.type.Contact.Individual,
+        ? PUPPET.types.Contact.Official
+        : PUPPET.types.Contact.Individual,
       weixin:     rawPayload.Alias,  // Wechat ID
     }
   }
@@ -746,7 +746,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   override async roomRawPayloadParser (
     rawPayload: WebRoomRawPayload,
-  ): Promise<PUPPET.payload.Room> {
+  ): Promise<PUPPET.payloads.Room> {
     log.verbose('PuppetWeChat', 'roomRawPayloadParser(%s)', rawPayload)
 
     // const payload = await this.roomPayload(rawPayload.UserName)
@@ -784,7 +784,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
       ? rawPayload.MemberList.map(m => m.UserName)
       : []
 
-    const roomPayload: PUPPET.payload.Room = {
+    const roomPayload: PUPPET.payloads.Room = {
       adminIdList: [],
       id,
       memberIdList,
@@ -922,10 +922,10 @@ export class PuppetWeChat extends PUPPET.Puppet {
     }
   }
 
-  override async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<PUPPET.payload.RoomMember>  {
+  override async roomMemberRawPayloadParser (rawPayload: WebRoomRawMember): Promise<PUPPET.payloads.RoomMember>  {
     log.verbose('PuppetWeChat', 'roomMemberRawPayloadParser(%s)', rawPayload)
 
-    const payload: PUPPET.payload.RoomMember = {
+    const payload: PUPPET.payloads.RoomMember = {
       avatar    : rawPayload.HeadImgUrl,
       id        : rawPayload.UserName,
       name      : rawPayload.NickName,
@@ -947,7 +947,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     return PUPPET.throwUnsupportedError(roomInvitationId)
   }
 
-  override async roomInvitationRawPayloadParser (rawPayload: any): Promise<PUPPET.payload.RoomInvitation> {
+  override async roomInvitationRawPayloadParser (rawPayload: any): Promise<PUPPET.payloads.RoomInvitation> {
     return PUPPET.throwUnsupportedError(rawPayload)
   }
 
@@ -963,7 +963,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     return rawPayload
   }
 
-  override async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<PUPPET.payload.Friendship> {
+  override async friendshipRawPayloadParser (rawPayload: WebMessageRawPayload): Promise<PUPPET.payloads.Friendship> {
     log.warn('PuppetWeChat', 'friendshipRawPayloadParser(%s)', rawPayload)
 
     const timestamp = Math.floor(Date.now() / 1000) // in seconds
@@ -975,22 +975,22 @@ export class PuppetWeChat extends PUPPET.Puppet {
           throw new Error('no RecommendInfo')
         }
 
-        const payloadReceive: PUPPET.payload.FriendshipReceive = {
+        const payloadReceive: PUPPET.payloads.FriendshipReceive = {
           contactId : recommendInfo.UserName,
           hello     : recommendInfo.Content,
           id        : rawPayload.MsgId,
           ticket    : recommendInfo.Ticket,
           timestamp,
-          type      : PUPPET.type.Friendship.Receive,
+          type      : PUPPET.types.Friendship.Receive,
         }
         return payloadReceive
       }
       case WebMessageType.SYS: {
-        const payloadConfirm: PUPPET.payload.FriendshipConfirm = {
+        const payloadConfirm: PUPPET.payloads.FriendshipConfirm = {
           contactId : rawPayload.FromUserName,
           id        : rawPayload.MsgId,
           timestamp,
-          type      : PUPPET.type.Friendship.Confirm,
+          type      : PUPPET.types.Friendship.Confirm,
         }
         return payloadConfirm
       }
@@ -1026,7 +1026,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
   override async friendshipAccept (
     friendshipId : string,
   ): Promise<void> {
-    const payload = await this.friendshipPayload(friendshipId) as any as PUPPET.payload.FriendshipReceive
+    const payload = await this.friendshipPayload(friendshipId) as any as PUPPET.payloads.FriendshipReceive
 
     try {
       await this.bridge.verifyUserOk(payload.contactId, payload.ticket)
@@ -1136,27 +1136,27 @@ export class PuppetWeChat extends PUPPET.Puppet {
   ): Promise<null | string> {
     log.silly('PuppetWeChat', 'readyMedia()')
 
-    // let type = PUPPET.type.Message.Unknown
+    // let type = PUPPET.types.Message.Unknown
     let url: undefined | string
 
     try {
 
       switch (rawPayload.MsgType) {
         case WebMessageType.EMOTICON:
-          // type = PUPPET.type.Message.Emoticon
+          // type = PUPPET.types.Message.Emoticon
           url = await this.bridge.getMsgEmoticon(rawPayload.MsgId)
           break
         case WebMessageType.IMAGE:
-          // type = PUPPET.type.Message.Image
+          // type = PUPPET.types.Message.Image
           url = await this.bridge.getMsgImg(rawPayload.MsgId)
           break
         case WebMessageType.VIDEO:
         case WebMessageType.MICROVIDEO:
-          // type = PUPPET.type.Message.Video
+          // type = PUPPET.types.Message.Video
           url = await this.bridge.getMsgVideo(rawPayload.MsgId)
           break
         case WebMessageType.VOICE:
-          // type = PUPPET.type.Message.Audio
+          // type = PUPPET.types.Message.Audio
           url = await this.bridge.getMsgVoice(rawPayload.MsgId)
           break
 
@@ -1167,7 +1167,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
                 throw new Error('no MMAppMsgDownloadUrl')
               }
               // had set in Message
-              // type = PUPPET.type.Message.Attachment
+              // type = PUPPET.types.Message.Attachment
               url = rawPayload.MMAppMsgDownloadUrl
               break
 
@@ -1177,7 +1177,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
                 throw new Error('no Url')
               }
               // had set in Message
-              // type = PUPPET.type.Message.Attachment
+              // type = PUPPET.types.Message.Attachment
               url = rawPayload.Url
               break
 
@@ -1191,7 +1191,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
         case WebMessageType.TEXT:
           if (rawPayload.SubMsgType === WebMessageType.LOCATION) {
-            // type = PUPPET.type.Message.Image
+            // type = PUPPET.types.Message.Image
             url = await this.bridge.getMsgPublicLinkImg(rawPayload.MsgId)
           }
           break
@@ -1213,7 +1213,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
         // }
         // url = this.payload.url
         // return {
-        //   type: PUPPET.type.Message.Unknown,
+        //   type: PUPPET.types.Message.Unknown,
         // }
         return null
       }
@@ -1544,7 +1544,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     return PUPPET.throwUnsupportedError()
   }
 
-  override async messageImage (messageId: string, imageType: PUPPET.type.Image): Promise<FileBoxInterface> {
+  override async messageImage (messageId: string, imageType: PUPPET.types.Image): Promise<FileBoxInterface> {
     log.verbose('PuppetWeChat', 'messageImage(%s, %s)', messageId, imageType)
     return this.messageFile(messageId)
   }

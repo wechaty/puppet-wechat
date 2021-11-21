@@ -29,7 +29,7 @@ import type { PuppetWeChat }  from './puppet-wechat.js'
 
 const CURRENT_USER_ID = 'current-user-id'
 const mockPuppetWeChat = {
-  currentUserId: SELF_ID,
+  currentUserId: CURRENT_USER_ID,
 } as any as PuppetWeChat
 
 test('parseFriendConfirm()', async (t) => {

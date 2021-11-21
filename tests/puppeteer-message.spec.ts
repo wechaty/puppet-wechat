@@ -78,13 +78,13 @@ test('constructor()', async t => {
   }
   const sandbox = sinon.createSandbox()
   const mockMessagePayload = async (/* _: string */) => {
-    const payload: PUPPET.payload.Message = {
+    const payload: PUPPET.payloads.Message = {
       fromId        : EXPECTED.from,
       id            : EXPECTED.id,
       mentionIdList : [],
       timestamp     : Date.now(),
       toId          : 'toId',
-      type          : PUPPET.type.Message.Text,
+      type          : PUPPET.types.Message.Text,
     }
     return payload
   }

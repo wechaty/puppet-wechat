@@ -17,7 +17,7 @@ import {
 
 export function messageRawPayloadParser (
   rawPayload: WebMessageRawPayload,
-): PUPPET.payload.Message {
+): PUPPET.payloads.Message {
   const id                           = rawPayload.MsgId
   const fromId                       = rawPayload.MMActualSender               // MMPeerUserName
   const text: string                 = rawPayload.MMActualContent              // Content has @id prefix added by wx
@@ -49,7 +49,7 @@ export function messageRawPayloadParser (
     }
   }
 
-  const type: PUPPET.type.Message = webMessageType(rawPayload)
+  const type: PUPPET.types.Message = webMessageType(rawPayload)
 
   const payloadBase = {
     filename: msgFileName,
@@ -61,7 +61,7 @@ export function messageRawPayloadParser (
     type,
   }
 
-  let payload: PUPPET.payload.Message
+  let payload: PUPPET.payloads.Message
 
   if (toId) {
     payload = {

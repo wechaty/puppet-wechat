@@ -8,38 +8,38 @@ import * as PUPPET from 'wechaty-puppet'
 
 export function webMessageType (
   rawPayload: WebMessageRawPayload,
-): PUPPET.type.Message {
+): PUPPET.types.Message {
 
   switch (rawPayload.MsgType) {
     case WebMessageType.TEXT:
       switch (rawPayload.SubMsgType) {
         case WebMessageType.LOCATION:
-          return PUPPET.type.Message.Attachment
+          return PUPPET.types.Message.Attachment
 
         default:
-          return PUPPET.type.Message.Text
+          return PUPPET.types.Message.Text
       }
 
     case WebMessageType.EMOTICON:
     case WebMessageType.IMAGE:
-      return PUPPET.type.Message.Image
+      return PUPPET.types.Message.Image
 
     case WebMessageType.VOICE:
-      return PUPPET.type.Message.Audio
+      return PUPPET.types.Message.Audio
 
     case WebMessageType.MICROVIDEO:
     case WebMessageType.VIDEO:
-      return PUPPET.type.Message.Video
+      return PUPPET.types.Message.Video
 
     case WebMessageType.APP:
       switch (rawPayload.AppMsgType) {
         case WebAppMsgType.ATTACH:
         case WebAppMsgType.URL:
         case WebAppMsgType.READER_TYPE:
-          return PUPPET.type.Message.Attachment
+          return PUPPET.types.Message.Attachment
 
         default:
-          return PUPPET.type.Message.Text
+          return PUPPET.types.Message.Text
       }
 
     /**
@@ -49,10 +49,10 @@ export function webMessageType (
      * FIXME: should we use better message type at here???
      */
     case WebMessageType.SYS:
-      return PUPPET.type.Message.Text
+      return PUPPET.types.Message.Text
     // add recall type
     case WebMessageType.RECALLED:
-      return PUPPET.type.Message.Recalled
+      return PUPPET.types.Message.Recalled
     // VERIFYMSG           = 37,
     // POSSIBLEFRIEND_MSG  = 40,
     // SHARECARD           = 42,
@@ -64,6 +64,6 @@ export function webMessageType (
     // SYSNOTICE           = 9999,
     // RECALLED            = 10002,
     default:
-      return PUPPET.type.Message.Text
+      return PUPPET.types.Message.Text
   }
 }

@@ -66,7 +66,7 @@ puppet.start()
  *  `scan`, `login`, `logout`, `error`, and `message`
  *
  */
-function onScan (payload: PUPPET.payload.EventScan) {
+function onScan (payload: PUPPET.payloads.EventScan) {
   if (payload.qrcode) {
     // Generate a QR Code online via
     // http://goqr.me/api/doc/create-qr-code/
@@ -81,16 +81,16 @@ function onScan (payload: PUPPET.payload.EventScan) {
   }
 }
 
-function onLogin (payload: PUPPET.payload.EventLogin) {
+function onLogin (payload: PUPPET.payloads.EventLogin) {
   console.info(`${payload.contactId} login`)
   puppet.messageSendText(payload.contactId, 'Wechaty login').catch(console.error)
 }
 
-function onLogout (payload: PUPPET.payload.EventLogout) {
+function onLogout (payload: PUPPET.payloads.EventLogout) {
   console.info(`${payload.contactId} logouted`)
 }
 
-function onError (payload: PUPPET.payload.EventError) {
+function onError (payload: PUPPET.payloads.EventError) {
   console.error('Bot error:', payload.data)
   /*
   if (bot.isLoggedIn) {
@@ -105,11 +105,11 @@ function onError (payload: PUPPET.payload.EventError) {
  *    dealing with Messages.
  *
  */
-async function onMessage (payload: PUPPET.payload.EventMessage) {
+async function onMessage (payload: PUPPET.payloads.EventMessage) {
   const messagePayload = await puppet.messagePayload(payload.messageId)
   console.info(JSON.stringify(messagePayload))
 
-  if (messagePayload.type === PUPPET.type.Message.Text
+  if (messagePayload.type === PUPPET.types.Message.Text
     && /^ding$/i.test(messagePayload.text || '')
   ) {
     const conversationId = messagePayload.roomId || messagePayload.fromId
