@@ -25,14 +25,13 @@ import stealthPlugin    from 'puppeteer-extra-plugin-stealth'
 import { StateSwitch }  from 'state-switch'
 import { parseString }  from 'xml2js'
 
-import { wrapAsyncError } from 'wechaty-puppet/helpers'
-
+import { wrapAsyncError } from 'gerror'
 import type {
   MemoryCard,
-}                       from 'memory-card'
+}                         from 'memory-card'
 import {
   log,
-}                       from 'wechaty-puppet'
+}                         from 'wechaty-puppet'
 
 import {
   MEMORY_SLOT,
