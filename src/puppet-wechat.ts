@@ -34,7 +34,7 @@ import {
   Watchdog,
   WatchdogFood,
 }                           from 'watchdog'
-
+import { GError }           from 'gerror'
 import * as PUPPET          from 'wechaty-puppet'
 import { log }              from 'wechaty-puppet'
 import {
@@ -226,7 +226,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
         } catch (e) {
           log.error('PuppetWeChat', 'initScanWatchdog() on(reset) recover FAIL: %s', e as Error)
           this.emit('error', {
-            data: (e as Error).message,
+            gerror: GError.stringify(e),
           })
         }
       }
@@ -247,7 +247,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     this.bridge.on('heartbeat', (data: string) => this.emit('heartbeat', { data: data + 'bridge ding' }))
 
     this.bridge.on('error',     (e: Error) => this.emit('error', {
-      data: (e as Error).message,
+      gerror: GError.stringify(e),
     }))
     this.bridge.on('log',       Event.onLog.bind(this))
     this.bridge.on('login',     this.wrapAsync(Event.onLogin.bind(this)))
@@ -264,7 +264,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
         log.error('PuppetWeChat', 'initBridge() this.bridge.stop() rejection: %s', e as Error)
       })
       this.emit('error', {
-        data: (e as Error).message,
+        gerror: GError.stringify(e),
       })
 
       throw e
@@ -1098,7 +1098,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     } catch (e) {
       log.error('PuppetWeChat', 'hostname() exception:%s', e as Error)
       this.emit('error', {
-        data: (e as Error).message,
+        gerror: GError.stringify(e),
       })
       throw e
     }
@@ -1364,7 +1364,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
                     log.error('PuppetWeChat', 'updateMedia() body = %s', body)
                     log.error('PuppetWeChat', 'updateMedia() exception: %s', e as Error)
                     this.emit('error', {
-                      data: (e as Error).message,
+                      gerror: GError.stringify(e),
                     })
                   }
                 }

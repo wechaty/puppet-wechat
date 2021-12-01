@@ -41,6 +41,7 @@ import {
 import {
   normalizeScanStatus,
 }                         from './pure-function-helpers/normalize-scan-status.js'
+import { GError } from 'wechaty-puppet/helper'
 
 export const Event = {
   onDing,
@@ -121,7 +122,7 @@ async function onLogin (
   if (ttl <= 0) {
     log.verbose('PuppetWeChatEvent', 'onLogin(%s) TTL expired')
     this.emit('error', {
-      data: 'onLogin() TTL expired.',
+      gerror: GError.from('onLogin() TTL expired.').toJSON(),
     })
     return
   }
@@ -239,7 +240,7 @@ async function onUnload (this: PuppetWeChat): Promise<void> {
     await this.init()
   } catch (e) {
     log.error('PuppetWeChatEvent', 'onUnload() exception: %s', e as Error)
-    this.emit('error', e as Error)
+    this.emit('error', GError.from(e))
     throw e
   }
   */

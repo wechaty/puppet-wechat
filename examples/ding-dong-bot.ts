@@ -36,11 +36,11 @@ const puppet = new PuppetWeChat()
  *
  */
 puppet
-  .on('logout', onLogout)
-  .on('login',  onLogin)
-  .on('scan',   onScan)
-  .on('error',  onError)
-  .on('message', onMessage)
+  .on('logout',   onLogout)
+  .on('login',    onLogin)
+  .on('scan',     onScan)
+  .on('error',    onError)
+  .on('message',  onMessage)
 
 /**
  *
