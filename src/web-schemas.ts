@@ -272,10 +272,10 @@ export interface WebMessageRawPayload {
 }
 
 export const enum WebMediaType {
-  Image      = 'pic',
-  Video      = 'video',
-  Attachment = 'doc',
-  // Audio      = 3, useless now
+  Image      = 1,
+  Video      = 2,
+  Audio      = 3,
+  Attachment = 4,
 }
 
 export interface WebRoomRawMember {
