@@ -373,10 +373,6 @@ export class Firer {
       this.puppet.roomPayloadDirty(roomId)
         .then(() => this.puppet.roomPayload(roomId))
         .catch(console.error)
-      // this.puppet.emit('dirty', {
-      //   payloadType: PayloadType.Room,
-      //   payloadId: roomId,
-      // })
     }, 10 * 1000) // reload the room data, especially for memberList
 
     return true
