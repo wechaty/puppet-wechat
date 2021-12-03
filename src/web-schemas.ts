@@ -156,7 +156,12 @@ export enum WebAppMsgType {
   RED_ENVELOPES            = 2001,
   READER_TYPE              = 100001,
 }
-
+export enum WebMessageStatus{
+    READY=0,
+    SENDING=1,
+    SUCCESS=2,
+    FAIL=5,
+}
 export interface WebMessageRawPayload {
   MsgId:            string,
 
@@ -223,7 +228,7 @@ export interface WebMessageRawPayload {
    * Status-es
    */
   Status:           string,
-  MMStatus:         number,  // img ng-show="message.MMStatus == 1" class="ico_loading"
+  MMStatus:         WebMessageStatus,  // img ng-show="message.MMStatus == 1" class="ico_loading"
                              // ng-click="resendMsg(message)" ng-show="message.MMStatus == 5" title="重新发送"
   MMFileStatus:     number,  // <p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
                              // CONF.MM_SEND_FILE_STATUS_QUEUED, MM_SEND_FILE_STATUS_SENDING

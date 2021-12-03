@@ -72,6 +72,7 @@ import {
   WebMediaType,
   WebMessageMediaPayload,
   WebMessageRawPayload,
+  WebMessageStatus,
   WebMessageType,
   WebRoomRawMember,
   WebRoomRawPayload,
@@ -317,9 +318,16 @@ export class PuppetWeChat extends PUPPET.Puppet {
   }
 
   override async messageFile (messageId: string): Promise<FileBoxInterface> {
-    const rawPayload = await this.messageRawPayload(messageId)
-    const fileBox    = await this.messageRawPayloadToFile(rawPayload)
-    return fileBox
+    do {
+      const rawPayload = await this.messageRawPayload(messageId)
+      switch (rawPayload.MMStatus) {
+        case WebMessageStatus.SENDING:
+          await new Promise((resolve) => setTimeout(resolve, 50))
+          break
+        default:
+          return await this.messageRawPayloadToFile(rawPayload)
+      }
+    } while (true)
   }
 
   override async messageUrl (messageId: string)  : Promise<PUPPET.payloads.UrlLink> {
