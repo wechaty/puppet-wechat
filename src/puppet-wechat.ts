@@ -1245,6 +1245,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
     let mediatype: 'pic'|'video'|'doc'
     switch (msgType) {
+      // case WebMessageType.EMOTICON:  //gif cannot be "pic", it will cause sending wrong picture. #178
       case WebMessageType.IMAGE:
         mediatype = 'pic'
         break
