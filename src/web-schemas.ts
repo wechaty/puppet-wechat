@@ -281,7 +281,7 @@ export interface WebMessageRawPayload {
  *    UPLOAD_MEDIA_TYPE_AUDIO: 3
  *    UPLOAD_MEDIA_TYPE_ATTACHMENT: 4,
  */
-export const enum UploadMediaType {
+export enum UploadMediaType {
   Unknown    = 0,
   Image      = 1,
   Video      = 2,
