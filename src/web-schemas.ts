@@ -157,7 +157,7 @@ export enum WebAppMsgType {
   READER_TYPE              = 100001,
 }
 /**
- * WebMessageSendStatus from webwx-app
+ * MsgSendStatus from webwx-app
  *  @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L7520-L7524
  *
  *  //msg send status
@@ -166,7 +166,7 @@ export enum WebAppMsgType {
  *    MSG_SEND_STATUS_SUCC: 2
  *    MSG_SEND_STATUS_FAIL: 5
  */
-export enum WebMessageSendStatus{
+export enum MsgSendStatus{
     READY=0,
     SENDING=1,
     SUCCESS=2,
@@ -238,7 +238,7 @@ export interface WebMessageRawPayload {
    * Status-es
    */
   Status:           string,
-  MMStatus:         WebMessageSendStatus,  // img ng-show="message.MMStatus == 1" class="ico_loading"
+  MMStatus:         MsgSendStatus,  // img ng-show="message.MMStatus == 1" class="ico_loading"
                              // ng-click="resendMsg(message)" ng-show="message.MMStatus == 5" title="重新发送"
   MMFileStatus:     number,  // <p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
                              // CONF.MM_SEND_FILE_STATUS_QUEUED, MM_SEND_FILE_STATUS_SENDING
