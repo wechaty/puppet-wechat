@@ -317,8 +317,8 @@ export class PuppetWeChat extends PUPPET.Puppet {
   }
 
   override async messageFile (messageId: string): Promise<FileBoxInterface> {
-      const rawPayload = await this.messageRawPayload(messageId)
-      return await this.messageRawPayloadToFile(rawPayload)
+    const rawPayload = await this.messageRawPayload(messageId)
+    return await this.messageRawPayloadToFile(rawPayload)
   }
 
   override async messageUrl (messageId: string)  : Promise<PUPPET.payloads.UrlLink> {
