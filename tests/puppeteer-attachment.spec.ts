@@ -26,7 +26,17 @@ import { WebMessageMediaPayload, WebMessageType } from '../src/web-schemas.js'
 import { FileBox } from 'file-box'
 import request from 'request'
 
-class PuppetTest extends PuppetWeChat {}
+class PuppetTest extends PuppetWeChat {
+
+  override getExtName (filename:string) {
+    return super.getExtName(filename)
+  }
+
+  override getMsgType (ext: string): WebMessageType {
+    return super.getMsgType(ext)
+  }
+
+}
 
 test('Send Attachment', async (t) => {
   const puppet = new PuppetTest()

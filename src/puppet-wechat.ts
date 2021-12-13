@@ -1118,7 +1118,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
    * `isImg()` @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L3441-L3450
    * `getMsgType()` @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L3452-L3463
    */
-  getMsgType (ext: string): WebMessageType {
+  protected getMsgType (ext: string): WebMessageType {
     switch (ext.toLowerCase()) {
       case 'bmp':
       case 'jpeg':
@@ -1231,7 +1231,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   }
 
-  getExtName (filename:string) {
+  protected getExtName (filename:string) {
     return path.extname(filename).slice(1)
   }
 
