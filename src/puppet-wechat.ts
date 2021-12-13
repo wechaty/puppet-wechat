@@ -69,7 +69,7 @@ import {
 import {
   WebAppMsgType,
   WebContactRawPayload,
-  WebMediaType,
+  UploadMediaType,
   WebMessageMediaPayload,
   WebMessageRawPayload,
   WebMessageType,
@@ -1114,16 +1114,20 @@ export class PuppetWeChat extends PUPPET.Puppet {
     await this.memory.save()
   }
 
-  private extToType (ext: string): WebMessageType {
-    switch (ext) {
-      case '.bmp':
-      case '.jpeg':
-      case '.jpg':
-      case '.png':
+  /**
+   * `isImg()` @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L3441-L3450
+   * `getMsgType()` @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L3452-L3463
+   */
+  protected getMsgType (ext: string): WebMessageType {
+    switch (ext.toLowerCase()) {
+      case 'bmp':
+      case 'jpeg':
+      case 'jpg':
+      case 'png':
         return WebMessageType.IMAGE
-      case '.gif':
+      case 'gif':
         return WebMessageType.EMOTICON
-      case '.mp4':
+      case 'mp4':
         return WebMessageType.VIDEO
       default:
         return WebMessageType.APP
@@ -1227,34 +1231,33 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   }
 
+  protected getExtName (filename:string) {
+    return path.extname(filename).slice(1)
+  }
+
   private async uploadMedia (
     file       : FileBoxInterface,
     toUserName : string,
   ): Promise<WebMessageMediaPayload> {
     const filename = file.name
-    const ext      = path.extname(filename) //  message.ext()
-
-    // const contentType = Misc.mime(ext)
+    const ext      = this.getExtName(filename)
+    const msgType  = this.getMsgType(ext)
     const contentType = mime.getType(ext) || file.mediaType || undefined
-    // const contentType = message.mimeType()
     if (!contentType) {
       throw new Error('no MIME Type found on mediaMessage: ' + file.name)
     }
-    let mediatype: WebMediaType
 
-    switch (ext) {
-      case '.bmp':
-      case '.jpeg':
-      case '.jpg':
-      case '.png':
-      case '.gif':
-        mediatype = WebMediaType.Image
+    let mediatype: 'pic'|'video'|'doc'
+    switch (msgType) {
+      // case WebMessageType.EMOTICON:  //gif cannot be "pic", it will cause sending wrong picture. #178
+      case WebMessageType.IMAGE:
+        mediatype = 'pic'
         break
-      case '.mp4':
-        mediatype = WebMediaType.Video
+      case WebMessageType.VIDEO:
+        mediatype = 'video'
         break
       default:
-        mediatype = WebMediaType.Attachment
+        mediatype = 'doc'
     }
 
     const buffer = await new Promise<Buffer>((resolve, reject) => {
@@ -1262,8 +1265,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
         if (err) reject(err)
         else resolve(data)
       })
-      // Huan(202110): how to remove any?
-      file.pipe(bl as any)
+      file.pipe(bl)
     })
 
     // Sending video files is not allowed to exceed 20MB
@@ -1273,7 +1275,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     const LARGE_FILE_SIZE = 25 * 1024 * 1024
     const MAX_VIDEO_SIZE  = 20 * 1024 * 1024
 
-    if (mediatype === WebMediaType.Video && buffer.length > MAX_VIDEO_SIZE) {
+    if (msgType === WebMessageType.VIDEO && buffer.length > MAX_VIDEO_SIZE) {
       throw new Error(`Sending video files is not allowed to exceed ${MAX_VIDEO_SIZE / 1024 / 1024}MB`)
     }
     if (buffer.length > MAX_FILE_SIZE) {
@@ -1311,7 +1313,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
       DataLen:       size,
       FileMd5:       fileMd5,
       FromUserName:  fromUserName,
-      MediaType:     WebMediaType.Attachment,
+      MediaType:     UploadMediaType.Attachment,
       Signature:     '',
       StartPos:      0,
       ToUserName:    toUserName,
@@ -1518,7 +1520,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     // console.log('mediaData.MsgType', mediaData.MsgType)
     // console.log('rawObj.MsgType', message.rawObj && message.rawObj.MsgType)
 
-    mediaData.MsgType = this.extToType(path.extname(file.name))
+    mediaData.MsgType = this.getMsgType(this.getExtName(file.name))
     log.silly('PuppetWeChat', 'sendMedia() destination: %s, mediaId: %s, MsgType; %s)',
       conversationId,
       mediaData.MediaId,

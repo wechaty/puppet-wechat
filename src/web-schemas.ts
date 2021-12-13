@@ -271,11 +271,22 @@ export interface WebMessageRawPayload {
 
 }
 
-export const enum WebMediaType {
-  Image      = 'pic',
-  Video      = 'video',
-  Attachment = 'doc',
-  // Audio      = 3, useless now
+/**
+ * UploadMediaType from webwx-app
+ *  @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L7545-L7549
+ *
+ *  //upload media type
+ *    UPLOAD_MEDIA_TYPE_IMAGE: 1
+ *    UPLOAD_MEDIA_TYPE_VIDEO: 2
+ *    UPLOAD_MEDIA_TYPE_AUDIO: 3
+ *    UPLOAD_MEDIA_TYPE_ATTACHMENT: 4,
+ */
+export enum UploadMediaType {
+  Unknown    = 0,
+  Image      = 1,
+  Video      = 2,
+  Audio      = 3,
+  Attachment = 4,
 }
 
 export interface WebRoomRawMember {
