@@ -25,7 +25,6 @@ import { PuppetWeChat } from '../src/puppet-wechat.js'
 import { WebMessageMediaPayload, WebMessageType } from '../src/web-schemas.js'
 import { FileBox } from 'file-box'
 import request from 'request'
-import { extname } from 'path'
 
 class PuppetTest extends PuppetWeChat {}
 
