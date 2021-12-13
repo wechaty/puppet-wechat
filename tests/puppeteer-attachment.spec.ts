@@ -72,9 +72,9 @@ test('Send Attachment', async (t) => {
     log.silly('TestMessage', 'mocked bridge.sendMedia(%o)', msg)
     const ext = getExtName(msg.FileName)
     const msgType = extToType(ext)
-    t.match(msg.MMFileExt, /^\w+$/)
-    t.equal(msg.MsgType, msgType)
-    t.equal(msg.MMFileExt, ext)
+    t.match(msg.MMFileExt, /^\w+$/, 'should be WebMessageMediaPayload.MMFileExt matches /^\\w+$/')
+    t.equal(msg.MsgType, msgType, `should be WebMessageMediaPayload.MsgType is "${msgType}"`)
+    t.equal(msg.MMFileExt, ext, `should be WebMessageMediaPayload.MMFileExt is "${ext}"`)
     return true
   }
   const mockPostRequest = (
@@ -96,7 +96,6 @@ test('Send Attachment', async (t) => {
         path = options.uri
       }
     }
-    t.not(path, null)
     if (path && callback) {
       if (path.includes(uploadMediaUrl)) {
         log.silly(
@@ -138,9 +137,9 @@ test('Send Attachment', async (t) => {
           default:
             mediatype = 'doc'
         }
-        t.equal(formData.mediatype, mediatype)
-        t.equal(uploadmediarequest.MediaType, 4)
-        t.equal(uploadmediarequest.UploadType, 2)
+        t.equal(formData.mediatype, mediatype, `should be mediatype is "${mediatype}"`)
+        t.equal(uploadmediarequest.MediaType, 4, 'should be uploadmediarequest.MediaType is 4')
+        t.equal(uploadmediarequest.UploadType, 2, 'should be uploadmediarequest.UploadType is 2')
 
         callback(null, {} as any, mockedResUploadMedia)
       } else if (path.includes(checkUploadUrl)) {
