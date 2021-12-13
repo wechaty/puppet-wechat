@@ -426,9 +426,9 @@
       const m = chatFactory.createMessage(d)
 
       m.MMFileStatus = confFactory.MM_SEND_FILE_STATUS_SUCCESS
-      m.MMStatus = confFactory.MSG_SEND_STATUS_SUCC
+      m.MMStatus = confFactory.MSG_SEND_STATUS_SENDING
       m.sendByLocal = false
-
+      
       chatFactory.appendMessage(m)
       chatFactory.sendMessage(m)
     } catch (e) {
@@ -485,16 +485,31 @@
     return true
   }
 
-  function getMessage (id) {
+  async function getMessage (id) {
     const chatFactory = WechatyBro.glue.chatFactory
-    if (!chatFactory) {
-      log('chatFactory not inited')
+    const confFactory = WechatyBro.glue.confFactory
+    const rootScope = WechatyBro.glue.rootScope
+    if (!chatFactory||!rootScope||!confFactory) {
+      log('chatFactory,rootScope or confFactory not inited')
       return null
     }
     const msg = chatFactory.getMsg(id)
 
     if (!msg) {
       return null
+    }
+
+    if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
+      await new Promise((resolve)=>{
+        if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
+          const unwatch=rootScope.$watch(()=>msg.MMStatus,()=>{
+            unwatch();
+            resolve();
+          });
+        }else{
+          resolve();
+        }
+      })
     }
 
     const msgWithoutFunction = {}
