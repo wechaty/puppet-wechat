@@ -1114,7 +1114,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
     await this.memory.save()
   }
 
-  private extToType (ext: string): WebMessageType {
+  extToType (ext: string): WebMessageType {
     switch (ext.toLowerCase()) {
       case 'bmp':
       case 'jpeg':
@@ -1227,7 +1227,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
   }
 
-  private getExtName (filename:string) {
+  getExtName (filename:string) {
     return path.extname(filename).slice(1)
   }
 

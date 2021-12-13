@@ -50,28 +50,10 @@ test('Send Attachment', async (t) => {
   const mockedResUploadMedia = {
     MediaId: 'MediaId',
   }
-  const getExtName = (filename: string) => {
-    return extname(filename).slice(1)
-  }
-  const extToType = (ext: string): WebMessageType => {
-    switch (ext.toLowerCase()) {
-      case 'bmp':
-      case 'jpeg':
-      case 'jpg':
-      case 'png':
-        return WebMessageType.IMAGE
-      case 'gif':
-        return WebMessageType.EMOTICON
-      case 'mp4':
-        return WebMessageType.VIDEO
-      default:
-        return WebMessageType.APP
-    }
-  }
   const mockSendMedia = async (msg: WebMessageMediaPayload) => {
     log.silly('TestMessage', 'mocked bridge.sendMedia(%o)', msg)
-    const ext = getExtName(msg.FileName)
-    const msgType = extToType(ext)
+    const ext = puppet.getExtName(msg.FileName)
+    const msgType = puppet.extToType(ext)
     t.match(msg.MMFileExt, /^\w+$/, 'MMFileExt should match /^\\w+$/')
     t.equal(msg.MsgType, msgType, `MsgType should be "${msgType}"`)
     t.equal(msg.MMFileExt, ext, `MMFileExt should be "${ext}"`)
@@ -125,9 +107,9 @@ test('Send Attachment', async (t) => {
           UploadType: number;
         }
         const name = formData.name
-        const ext = getExtName(name)
+        const ext = puppet.getExtName(name)
         let mediatype: string
-        switch (extToType(ext)) {
+        switch (puppet.extToType(ext)) {
           case WebMessageType.IMAGE:
             mediatype = 'pic'
             break
