@@ -53,7 +53,7 @@ test('Send Attachment', async (t) => {
   const mockSendMedia = async (msg: WebMessageMediaPayload) => {
     log.silly('TestMessage', 'mocked bridge.sendMedia(%o)', msg)
     const ext = puppet.getExtName(msg.FileName)
-    const msgType = puppet.extToType(ext)
+    const msgType = puppet.getMsgType(ext)
     t.match(msg.MMFileExt, /^\w+$/, 'MMFileExt should match /^\\w+$/')
     t.equal(msg.MsgType, msgType, `MsgType should be "${msgType}"`)
     t.equal(msg.MMFileExt, ext, `MMFileExt should be "${ext}"`)
@@ -109,7 +109,7 @@ test('Send Attachment', async (t) => {
         const name = formData.name
         const ext = puppet.getExtName(name)
         let mediatype: string
-        switch (puppet.extToType(ext)) {
+        switch (puppet.getMsgType(ext)) {
           case WebMessageType.IMAGE:
             mediatype = 'pic'
             break
