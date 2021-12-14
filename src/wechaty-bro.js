@@ -429,10 +429,6 @@
 
       const m = chatFactory.createMessage(d)
 
-      m.MMFileStatus = confFactory.MM_SEND_FILE_STATUS_SUCCESS
-      m.MMStatus = confFactory.MSG_SEND_STATUS_SENDING
-      m.sendByLocal = false
-      
       chatFactory.appendMessage(m)
       chatFactory.sendMessage(m)
     } catch (e) {
