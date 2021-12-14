@@ -75,6 +75,7 @@ import {
   WebMessageType,
   WebRoomRawMember,
   WebRoomRawPayload,
+  MsgSendStatus,
 }                           from './web-schemas.js'
 import { parseMentionIdList } from './pure-function-helpers/parse-mention-id-list.js'
 
@@ -1144,6 +1145,14 @@ export class PuppetWeChat extends PUPPET.Puppet {
     let url: undefined | string
 
     try {
+
+      if (rawPayload.MMStatus === MsgSendStatus.SENDING) {
+        throw new Error('message still sending')
+      }
+
+      if (rawPayload.MMStatus !== MsgSendStatus.SUCCESS) {
+        throw new Error('message was not sent successfully')
+      }
 
       switch (rawPayload.MsgType) {
         case WebMessageType.EMOTICON:
