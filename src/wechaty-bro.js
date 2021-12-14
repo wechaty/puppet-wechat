@@ -501,14 +501,12 @@
 
     if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
       await new Promise((resolve)=>{
-        if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
-          const unwatch=rootScope.$watch(()=>msg.MMStatus,()=>{
+        const unwatch=rootScope.$watch(()=>msg.MMStatus,()=>{
+          if(msg.MMStatus!=confFactory.MSG_SEND_STATUS_SENDING){
             unwatch();
             resolve();
-          });
-        }else{
-          resolve();
-        }
+          }
+        });
       })
     }
 
