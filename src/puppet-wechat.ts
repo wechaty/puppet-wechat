@@ -75,7 +75,6 @@ import {
   WebMessageType,
   WebRoomRawMember,
   WebRoomRawPayload,
-  MsgSendStatus,
 }                           from './web-schemas.js'
 import { parseMentionIdList } from './pure-function-helpers/parse-mention-id-list.js'
 
