@@ -1146,14 +1146,6 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
     try {
 
-      if (rawPayload.MMStatus === MsgSendStatus.SENDING) {
-        throw new Error('message still sending')
-      }
-
-      if (rawPayload.MMStatus !== MsgSendStatus.SUCCESS) {
-        throw new Error('message was not sent successfully')
-      }
-
       switch (rawPayload.MsgType) {
         case WebMessageType.EMOTICON:
           // type = PUPPET.types.Message.Emoticon
