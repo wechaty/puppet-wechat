@@ -341,6 +341,8 @@
       throw new Error('getMsgImg() contentChatScope not found')
     }
     const path = contentChatScope.getMsgImg(id, type, message)
+    if(!path)
+      return null
     return window.location.origin + path
     // https://wx.qq.com/?&lang=en_US/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=4520385745174034093&skey=%40crypt_f9cec94b_a3aa5c868466d81bc518293eb292926e
     // https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxgetmsgimg?&MsgID=8454987316459381112&skey=%40crypt_f9cec94b_bd210b2224f217afeab8d462af70cf53
@@ -359,6 +361,8 @@
       throw new Error('getMsgVideo() contentChatScope not found')
     }
     const path = contentChatScope.getMsgVideo(id)
+    if(!path)
+      return null
     return window.location.origin + path
   }
 
@@ -425,10 +429,6 @@
 
       const m = chatFactory.createMessage(d)
 
-      m.MMFileStatus = confFactory.MM_SEND_FILE_STATUS_SUCCESS
-      m.MMStatus = confFactory.MSG_SEND_STATUS_SENDING
-      m.sendByLocal = false
-      
       chatFactory.appendMessage(m)
       chatFactory.sendMessage(m)
     } catch (e) {
@@ -501,14 +501,12 @@
 
     if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
       await new Promise((resolve)=>{
-        if(msg.MMStatus==confFactory.MSG_SEND_STATUS_SENDING){
-          const unwatch=rootScope.$watch(()=>msg.MMStatus,()=>{
+        const unwatch=rootScope.$watch(()=>msg.MMStatus,()=>{
+          if(msg.MMStatus!=confFactory.MSG_SEND_STATUS_SENDING){
             unwatch();
             resolve();
-          });
-        }else{
-          resolve();
-        }
+          }
+        });
       })
     }
 
