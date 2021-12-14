@@ -1,6 +1,6 @@
 {
   "name": "wechaty-puppet-wechat",
-  "version": "1.10.4",
+  "version": "1.11.5",
   "description": "Puppet WeChat for Wechaty",
   "type": "module",
   "exports": {
@@ -60,13 +60,12 @@
     "@types/md5": "^2.3.1",
     "@types/mime": "^2.0.3",
     "@types/qr-image": "^3.2.4",
-    "@types/raven": "^2.5.4",
     "@types/request": "^2.48.7",
     "@types/xml2js": "^0.4.9",
     "why-is-node-running": "^2.2.0"
   },
   "peerDependencies": {
-    "wechaty-puppet": "^1.10.1"
+    "wechaty-puppet": "^1.11.12"
   },
   "homepage": "https://github.com/wechaty/puppet-wechat#readme",
   "dependencies": {

@@ -156,7 +156,22 @@ export enum WebAppMsgType {
   RED_ENVELOPES            = 2001,
   READER_TYPE              = 100001,
 }
-
+/**
+ * MsgSendStatus from webwx-app
+ *  @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L7520-L7524
+ *
+ *  //msg send status
+ *    MSG_SEND_STATUS_READY: 0
+ *    MSG_SEND_STATUS_SENDING: 1
+ *    MSG_SEND_STATUS_SUCC: 2
+ *    MSG_SEND_STATUS_FAIL: 5
+ */
+export enum MsgSendStatus{
+    READY=0,
+    SENDING=1,
+    SUCCESS=2,
+    FAIL=5,
+}
 export interface WebMessageRawPayload {
   MsgId:            string,
 
@@ -223,7 +238,7 @@ export interface WebMessageRawPayload {
    * Status-es
    */
   Status:           string,
-  MMStatus:         number,  // img ng-show="message.MMStatus == 1" class="ico_loading"
+  MMStatus:         MsgSendStatus,  // img ng-show="message.MMStatus == 1" class="ico_loading"
                              // ng-click="resendMsg(message)" ng-show="message.MMStatus == 5" title="重新发送"
   MMFileStatus:     number,  // <p class="loading" ng-show="message.MMStatus == 1 || message.MMFileStatus == CONF.MM_SEND_FILE_STATUS_FAIL">
                              // CONF.MM_SEND_FILE_STATUS_QUEUED, MM_SEND_FILE_STATUS_SENDING
@@ -271,7 +286,18 @@ export interface WebMessageRawPayload {
 
 }
 
-export const enum WebMediaType {
+/**
+ * UploadMediaType from webwx-app
+ *  @see https://github.com/wechaty/webwx-app-tracker/blob/a12c78fb8bd7186c0f3bb0e18dd611151e6b8aac/formatted/webwxApp.js#L7545-L7549
+ *
+ *  //upload media type
+ *    UPLOAD_MEDIA_TYPE_IMAGE: 1
+ *    UPLOAD_MEDIA_TYPE_VIDEO: 2
+ *    UPLOAD_MEDIA_TYPE_AUDIO: 3
+ *    UPLOAD_MEDIA_TYPE_ATTACHMENT: 4,
+ */
+export enum UploadMediaType {
+  Unknown    = 0,
   Image      = 1,
   Video      = 2,
   Audio      = 3,

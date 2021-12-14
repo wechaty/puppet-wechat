@@ -19,6 +19,7 @@
 import type {
   WatchdogFood,
 }                 from 'watchdog'
+import { GError } from 'gerror'
 
 import {
   log,
@@ -41,7 +42,6 @@ import {
 import {
   normalizeScanStatus,
 }                         from './pure-function-helpers/normalize-scan-status.js'
-import { GError } from 'wechaty-puppet/helper'
 
 export const Event = {
   onDing,

@@ -23,11 +23,20 @@ import { log } from '../src/config.js'
 
 import { PuppetWeChat } from '../src/puppet-wechat.js'
 import { WebMessageMediaPayload, WebMessageType } from '../src/web-schemas.js'
-import { FileBox } from 'wechaty-puppet/helper'
+import { FileBox } from 'file-box'
 import request from 'request'
-import { extname } from 'path'
 
-class PuppetTest extends PuppetWeChat {}
+class PuppetTest extends PuppetWeChat {
+
+  override getExtName (filename:string) {
+    return super.getExtName(filename)
+  }
+
+  override getMsgType (ext: string): WebMessageType {
+    return super.getMsgType(ext)
+  }
+
+}
 
 test('Send Attachment', async (t) => {
   const puppet = new PuppetTest()
@@ -50,31 +59,13 @@ test('Send Attachment', async (t) => {
   const mockedResUploadMedia = {
     MediaId: 'MediaId',
   }
-  const getExtName = (filename: string) => {
-    return extname(filename).slice(1)
-  }
-  const extToType = (ext: string): WebMessageType => {
-    switch (ext.toLowerCase()) {
-      case 'bmp':
-      case 'jpeg':
-      case 'jpg':
-      case 'png':
-        return WebMessageType.IMAGE
-      case 'gif':
-        return WebMessageType.EMOTICON
-      case 'mp4':
-        return WebMessageType.VIDEO
-      default:
-        return WebMessageType.APP
-    }
-  }
   const mockSendMedia = async (msg: WebMessageMediaPayload) => {
     log.silly('TestMessage', 'mocked bridge.sendMedia(%o)', msg)
-    const ext = getExtName(msg.FileName)
-    const msgType = extToType(ext)
-    t.match(msg.MMFileExt, /^\w+$/)
-    t.equal(msg.MsgType, msgType)
-    t.equal(msg.MMFileExt, ext)
+    const ext = puppet.getExtName(msg.FileName)
+    const msgType = puppet.getMsgType(ext)
+    t.match(msg.MMFileExt, /^\w+$/, 'MMFileExt should match /^\\w+$/')
+    t.equal(msg.MsgType, msgType, `MsgType should be "${msgType}"`)
+    t.equal(msg.MMFileExt, ext, `MMFileExt should be "${ext}"`)
     return true
   }
   const mockPostRequest = (
@@ -96,7 +87,6 @@ test('Send Attachment', async (t) => {
         path = options.uri
       }
     }
-    t.not(path, null)
     if (path && callback) {
       if (path.includes(uploadMediaUrl)) {
         log.silly(
@@ -126,9 +116,9 @@ test('Send Attachment', async (t) => {
           UploadType: number;
         }
         const name = formData.name
-        const ext = getExtName(name)
+        const ext = puppet.getExtName(name)
         let mediatype: string
-        switch (extToType(ext)) {
+        switch (puppet.getMsgType(ext)) {
           case WebMessageType.IMAGE:
             mediatype = 'pic'
             break
@@ -138,9 +128,9 @@ test('Send Attachment', async (t) => {
           default:
             mediatype = 'doc'
         }
-        t.equal(formData.mediatype, mediatype)
-        t.equal(uploadmediarequest.MediaType, 4)
-        t.equal(uploadmediarequest.UploadType, 2)
+        t.equal(formData.mediatype, mediatype, `mediatype should be "${mediatype}"`)
+        t.equal(uploadmediarequest.MediaType, 4, 'MediaType should be 4')
+        t.equal(uploadmediarequest.UploadType, 2, 'UploadType should be 2')
 
         callback(null, {} as any, mockedResUploadMedia)
       } else if (path.includes(checkUploadUrl)) {
@@ -156,6 +146,7 @@ test('Send Attachment', async (t) => {
 
   await Promise.all(
     [
+      'gif',
       'png',
       'jpg',
       'jpeg',
