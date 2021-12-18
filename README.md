@@ -33,13 +33,13 @@ Cause `storage.googleapis.com` is blocked in mainland china, you'd better config
 ### 1. Linux & Mac
 
 ```shell
-PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-wechat
+PUPPETEER_DOWNLOAD_HOST=https://registry.npmmirror.com/mirrors npm install wechaty-puppet-wechat
 ```
 
 ### 2. Windows
 
 ```shell
-SET PUPPETEER_DOWNLOAD_HOST=https://npm.taobao.org/mirrors npm install wechaty-puppet-wechat
+SET PUPPETEER_DOWNLOAD_HOST=https://registry.npmmirror.com/mirrors npm install wechaty-puppet-wechat
 ```
 
 Learn more from <https://github.com/GoogleChrome/puppeteer/issues/1597#issuecomment-351945645>
