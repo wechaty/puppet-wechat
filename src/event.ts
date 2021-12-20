@@ -121,9 +121,7 @@ async function onLogin (
   const TTL_WAIT_MILLISECONDS = 1 * 1000
   if (ttl <= 0) {
     log.verbose('PuppetWeChatEvent', 'onLogin(%s) TTL expired')
-    this.emit('error', {
-      gerror: GError.from('onLogin() TTL expired.').toJSON(),
-    })
+    this.emit('error', GError.from('onLogin() TTL expired.'))
     return
   }
 
@@ -240,7 +238,7 @@ async function onUnload (this: PuppetWeChat): Promise<void> {
     await this.init()
   } catch (e) {
     log.error('PuppetWeChatEvent', 'onUnload() exception: %s', e as Error)
-    this.emit('error', GError.from(e))
+    this.emit('error', e)
     throw e
   }
   */

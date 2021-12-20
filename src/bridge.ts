@@ -77,7 +77,7 @@ export class Bridge extends EventEmitter {
   private page    : undefined | puppeteer.Page
   private state   : StateSwitch
 
-  private wrapAsync = wrapAsyncError(e => this.emit('error', GError.from(e)))
+  private wrapAsync = wrapAsyncError(e => this.emit('error', e))
 
   constructor (
     public options: BridgeOptions,
@@ -119,7 +119,7 @@ export class Bridge extends EventEmitter {
         log.error('PuppetWeChatBridge', 'start() exception %s, close page/browser exception %s', e, e2)
       }
 
-      this.emit('error', GError.from(e))
+      this.emit('error', e)
       throw e
     }
   }
@@ -174,8 +174,11 @@ export class Bridge extends EventEmitter {
   }
 
   public async onDialog (dialog: puppeteer.Dialog) {
-    log.warn('PuppetWeChatBridge', 'onDialog() page.on(dialog) type:%s message:%s',
-      dialog.type, dialog.message())
+    log.warn('PuppetWeChatBridge',
+      'onDialog() page.on(dialog) type:%s message:%s',
+      dialog.type, dialog.message(),
+    )
+
     try {
       // XXX: Which ONE is better?
       await dialog.accept()
@@ -215,7 +218,7 @@ export class Bridge extends EventEmitter {
     } catch (e) {
       log.error('PuppetWeChatBridge', 'onLoad() exception: %s', e as Error)
       await page.close()
-      this.emit('error', GError.from(e))
+      this.emit('error', e)
     }
   }
 
@@ -232,7 +235,7 @@ export class Bridge extends EventEmitter {
      */
     await this.uosPatch(page)
 
-    page.on('error',  e => this.emit('error', GError.from(e)))
+    page.on('error',  e => this.emit('error', e))
     page.on('dialog', this.wrapAsync(this.onDialog.bind(this)))
 
     const cookieList = (
@@ -818,7 +821,7 @@ export class Bridge extends EventEmitter {
       })
       .catch(e => {
         log.error('PuppetWeChatBridge', 'ding(%s) exception: %s', data, (e as Error).message)
-        this.emit('error', GError.from(e))
+        this.emit('error', e)
       })
   }
 
@@ -1006,7 +1009,7 @@ export class Bridge extends EventEmitter {
       return hostname
     } catch (e) {
       log.error('PuppetWeChatBridge', 'hostname() exception: %s', e as Error)
-      this.emit('error', GError.from(e))
+      this.emit('error', e)
       return null
     }
   }
@@ -1024,7 +1027,7 @@ export class Bridge extends EventEmitter {
         await this.page.setCookie(...cookieList)
       } catch (e) {
         log.error('PuppetWeChatBridge', 'cookies(%s) reject: %s', cookieList, e as Error)
-        this.emit('error', GError.from(e))
+        this.emit('error', e)
       }
       // RETURN
     } else {
@@ -1098,7 +1101,7 @@ export class Bridge extends EventEmitter {
       return await this.page.evaluate(fn, ...args)
     } catch (e) {
       log.error('PuppetWeChatBridge', 'evaluate() exception: %s', e as Error)
-      this.emit('error', GError.from(e))
+      this.emit('error', e)
       return null
     }
   }
