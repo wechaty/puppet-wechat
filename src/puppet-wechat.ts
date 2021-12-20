@@ -43,8 +43,6 @@ import {
 }                           from 'file-box'
 
 import {
-  envStealthless,
-  envHead,
   MEMORY_SLOT,
   qrCodeForChatie,
   VERSION,
@@ -65,6 +63,7 @@ import {
 import {
   Event,
 }                           from './event.js'
+import * as envVars         from './env-vars.js'
 
 import {
   WebAppMsgType,
@@ -75,7 +74,7 @@ import {
   WebMessageType,
   WebRoomRawMember,
   WebRoomRawPayload,
-}                           from './web-schemas.js'
+}                             from './web-schemas.js'
 import { parseMentionIdList } from './pure-function-helpers/parse-mention-id-list.js'
 
 export type ScanFoodType   = 'scan' | 'login' | 'logout'
@@ -104,12 +103,12 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
     this.fileId = 0
     this.bridge = new Bridge({
-      endpoint      : options.endpoint || process.env['WECHATY_PUPPET_PUPPETEER_ENDPOINT'],
-      extspam       : options.token || process.env['WECHATY_PUPPET_WECHAT_TOKEN'],
-      head          : typeof options.head === 'boolean' ? options['head'] : envHead(),
+      endpoint      : envVars.WECHATY_PUPPET_WECHAT_ENDPOINT(options.endpoint),
+      extspam       : envVars.WECHATY_PUPPET_WECHAT_TOKEN(options.token),
+      head          : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_HEAD(options.head),
       launchOptions : options.launchOptions,
       memory        : this.memory,
-      stealthless   : typeof options.stealthless === 'boolean' ? options.stealthless : envStealthless(),
+      stealthless   : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_STEALTHLESS(options.stealthless),
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
