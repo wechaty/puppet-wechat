@@ -66,7 +66,8 @@ export interface BridgeOptions {
   launchOptions?  : puppeteer.LaunchOptions,
   memory          : MemoryCard,
   stealthless?    : boolean,
-  extspam?        : string
+  extspam?        : string,
+  uos?           : boolean
 }
 
 export type Cookie = puppeteer.Protocol.Network.Cookie
@@ -233,7 +234,9 @@ export class Bridge extends EventEmitter {
      * Can we support UOS with puppeteer? #127
      *  https://github.com/wechaty/wechaty-puppet-wechat/issues/127
      */
-    await this.uosPatch(page)
+    if (this.options.uos) {
+      await this.uosPatch(page)
+    }
 
     page.on('error',  e => this.emit('error', e))
     page.on('dialog', this.wrapAsync(this.onDialog.bind(this)))

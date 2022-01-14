@@ -38,9 +38,17 @@ const WECHATY_PUPPET_WECHAT_TOKEN = (value?: string): undefined | string => {
   return process.env['WECHATY_PUPPET_WECHAT_TOKEN']
 }
 
+const WECHATY_PUPPET_WECHAT_UOS = (value?: boolean): boolean => {
+  if (typeof value !== 'undefined') {
+    return value
+  }
+  return String(process.env['WECHATY_PUPPET_WECHAT_UOS']) === '1'
+}
+
 export {
   WECHATY_PUPPET_WECHAT_PUPPETEER_HEAD,
   WECHATY_PUPPET_WECHAT_PUPPETEER_STEALTHLESS,
   WECHATY_PUPPET_WECHAT_ENDPOINT,
   WECHATY_PUPPET_WECHAT_TOKEN,
+  WECHATY_PUPPET_WECHAT_UOS,
 }
