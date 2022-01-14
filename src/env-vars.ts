@@ -42,7 +42,7 @@ const WECHATY_PUPPET_WECHAT_UOS = (value?: boolean): boolean => {
   if (typeof value !== 'undefined') {
     return value
   }
-  return String(process.env['WECHATY_PUPPET_WECHAT_UOS']) === '1'
+  return /^(true|1)$/i.test(String(process.env['WECHATY_PUPPET_WECHAT_UOS']))
 }
 
 export {
