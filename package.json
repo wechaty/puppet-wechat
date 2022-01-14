@@ -80,7 +80,7 @@
     "request": "^2.88.2",
     "rx-queue": "^0.12.6",
     "rxjs": "^7.4.0",
-    "state-switch": "^1.6.1",
+    "state-switch": "^1.6.3",
     "watchdog": "^0.8.17",
     "xml2js": "^0.4.23"
   },
