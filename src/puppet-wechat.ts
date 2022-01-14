@@ -328,14 +328,12 @@ export class PuppetWeChat extends PUPPET.Puppet {
   private async messageRawPayloadToFile (
     rawPayload: WebMessageRawPayload,
   ): Promise<FileBoxInterface> {
-    let url = await this.messageRawPayloadToUrl(rawPayload)
+    const url = await this.messageRawPayloadToUrl(rawPayload)
 
     if (!url) {
       throw new Error('no url for type ' + PUPPET.types.Message[rawPayload.MsgType])
     }
 
-    // use http instead of https, because https will only success on the very first request!
-    url = url.replace(/^https/i, 'http')
     const parsedUrl = new nodeUrl.URL(url)
 
     const msgFileName = messageFilename(rawPayload)
