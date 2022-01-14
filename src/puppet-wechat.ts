@@ -153,7 +153,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
   }
 
   override async onStop (): Promise<void> {
-    log.verbose('PuppetWeChat', 'onSsop()')
+    log.verbose('PuppetWeChat', 'onStop()')
 
     /**
      * Clean listeners for `watchdog`
