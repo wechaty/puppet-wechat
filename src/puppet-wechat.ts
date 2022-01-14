@@ -19,7 +19,6 @@
 import path    from 'path'
 import nodeUrl from 'url'
 
-import BufferList from 'bl'
 import md5        from 'md5'
 import mime       from 'mime'
 import request    from 'request'
@@ -1252,13 +1251,15 @@ export class PuppetWeChat extends PUPPET.Puppet {
         mediatype = 'doc'
     }
 
-    const buffer = await new Promise<Buffer>((resolve, reject) => {
-      const bl = new BufferList((err: undefined | Error, data: Buffer) => {
-        if (err) reject(err)
-        else resolve(data)
-      })
-      file.pipe(bl)
-    })
+    // const buffer = await new Promise<Buffer>((resolve, reject) => {
+    //   const bl = new BufferList((err: undefined | Error, data: Buffer) => {
+    //     if (err) reject(err)
+    //     else resolve(data)
+    //   })
+    //   file.pipe(bl)
+    // })
+    // Huan(202201): fix bl not a standard Writable problem
+    const buffer = await file.toBuffer()
 
     // Sending video files is not allowed to exceed 20MB
     // https://github.com/Chatie/webwx-app-tracker/blob/
