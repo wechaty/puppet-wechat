@@ -85,6 +85,7 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 | head          | boolean |     false     | puppeteerlaunchoptions.headless                                                                                             |
 | launchOptions | object  |       -       | same to [puppeteerlaunchoptions](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions) |
 | stealthless   | boolean |     false     | disabled [puppeteer-extra-plugin-stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) or not              |
+| uos           | boolean |     false     | enable [UOS patch](https://github.com/wechaty/puppet-wechat/issues/127) or not                                              |
 
 ## HISTORY
 
