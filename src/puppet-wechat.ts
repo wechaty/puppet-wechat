@@ -153,7 +153,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
   }
 
   override async onStop (): Promise<void> {
-    log.verbose('PuppetWeChat', 'onSsop()')
+    log.verbose('PuppetWeChat', 'onStop()')
 
     /**
      * Clean listeners for `watchdog`
@@ -1098,6 +1098,10 @@ export class PuppetWeChat extends PUPPET.Puppet {
   }
 
   async saveCookie (): Promise<void> {
+    if (this.state.inactive() === true) {
+      log.warn('PuppetWeChat', 'saveCookie() found state inactive, skipped.')
+      return
+    }
     const cookieList = await this.bridge.cookies()
     await this.memory.set(MEMORY_SLOT, cookieList)
     await this.memory.save()
