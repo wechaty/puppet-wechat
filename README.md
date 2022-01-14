@@ -80,11 +80,12 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 | Option        |  value  | default value | description                                                                                                                 |
 | ------------- | :-----: | :-----------: | :-------------------------------------------------------------------------------------------------------------------------- |
-| token         | string  |       -       | your own extspam value, see [#127](https://github.com/wechaty/wechaty-puppet-wechat/issues/127)                             |
+| token         | string  |       -       | your own uos extspam value, see [#127](https://github.com/wechaty/wechaty-puppet-wechat/issues/127)                         |
 | endpoint      | string  |       -       | puppeteerlaunchoptions.executablePath                                                                                       |
 | head          | boolean |     false     | puppeteerlaunchoptions.headless                                                                                             |
 | launchOptions | object  |       -       | same to [puppeteerlaunchoptions](https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions) |
 | stealthless   | boolean |     false     | disabled [puppeteer-extra-plugin-stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) or not              |
+| uos           | boolean |     false     | enable [UOS patch](https://github.com/wechaty/puppet-wechat/issues/127) or not                                              |
 
 ## HISTORY
 
