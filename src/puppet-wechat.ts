@@ -109,7 +109,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
       launchOptions : options.launchOptions,
       memory        : this.memory,
       stealthless   : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_STEALTHLESS(options.stealthless),
-      uos           : envVars.WECHATY_PUPPET_WECHAT_UOS(options.uos),
+      uos           : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_UOS(options.uos),
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
