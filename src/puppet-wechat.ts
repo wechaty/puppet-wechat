@@ -104,12 +104,12 @@ export class PuppetWeChat extends PUPPET.Puppet {
     this.fileId = 0
     this.bridge = new Bridge({
       endpoint      : envVars.WECHATY_PUPPET_WECHAT_ENDPOINT(options.endpoint),
-      extspam       : envVars.WECHATY_PUPPET_WECHAT_TOKEN(options.token),
       head          : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_HEAD(options.head),
       launchOptions : options.launchOptions,
       memory        : this.memory,
       stealthless   : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_STEALTHLESS(options.stealthless),
       uos           : envVars.WECHATY_PUPPET_WECHAT_PUPPETEER_UOS(options.uos),
+      uosExtSpam    : envVars.WECHATY_PUPPET_WECHAT_TOKEN(options.token),
     })
 
     const SCAN_TIMEOUT  = 2 * 60 * 1000 // 2 minutes
