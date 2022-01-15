@@ -1048,7 +1048,7 @@ export class Bridge extends EventEmitter {
     /**
      * `?target=t` is from https://github.com/wechaty/wechaty-puppet-wechat/pull/129
      */
-    const DEFAULT_URL = 'https://wx.qq.com?target=t'
+    const DEFAULT_URL = 'https://wx.qq.com'
 
     if (!cookieList || cookieList.length === 0) {
       log.silly('PuppetWeChatBridge', 'cookieDomain() no cookie, return default %s', DEFAULT_URL)
@@ -1080,7 +1080,7 @@ export class Bridge extends EventEmitter {
     }
     log.silly('PuppetWeChatBridge', 'cookieDomain() got %s', url)
 
-    return url + '?target=t'
+    return url
   }
 
   public async reload (): Promise<void> {
