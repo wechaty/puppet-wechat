@@ -612,7 +612,7 @@ export class PuppetWeChat extends PUPPET.Puppet {
 
     try {
       const hostname = await this.hostname()
-      const avatarUrl = `http://${hostname}${payload.avatar}&type=big` // add '&type=big' to get big image
+      const avatarUrl = `https://${hostname}${payload.avatar}&type=big` // add '&type=big' to get big image
       const cookieList = await this.cookies()
       log.silly('PuppeteerContact', 'avatar() url: %s', avatarUrl)
 
