@@ -89,7 +89,11 @@ We use [stealth](https://www.npmjs.com/package/puppeteer-extra-plugin-stealth) t
 
 ## HISTORY
 
-### master v1.0 (Oct 30, 2021)
+### master v1.12 (Mar 11, 2022)
+
+Release stable for the standard Web Protocol
+
+### v1.0 (Oct 30, 2021)
 
 Release 1.0 of Wechaty Puppet for WeChat
 
