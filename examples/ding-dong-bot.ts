@@ -112,7 +112,7 @@ async function onMessage (payload: PUPPET.payloads.EventMessage) {
   if (messagePayload.type === PUPPET.types.Message.Text
     && /^ding$/i.test(messagePayload.text || '')
   ) {
-    const conversationId = messagePayload.roomId || messagePayload.fromId
+    const conversationId = messagePayload.roomId || messagePayload.listenerId
 
     if (!conversationId) {
       throw new Error('no conversation id')

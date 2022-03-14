@@ -79,11 +79,11 @@ test('constructor()', async t => {
   const sandbox = sinon.createSandbox()
   const mockMessagePayload = async (/* _: string */) => {
     const payload: PUPPET.payloads.Message = {
-      fromId        : EXPECTED.from,
       id            : EXPECTED.id,
+      listenerId    : 'listenerId',
       mentionIdList : [],
+      talkerId      : EXPECTED.from,
       timestamp     : Date.now(),
-      toId          : 'toId',
       type          : PUPPET.types.Message.Text,
     }
     return payload
@@ -102,8 +102,8 @@ test('constructor()', async t => {
 
   const msgPayload = await puppet.messagePayload(rawPayload.MsgId)
 
-  t.equal(msgPayload.id,     EXPECTED.id,    'id right')
-  t.equal(msgPayload.fromId, EXPECTED.from,  'from right')
+  t.equal(msgPayload.id,        EXPECTED.id,    'id right')
+  t.equal(msgPayload.talkerId,  EXPECTED.from,  'talkerId right')
 
   sandbox.restore()
 })
@@ -174,19 +174,19 @@ test('ready()', async t => {
 
   t.equal(msgPayload.id, expectedMsgId, 'id/MsgId right')
 
-  const fromId = msgPayload.fromId
-  const toId   = msgPayload.toId
+  const talkerId    = msgPayload.talkerId
+  const listenerId  = msgPayload.listenerId
 
-  if (!fromId || !toId) {
-    throw new Error('no fc or no tc')
+  if (!talkerId || !listenerId) {
+    throw new Error('no talker or no listener')
   }
 
-  const fromContactPayload = await puppet.contactPayload(fromId)
-  const toContactPayload   = await puppet.contactPayload(toId)
+  const fromContactPayload = await puppet.contactPayload(talkerId)
+  const toContactPayload   = await puppet.contactPayload(listenerId)
 
-  t.equal(fromId,                  expectedFromUserName, 'contact ready for FromUserName')
+  t.equal(talkerId,                expectedFromUserName, 'contact ready for FromUserName')
   t.equal(fromContactPayload.name, expectedFromNickName, 'contact ready for FromNickName')
-  t.equal(toId,                    expectedToUserName,   'contact ready for ToUserName')
+  t.equal(listenerId,              expectedToUserName,   'contact ready for ToUserName')
   t.equal(toContactPayload.name,   expectedToNickName,   'contact ready for ToNickName')
 
   sandbox.restore()

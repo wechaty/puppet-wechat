@@ -19,13 +19,13 @@ export function messageRawPayloadParser (
   rawPayload: WebMessageRawPayload,
 ): PUPPET.payloads.Message {
   const id                           = rawPayload.MsgId
-  const fromId                       = rawPayload.MMActualSender               // MMPeerUserName
+  const talkerId                     = rawPayload.MMActualSender               // MMPeerUserName
   const text: string                 = rawPayload.MMActualContent              // Content has @id prefix added by wx
   const timestamp: number            = rawPayload.MMDisplayTime                // Javascript timestamp of milliseconds
   const msgFileName: undefined | string = messageFilename(rawPayload) || undefined
 
-  let roomId : undefined | string
-  let toId   : undefined | string
+  let roomId      : undefined | string
+  let listenerId  : undefined | string
 
   // FIXME: has there any better method to know the room ID?
   if (rawPayload.MMIsChatRoom) {
@@ -45,7 +45,7 @@ export function messageRawPayloadParser (
   if (rawPayload.ToUserName) {
     if (!isRoomId(rawPayload.ToUserName)) {
       // if a message in room without any specific receiver, then it will set to be `undefined`
-      toId = rawPayload.ToUserName
+      listenerId = rawPayload.ToUserName
     }
   }
 
@@ -53,9 +53,9 @@ export function messageRawPayloadParser (
 
   const payloadBase = {
     filename: msgFileName,
-    fromId,
     id,
     mentionIdList: [],
+    talkerId,
     text,
     timestamp,
     type,
@@ -63,20 +63,20 @@ export function messageRawPayloadParser (
 
   let payload: PUPPET.payloads.Message
 
-  if (toId) {
+  if (listenerId) {
     payload = {
       ...payloadBase,
+      listenerId,
       roomId,
-      toId,
     }
   } else if (roomId) {
     payload = {
       ...payloadBase,
+      listenerId,
       roomId,
-      toId,
     }
   } else {
-    throw new Error('neither roomId nor toId')
+    throw new Error('neither roomId nor listenerId')
   }
 
   return payload
