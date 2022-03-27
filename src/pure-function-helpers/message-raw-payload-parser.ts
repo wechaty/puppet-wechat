@@ -24,8 +24,8 @@ export function messageRawPayloadParser (
   const timestamp: number            = rawPayload.MMDisplayTime                // Javascript timestamp of milliseconds
   const msgFileName: undefined | string = messageFilename(rawPayload) || undefined
 
-  let roomId      : undefined | string
-  let listenerId  : undefined | string
+  let roomId     : undefined | string
+  let listenerId : undefined | string
 
   // FIXME: has there any better method to know the room ID?
   if (rawPayload.MMIsChatRoom) {
