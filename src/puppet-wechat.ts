@@ -35,10 +35,8 @@ import {
 }                           from 'watchdog'
 import * as PUPPET          from 'wechaty-puppet'
 import { log }              from 'wechaty-puppet'
-import {
-  FileBox,
-  type FileBoxInterface,
-}                           from 'file-box'
+import type { FileBoxInterface } from 'file-box'
+import { FileBox }          from 'file-box'
 
 import {
   MEMORY_SLOT,
@@ -82,6 +80,7 @@ type PuppetWeChatOptions = PUPPET.PuppetOptions & {
   launchOptions? : LaunchOptions
   stealthless?   : boolean
   uos?           : boolean
+  token?           : string
 }
 
 export class PuppetWeChat extends PUPPET.Puppet {
