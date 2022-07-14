@@ -56,6 +56,7 @@ const ROOM_EXPECTED = {
 }
 
 test('Room smoke testing', async t => {
+  const MOCK_USER_ID = 'TEST-USER-ID'
 
   // Mock
   const mockContactRoomRawPayload = (id: string) => {
@@ -80,7 +81,7 @@ test('Room smoke testing', async t => {
   sandbox.stub(puppet, 'roomRawPayload').callsFake(mockContactRoomRawPayload)
 
   sandbox.stub(puppet, 'id').value('pretend-to-be-logined')
-
+  await puppet.login(MOCK_USER_ID)
   const roomPayload = await puppet.roomPayload(ROOM_EXPECTED.id)
 
   t.equal(roomPayload.id, ROOM_EXPECTED.id, 'should set id/UserName right')

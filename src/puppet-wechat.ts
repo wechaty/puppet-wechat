@@ -1482,9 +1482,9 @@ export class PuppetWeChat extends PUPPET.Puppet {
     )
 
     let mediaData: WebMessageMediaPayload
-    let rawPayload = {} as undefined | WebMessageRawPayload
+    let rawPayload = {} as WebMessageRawPayload
 
-    if (!rawPayload || !rawPayload.MediaId) {
+    if (!rawPayload.MediaId) {
       try {
         mediaData = await this.uploadMedia(file, conversationId)
         rawPayload = Object.assign(rawPayload, mediaData)
