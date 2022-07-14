@@ -80,7 +80,6 @@ type PuppetWeChatOptions = PUPPET.PuppetOptions & {
   launchOptions? : LaunchOptions
   stealthless?   : boolean
   uos?           : boolean
-  token?           : string
 }
 
 export class PuppetWeChat extends PUPPET.Puppet {
