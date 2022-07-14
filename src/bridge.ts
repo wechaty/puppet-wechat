@@ -237,7 +237,6 @@ export class Bridge extends EventEmitter {
     if (this.options.uos) {
       await this.uosPatch(page)
     }
-
     page.on('error',  e => this.emit('error', e))
     page.on('dialog', this.wrapAsync(this.onDialog.bind(this)))
 
@@ -245,9 +244,13 @@ export class Bridge extends EventEmitter {
       await this.options.memory.get(MEMORY_SLOT)
     ) || [] as puppeteer.Protocol.Network.Cookie[]
 
-    const url = this.entryUrl(cookieList)
+    let url = this.entryUrl(cookieList)
+    if (this.options.uos) {
+      url = url + '?lang=zh_CN&target=t'
+    }
     log.verbose('PuppetWeChatBridge', 'initPage() before page.goto(url)')
-
+    // set timeout 60000 ms，30000ms always timeout
+    page.setDefaultTimeout(60000)
     // Does this related to(?) the CI Error: exception: Navigation Timeout Exceeded: 30000ms exceeded
     await page.goto(url)
     log.verbose('PuppetWeChatBridge', 'initPage() after page.goto(url)')
@@ -274,7 +277,7 @@ export class Bridge extends EventEmitter {
      * Credit: @luvletter2333 https://github.com/luvletter2333
      */
     const UOS_PATCH_CLIENT_VERSION = '2.0.0'
-    const UOS_PATCH_EXTSPAM = this.options.uosExtSpam ?? 'Gp8ICJkIEpkICggwMDAwMDAwMRAGGoAI1GiJSIpeO1RZTq9QBKsRbPJdi84ropi16EYI10WB6g74sGmRwSNXjPQnYUKYotKkvLGpshucCaeWZMOylnc6o2AgDX9grhQQx7fm2DJRTyuNhUlwmEoWhjoG3F0ySAWUsEbH3bJMsEBwoB//0qmFJob74ffdaslqL+IrSy7LJ76/G5TkvNC+J0VQkpH1u3iJJs0uUYyLDzdBIQ6Ogd8LDQ3VKnJLm4g/uDLe+G7zzzkOPzCjXL+70naaQ9medzqmh+/SmaQ6uFWLDQLcRln++wBwoEibNpG4uOJvqXy+ql50DjlNchSuqLmeadFoo9/mDT0q3G7o/80P15ostktjb7h9bfNc+nZVSnUEJXbCjTeqS5UYuxn+HTS5nZsPVxJA2O5GdKCYK4x8lTTKShRstqPfbQpplfllx2fwXcSljuYi3YipPyS3GCAqf5A7aYYwJ7AvGqUiR2SsVQ9Nbp8MGHET1GxhifC692APj6SJxZD3i1drSYZPMMsS9rKAJTGz2FEupohtpf2tgXm6c16nDk/cw+C7K7me5j5PLHv55DFCS84b06AytZPdkFZLj7FHOkcFGJXitHkX5cgww7vuf6F3p0yM/W73SoXTx6GX4G6Hg2rYx3O/9VU2Uq8lvURB4qIbD9XQpzmyiFMaytMnqxcZJcoXCtfkTJ6pI7a92JpRUvdSitg967VUDUAQnCXCM/m0snRkR9LtoXAO1FUGpwlp1EfIdCZFPKNnXMeqev0j9W9ZrkEs9ZWcUEexSj5z+dKYQBhIICviYUQHVqBTZSNy22PlUIeDeIs11j7q4t8rD8LPvzAKWVqXE+5lS1JPZkjg4y5hfX1Dod3t96clFfwsvDP6xBSe1NBcoKbkyGxYK0UvPGtKQEE0Se2zAymYDv41klYE9s+rxp8e94/H8XhrL9oGm8KWb2RmYnAE7ry9gd6e8ZuBRIsISlJAE/e8y8xFmP031S6Lnaet6YXPsFpuFsdQs535IjcFd75hh6DNMBYhSfjv456cvhsb99+fRw/KVZLC3yzNSCbLSyo9d9BI45Plma6V8akURQA/qsaAzU0VyTIqZJkPDTzhuCl92vD2AD/QOhx6iwRSVPAxcRFZcWjgc2wCKh+uCYkTVbNQpB9B90YlNmI3fWTuUOUjwOzQRxJZj11NsimjOJ50qQwTTFj6qQvQ1a/I+MkTx5UO+yNHl718JWcR3AXGmv/aa9rD1eNP8ioTGlOZwPgmr2sor2iBpKTOrB83QgZXP+xRYkb4zVC+LoAXEoIa1+zArywlgREer7DLePukkU6wHTkuSaF+ge5Of1bXuU4i938WJHj0t3D8uQxkJvoFi/EYN/7u2P1zGRLV4dHVUsZMGCCtnO6BBigFMAA='
+    const UOS_PATCH_EXTSPAM = this.options.uosExtSpam ?? 'Go8FCIkFEokFCggwMDAwMDAwMRAGGvAESySibk50w5Wb3uTl2c2h64jVVrV7gNs06GFlWplHQbY/5FfiO++1yH4ykCyNPWKXmco+wfQzK5R98D3so7rJ5LmGFvBLjGceleySrc3SOf2Pc1gVehzJgODeS0lDL3/I/0S2SSE98YgKleq6Uqx6ndTy9yaL9qFxJL7eiA/R3SEfTaW1SBoSITIu+EEkXff+Pv8NHOk7N57rcGk1w0ZzRrQDkXTOXFN2iHYIzAAZPIOY45Lsh+A4slpgnDiaOvRtlQYCt97nmPLuTipOJ8Qc5pM7ZsOsAPPrCQL7nK0I7aPrFDF0q4ziUUKettzW8MrAaiVfmbD1/VkmLNVqqZVvBCtRblXb5FHmtS8FxnqCzYP4WFvz3T0TcrOqwLX1M/DQvcHaGGw0B0y4bZMs7lVScGBFxMj3vbFi2SRKbKhaitxHfYHAOAa0X7/MSS0RNAjdwoyGHeOepXOKY+h3iHeqCvgOH6LOifdHf/1aaZNwSkGotYnYScW8Yx63LnSwba7+hESrtPa/huRmB9KWvMCKbDThL/nne14hnL277EDCSocPu3rOSYjuB9gKSOdVmWsj9Dxb/iZIe+S6AiG29Esm+/eUacSba0k8wn5HhHg9d4tIcixrxveflc8vi2/wNQGVFNsGO6tB5WF0xf/plngOvQ1/ivGV/C1Qpdhzznh0ExAVJ6dwzNg7qIEBaw+BzTJTUuRcPk92Sn6QDn2Pu3mpONaEumacjW4w6ipPnPw+g2TfywJjeEcpSZaP4Q3YV5HG8D6UjWA4GSkBKculWpdCMadx0usMomsSS/74QgpYqcPkmamB4nVv1JxczYITIqItIKjD35IGKAUwAA=='
 
     const uosHeaders = {
       'client-version' : UOS_PATCH_CLIENT_VERSION,
@@ -282,18 +285,9 @@ export class Bridge extends EventEmitter {
     }
     // add RequestInterception
     await page.setRequestInterception(true)
-    page.on('request', req => {
+    page.on('request', (req) => {
       const url = new URL(req.url())
-      if (url.pathname === '/' && url.search.indexOf('target=t') === -1) {
-        if (url.search === '' || url.search === '?') {
-          url.search = '?'
-        } else {
-          url.search += '&'
-        }
-        url.search += 'target=t'
-        this.wrapAsync(req.continue({ url: url.toString() }))
-
-      } else if (url.pathname === '/cgi-bin/mmwebwx-bin/webwxnewloginpage') {
+      if (url.pathname === '/cgi-bin/mmwebwx-bin/webwxnewloginpage') {
         const override = {
           headers: {
             ...req.headers(),
@@ -301,7 +295,6 @@ export class Bridge extends EventEmitter {
           },
         }
         this.wrapAsync(req.continue(override))
-
       } else {
         this.wrapAsync(req.continue())
       }

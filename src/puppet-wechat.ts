@@ -35,10 +35,8 @@ import {
 }                           from 'watchdog'
 import * as PUPPET          from 'wechaty-puppet'
 import { log }              from 'wechaty-puppet'
-import {
-  FileBox,
-  type FileBoxInterface,
-}                           from 'file-box'
+import type { FileBoxInterface } from 'file-box'
+import { FileBox }          from 'file-box'
 
 import {
   MEMORY_SLOT,
@@ -1484,9 +1482,9 @@ export class PuppetWeChat extends PUPPET.Puppet {
     )
 
     let mediaData: WebMessageMediaPayload
-    let rawPayload = {} as undefined | WebMessageRawPayload
+    let rawPayload = {} as WebMessageRawPayload
 
-    if (!rawPayload || !rawPayload.MediaId) {
+    if (!rawPayload.MediaId) {
       try {
         mediaData = await this.uploadMedia(file, conversationId)
         rawPayload = Object.assign(rawPayload, mediaData)
